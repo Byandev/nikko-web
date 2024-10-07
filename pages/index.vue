@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-const welcomeMessage = ref('Welcome to Conkard!');
+const welcomeMessage = ref('Welcome to Nikko Industries!');
 
 definePageMeta({
   auth: {
