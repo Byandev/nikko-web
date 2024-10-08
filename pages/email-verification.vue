@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import { useFetchData } from '~/composables/useFetchData';
-import { Icon } from '@iconify/vue';
+import { useSubmit } from '~/composables/useSubmit';
 import type { User as UserResponse } from '~/types/models/User';
 import type { VerificationResponse } from "~/types/api/response/verfication";
 import type { ApiErrorResponse } from '~/types/api/response/error';
@@ -15,9 +14,8 @@ const countdown = ref(60);
 let timer: ReturnType<typeof setInterval> | null = null;
 
 const { data: currentUser, fetchData: fetchCurrentUser } = useFetchData<{ data: UserResponse }, ApiErrorResponse>();
-const { sendRequest: ResendEmailVerification } = useSubmit<VerificationResponse, ApiErrorResponse>();
-const { sendRequest: VerifyEmail } = useSubmit<VerificationResponse, ApiErrorResponse>()
-
+const { sendRequest: resendEmailVerification } = useSubmit<VerificationResponse, ApiErrorResponse>();
+const { sendRequest: verifyEmail } = useSubmit<VerificationResponse, ApiErrorResponse>();
 
 const focusNext = (event: Event, index: number) => {
     const input = event.target as HTMLInputElement;
@@ -31,8 +29,7 @@ const verifyCode = async () => {
     const enteredCode = code.value.join('');
     try {
         isLoading.value = true;
-        console.log('Entered code:', enteredCode);
-        const response = await VerifyEmail('/v1/auth/email-verification/verify', {
+        const response = await verifyEmail('/v1/auth/email-verification/verify', {
             method: 'POST',
             body: JSON.stringify({ code: enteredCode }),
         });
@@ -48,7 +45,7 @@ const verifyCode = async () => {
 const resendCode = async () => {
     try {
         isLoading.value = true;
-        await ResendEmailVerification('/v1/auth/email-verification/resend', {
+        await resendEmailVerification('/v1/auth/email-verification/resend', {
             method: 'POST',
         });
         startTimer();
@@ -74,7 +71,7 @@ const startTimer = () => {
     }, 1000);
 };
 
-onBeforeMount( async () => {
+onMounted( async () => {
     try {
         isLoading.value = true;
         await fetchCurrentUser('/v1/auth/profile');
@@ -87,7 +84,6 @@ onBeforeMount( async () => {
         isLoading.value = false;
     }
 });
-
 </script>
 
 <template>
