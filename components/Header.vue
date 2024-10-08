@@ -10,6 +10,7 @@ const toggleDropdown = () => {
 };
 
 const handleLogout = async () => {
+    toggleDropdown();
     await signOut();
 };
 </script>
