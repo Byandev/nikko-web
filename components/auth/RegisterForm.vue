@@ -71,7 +71,7 @@ const submitForm = async () => {
 
     await getSession()
 
-    await router.push("/dashboard");
+    await router.push("/email-verification");
   } catch (error) {
     console.error(error as ApiErrorResponse)
   } finally {
