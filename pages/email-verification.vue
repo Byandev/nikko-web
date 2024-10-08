@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useFetchData } from '~/composables/useFetchData';
 import { useSubmit } from '~/composables/useSubmit';
+import { Icon } from '@iconify/vue';
 import type { User as UserResponse } from '~/types/models/User';
 import type { VerificationResponse } from "~/types/api/response/verfication";
 import type { ApiErrorResponse } from '~/types/api/response/error';
@@ -90,7 +91,7 @@ onMounted( async () => {
     <div class="flex justify-center items-center h-full lg:h-[700px]">
         <form @submit.prevent="verifyCode" class="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full">
             <div class="flex justify-center items-center mb-6">
-                <Icon icon="fluent-color:mail-16" :ssr="true" width="96" height="96" />
+                <Icon icon="fluent-color:mail-16" :ssr="true" width="96" height="96"  />
             </div>
             <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Email Verification</h2>
             <p class="text-gray-600 mb-6 text-center">Please enter the 6-digit code sent to your email: <strong> {{
