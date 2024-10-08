@@ -29,13 +29,12 @@ const handleLogout = async () => {
                             <span>Profile</span>
                         </div>
                     </NuxtLink>
-                    <button @click="handleLogout" type="button"
-                        class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-b-lg">
+                    <NuxtLink to="/login" @click="handleLogout" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-b-lg">
                         <div class="flex items-center space-x-2">
                             <Icon icon="mdi:logout" width="24" height="24" class="text-primary" />
                             <span>Logout</span>
                         </div>
-                    </button>
+                    </NuxtLink>
                 </div>
             </template>
             <template v-else>
