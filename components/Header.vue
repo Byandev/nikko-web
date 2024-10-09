@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
+import { authStore } from '~/store/auth';
+
+const { user } = authStore();
+
+console.log(user);
 
 const { status, signOut } = useAuth();
 const isAuthenticated = computed(() => status.value === 'authenticated');
@@ -13,6 +18,8 @@ const handleLogout = async () => {
     toggleDropdown();
     await signOut();
 };
+
+
 </script>
 
 <template>

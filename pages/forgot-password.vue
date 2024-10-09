@@ -2,7 +2,6 @@
 import { useSubmit } from '~/composables/useSubmit';
 import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
-import type { VerificationResponse } from "~/types/api/response/verfication";
 import type { ApiErrorResponse } from '~/types/api/response/error';
 
 const router = useRouter();

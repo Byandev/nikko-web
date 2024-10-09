@@ -84,7 +84,7 @@ const submitForm = async () => {
 <template>
   <div class="flex items-center justify-center p-10">
     <div class="flex flex-1 flex-col justify-center lg:flex-none">
-      <div class="mx-auto w-full h-full lg:h-[700px] max-w-4xl bg-white rounded-2xl border-2 border-gray-200">
+      <div class="mx-auto w-full h-full lg:h-[800px] max-w-4xl bg-white rounded-2xl border-2 border-gray-200">
         <div class="flex flex-col lg:flex-row h-full">
           <!-- Left Image Section -->
           <Transition name="slide-fade">
@@ -140,7 +140,7 @@ const submitForm = async () => {
                               <Icon icon="mdi:user" :ssr="true" />
                               <input id="first_name" v-model="formRef.first_name"
                                 :class="{ 'ring-red-300': v$.first_name.$error, 'ring-gray-300': !v$.first_name.$error }"
-                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none"
+                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"
                                 type="text">
                             </div>
                             <span v-if="v$.first_name.$error" class="text-red-900 text-sm">{{

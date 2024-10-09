@@ -66,7 +66,7 @@ const submitForm = async () => {
 <template>
     <div class="flex items-center justify-center p-10">
         <div class="flex flex-1 flex-col justify-center lg:flex-none">
-            <div class="mx-auto w-full h-full lg:h-[700px] max-w-4xl bg-white rounded-2xl border-2 border-gray-200">
+            <div class="mx-auto w-full h-full lg:h-[800px] max-w-4xl bg-white rounded-2xl border-2 border-gray-200">
                 <div class="flex flex-col lg:flex-row-reverse h-full">
                     <!-- Left Image Section -->
                     <Transition name="slide-fade">
@@ -114,7 +114,7 @@ const submitForm = async () => {
                                                     </div>
                                                     <span v-if="v$.email.$error" class="text-red-900 text-sm">{{
                                                         v$.email.$errors[0].$message
-                                                        }}</span>
+                                                    }}</span>
                                                 </div>
                                             </div>
 
@@ -134,7 +134,7 @@ const submitForm = async () => {
                                                     </div>
                                                     <span v-if="v$.password.$error" class="text-red-900 text-sm">{{
                                                         v$.password.$errors[0].$message
-                                                        }}</span>
+                                                    }}</span>
                                                 </div>
                                             </div>
 
