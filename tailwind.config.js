@@ -15,9 +15,9 @@ export default {
       },
       colors: {
         primary: {
-          light: '#3B82F6', // Light shade of primary
-          DEFAULT: '#0a2a5b', // Default primary color
-          dark: '#1E40AF', // Dark shade of primary
+          light: '#a8c0b0', // Light shade of primary based on DEFAULT
+          DEFAULT: '#4a7c59', // Darker default primary color
+          dark: '#2e4d3a', // Dark shade of primary based on DEFAULT
         },
         secondary: {
           light: '#A855F7', // Light shade of secondary
