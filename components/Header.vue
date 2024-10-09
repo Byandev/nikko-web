@@ -36,14 +36,14 @@ const handleLogout = async () => {
                         class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-t-lg">
                         <div class="flex items-center space-x-2">
                             <Icon icon="mdi:account-circle" width="24" height="24" class="text-primary" />
-                            <span>Profile</span>
+                            <span>View Profile</span>
                         </div>
                     </NuxtLink>
                     <NuxtLink to="/settings/profile" @click="closeDropdown"
                         class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                         <div class="flex items-center space-x-2">
                             <Icon icon="mdi:cog" width="24" height="24" class="text-primary" />
-                            <span>Setting</span>
+                            <span>Settings</span>
                         </div>
                     </NuxtLink>
                     <NuxtLink to="/login" @click="handleLogout"
