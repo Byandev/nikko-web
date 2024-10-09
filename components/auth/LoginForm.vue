@@ -152,11 +152,13 @@ const submitForm = async () => {
                                                 </div>
 
                                                 <div>
-                                                    <label
-                                                        class="hover:cursor-pointer flex items-center text-sm font-medium leading-6 text-red-500"
-                                                        for="accept_policy">
-                                                        Forgot your password?
-                                                    </label>
+                                                    <NuxtLink to="/forgot-password">
+                                                        <label
+                                                            class="hover:cursor-pointer flex items-center text-sm font-medium leading-6 text-red-500"
+                                                            for="accept_policy">
+                                                            Forgot your password?
+                                                        </label>
+                                                    </NuxtLink>
                                                 </div>
                                             </div>
 

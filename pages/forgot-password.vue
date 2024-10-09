@@ -4,6 +4,13 @@ import { useRouter } from 'vue-router';
 import { Icon } from '@iconify/vue';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 
+definePageMeta({
+    auth: {
+        unauthenticatedOnly: true,
+        navigateAuthenticatedTo: '/dashboard',
+    },
+});
+
 const router = useRouter();
 const email = ref('');
 const isLoading = ref(false);
