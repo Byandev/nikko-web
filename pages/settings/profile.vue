@@ -74,14 +74,14 @@ const handleUpdate = async () => {
                         <div class="sm:col-span-1">
                             <label class="text-sm font-medium text-gray-500">First Name</label>
                             <div class="mt-1 text-sm text-gray-900">
-                                <input v-model="formRef.first_name" type="text"
+                                <input v-model="formRef.first_name" type="text" autocomplete="given-name"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
                             </div>
                         </div>
                         <div class="sm:col-span-1">
                             <label class="text-sm font-medium text-gray-500">Last Name</label>
                             <div class="mt-1 text-sm text-gray-900">
-                                <input v-model="formRef.last_name" type="text"
+                                <input v-model="formRef.last_name" type="text" autocomplete="family-name"
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
                             </div>
                         </div>
