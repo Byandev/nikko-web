@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { email, minLength, required, requiredIf, sameAs } from "@vuelidate/validators";
+import { email, minLength, required, sameAs } from "@vuelidate/validators";
 import { useSubmit } from "~/composables/useSubmit";
 import type { AuthenticationResponse } from "~/types/api/response/auth";
 import type { ApiErrorResponse } from "~/types/api/response/error";
