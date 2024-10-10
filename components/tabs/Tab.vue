@@ -3,8 +3,10 @@
         <div class="sm:hidden">
             <label for="tabs" class="sr-only">Select a tab</label>
             <select id="tabs" name="tabs"
-                class="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
-                <option v-for="tab in tabs" :key="tab.name" :selected="tab.current">{{ tab.name }}</option>
+                class="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                @change="handleTabChange">
+                <option v-for="tab in tabs" :key="tab.name" :value="tab.href" :selected="tab.current">{{ tab.name }}
+                </option>
             </select>
         </div>
         <div class="hidden sm:block">
@@ -40,6 +42,13 @@ const props = defineProps<{
 
 const route = useRoute();
 const tabs = ref(props.tabs);
+
+const router = useRouter();
+
+const handleTabChange = (event: Event) => {
+    const selectedTab = (event.target as HTMLSelectElement).value;
+    router.push(selectedTab);
+};
 
 // Watch for changes in the route and update the current tab
 watch(

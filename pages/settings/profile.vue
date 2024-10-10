@@ -38,7 +38,7 @@ const handleUpdate = async () => {
 
     try {
         isLoading.value = true;
-        const response = await updateProfile('/v1/auth/profile', {
+        await updateProfile('/v1/auth/profile', {
             method: 'PUT',
             body: {
                 first_name: UpdateForm.value.first_name,
@@ -54,43 +54,39 @@ const handleUpdate = async () => {
 </script>
 
 <template>
-    <div class="max-w-4xl mx-auto mt-12">
+    <div class="max-w-4xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
         <Tab :tabs="tabs">
-            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+            <div class="bg-white shadow sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6">
-                    <h3 class="text-lg font-medium leading-6 text-gray-900">Profile Information</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                        This section contains your personal details and application information.
-                        Here you can view and update your name, email address, phone number, and other personal details.
-                        Keeping this information up-to-date ensures that we can contact you if needed and that your
-                        profile is accurate.
+                    <h3 class="text-lg font-medium text-gray-900">Profile Information</h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                      Update your personal details here to ensure accurate contact information.
                     </p>
                 </div>
 
                 <!-- Name Section -->
                 <form @submit.prevent="handleUpdate" class="border-t border-gray-200 px-4 py-5 sm:px-6 bg-gray-50">
-                    <h1 class="text-lg font-medium leading-6 text-gray-900 mb-4">Name</h1>
-                    <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+                    <h1 class="text-lg font-medium text-gray-900 mb-4">Name</h1>
+                    <div class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                         <div class="sm:col-span-1">
-                            <dt class="text-sm font-medium text-gray-500">First Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900">
-                                <input v-model="formRef.first_name" type="text"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm outline-none bg-white p-2">
-                            </dd>
+                            <label class="text-sm font-medium text-gray-500">First Name</label>
+                            <div class="mt-1 text-sm text-gray-900">
+                                <input v-model="formRef.first_name" type="text" autocomplete="given-name" required
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                            </div>
                         </div>
                         <div class="sm:col-span-1">
-                            <dt class="text-sm font-medium text-gray-500">Last Name</dt>
-                            <dd class="mt-1 text-sm text-gray-900">
-                                <input v-model="formRef.last_name" type="text"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm outline-none bg-white p-2">
-                            </dd>
+                            <label class="text-sm font-medium text-gray-500">Last Name</label>
+                            <div class="mt-1 text-sm text-gray-900">
+                                <input v-model="formRef.last_name" type="text" autocomplete="family-name" required
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                            </div>
                         </div>
-                    </dl>
+                    </div>
                     <!-- Update Button -->
                     <div class="mt-6 flex justify-end">
                         <Button text="Update" background="primary" foreground="white" :is-loading="isLoading"
                             :is-wide="false" type="submit"></Button>
-                      
                     </div>
                 </form>
             </div>

@@ -6,6 +6,7 @@ import type { ApiErrorResponse } from "~/types/api/response/error";
 import { Icon } from '@iconify/vue';
 
 const router = useRouter();
+const route = useRoute();
 const { getSession } = useAuth()
 const { setToken } = useAuthState()
 
@@ -47,8 +48,6 @@ const submitForm = async () => {
             },
         });
 
-        console.log(response)
-
         setToken(response?.access_token as string)
 
         await getSession()
@@ -58,19 +57,18 @@ const submitForm = async () => {
         console.error(error as ApiErrorResponse)
     } finally {
         isLoading.value = false;
-        console.log('Form submission attempt finished.')
     }
 };
 </script>
 
 <template>
-    <div class="flex items-center justify-center p-10">
+    <div class="flex items-center justify-center p-4 sm:p-10">
         <div class="flex flex-1 flex-col justify-center lg:flex-none">
-            <div class="mx-auto w-full h-full lg:h-[800px] max-w-4xl bg-white rounded-2xl border-2 border-gray-200">
+            <div class="mx-auto w-full h-full lg:h-[700px] max-w-4xl bg-white rounded-2xl border-2 border-gray-200">
                 <div class="flex flex-col lg:flex-row-reverse h-full">
                     <!-- Left Image Section -->
                     <Transition name="slide-fade">
-                        <div class="relative flex items-center justify-center w-full mb-4 lg:mb-0 h-full">
+                        <div class="relative hidden lg:flex items-center justify-center w-full mb-4 lg:mb-0 h-full">
                             <img src="https://img.freepik.com/free-vector/abstract-paper-style-background_23-2150744372.jpg?t=st=1728313230~exp=1728316830~hmac=316229e5374994fe112e4883f479fc29b623d4a231fb6305c6534814b7f3e76e&w=996"
                                 alt="Side Image"
                                 class="w-full h-full object-cover rounded-tr-2xl rounded-br-2xl bg-primary">
@@ -86,20 +84,37 @@ const submitForm = async () => {
                             </div>
                         </div>
                     </Transition>
+
                     <!-- Right Form Section -->
                     <Transition name="slide-fade">
-                        <div class="flex flex-col px-10 py-7 justify-center w-full lg:w-5/6 h-full">
+                        <div class="flex flex-col px-4 py-7 sm:px-10 justify-center w-full lg:w-5/6 h-full">
+                            <!-- Tabs Navigation for Mobile -->
+                            <div class="block lg:hidden mb-4">
+                                <div class="flex justify-around border-b border-gray-200">
+                                    <NuxtLink to="/login" :class="{
+                                        'border-b-2 border-primary text-primary': route.path === '/login',
+                                        'py-2 px-4 text-sm font-medium text-gray-700 focus:outline-none focus:border-indigo-500': true
+                                    }">
+                                        Login
+                                    </NuxtLink>
+                                    <NuxtLink to="/register" :class="{
+                                        'border-b-2 border-primary text-primary': route.path === '/register',
+                                        'py-2 px-4 text-sm font-medium text-gray-700 focus:outline-none focus:border-indigo-500': true
+                                    }">
+                                        Sign Up
+                                    </NuxtLink>
+                                </div>
+                            </div>
+
                             <div class="mx-auto w-full max-w-sm lg:w-96">
                                 <div>
                                     <h2 class="text-2xl font-bold leading-9 tracking-tight text-gray-900">Log in to Your
-                                        Account
-                                    </h2>
+                                        Account</h2>
                                 </div>
 
                                 <div class="mt-8">
                                     <div>
                                         <form class="space-y-6" method="POST" @submit.prevent="submitForm">
-
                                             <div>
                                                 <label class="block text-sm font-medium leading-6 text-gray-900"
                                                     for="email">Email</label>
@@ -113,15 +128,13 @@ const submitForm = async () => {
                                                             type="email">
                                                     </div>
                                                     <span v-if="v$.email.$error" class="text-red-900 text-sm">{{
-                                                        v$.email.$errors[0].$message
-                                                    }}</span>
+                                                        v$.email.$errors[0].$message }}</span>
                                                 </div>
                                             </div>
 
                                             <div>
                                                 <label class="block text-sm font-medium leading-6 text-gray-900"
-                                                    for="password">
-                                                    Password</label>
+                                                    for="password">Password</label>
                                                 <div class="mt-2">
                                                     <div
                                                         class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
@@ -133,8 +146,7 @@ const submitForm = async () => {
                                                             type="password">
                                                     </div>
                                                     <span v-if="v$.password.$error" class="text-red-900 text-sm">{{
-                                                        v$.password.$errors[0].$message
-                                                    }}</span>
+                                                        v$.password.$errors[0].$message }}</span>
                                                 </div>
                                             </div>
 
@@ -148,13 +160,12 @@ const submitForm = async () => {
                                                             class="mr-2 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
                                                         Remember me
                                                     </label>
-
                                                 </div>
 
                                                 <div>
                                                     <NuxtLink to="/forgot-password">
                                                         <label
-                                                            class="hover:cursor-pointer flex items-center text-sm font-medium leading-6 text-red-500"
+                                                            class="hover:cursor-pointer flex items-center text-sm font-medium leading-6 text-primary"
                                                             for="accept_policy">
                                                             Forgot your password?
                                                         </label>
@@ -164,7 +175,7 @@ const submitForm = async () => {
 
                                             <div>
                                                 <Button text="Log In" background="primary" foreground="white"
-                                                    :is-loading="isLoading" :is-wide="true" type="submit" </Button>
+                                                    :is-loading="isLoading" :is-wide="true" type="submit" />
                                             </div>
                                         </form>
                                     </div>
