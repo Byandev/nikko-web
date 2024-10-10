@@ -104,7 +104,7 @@ const verifyOTP = async () => {
                     <form @submit.prevent="sendEmailVerification" class="flex flex-row mt-1 text-sm text-gray-900 w-3/4">
                         <input v-model="changeEmailForm.email" type="email" autocomplete="email" required
                             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100 cursor-not-allowed">
-                        <Button class=" whitespace-nowrap" type="submit" text="Send OTP" background="white" foreground="black"
+                        <Button class=" whitespace-nowrap" type="submit" text="Send OTP" background="none" foreground="black"
                             :is-loading="isLoading" :is-wide="false"></Button>
                     </form >
                 </div>
