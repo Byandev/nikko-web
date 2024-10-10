@@ -12,6 +12,7 @@ definePageMeta({
     },
 });
 
+const { resetData } = useResetPasswordStore();
 const { email, token } = storeToRefs(useResetPasswordStore());
 
 const resetPasswordForm = ref({
@@ -33,7 +34,7 @@ const handleResetPassword = async () => {
             method: 'POST',
             body: JSON.stringify({ email: resetPasswordForm.value.email, token: resetPasswordForm.value.token, password: resetPasswordForm.value.password, password_confirmation: resetPasswordForm.value.password_confirmation }),
         });
-
+        resetData();
         await router.push("/login");
     } catch (error) {
         console.error('Password reset failed:', error);

@@ -13,10 +13,16 @@ export const useResetPasswordStore = defineStore("resetPassword", () => {
         token.value = value;
     }
 
+    const resetData = () => {
+        email.value = '';
+        token.value = '';
+    }   
+
     return{
         email,
         token,
         setEmail,
-        setToken
+        setToken,
+        resetData
     }
 });
