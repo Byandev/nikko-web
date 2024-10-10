@@ -54,16 +54,13 @@ const handleUpdate = async () => {
 </script>
 
 <template>
-    <div class="max-w-4xl mx-auto mt-12">
+    <div class="max-w-4xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
         <Tab :tabs="tabs">
             <div class="bg-white shadow sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6">
                     <h3 class="text-lg font-medium text-gray-900">Profile Information</h3>
                     <p class="mt-1 text-sm text-gray-500">
-                        This section contains your personal details and application information.
-                        Here you can view and update your name, email address, phone number, and other personal details.
-                        Keeping this information up-to-date ensures that we can contact you if needed and that your
-                        profile is accurate.
+                      Update your personal details here to ensure accurate contact information.
                     </p>
                 </div>
 
@@ -74,14 +71,14 @@ const handleUpdate = async () => {
                         <div class="sm:col-span-1">
                             <label class="text-sm font-medium text-gray-500">First Name</label>
                             <div class="mt-1 text-sm text-gray-900">
-                                <input v-model="formRef.first_name" type="text" autocomplete="given-name"
+                                <input v-model="formRef.first_name" type="text" autocomplete="given-name" required
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
                             </div>
                         </div>
                         <div class="sm:col-span-1">
                             <label class="text-sm font-medium text-gray-500">Last Name</label>
                             <div class="mt-1 text-sm text-gray-900">
-                                <input v-model="formRef.last_name" type="text" autocomplete="family-name"
+                                <input v-model="formRef.last_name" type="text" autocomplete="family-name" required
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
                             </div>
                         </div>

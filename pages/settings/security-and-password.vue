@@ -59,7 +59,7 @@ const handleChangePassword = async () => {
 </script>
 
 <template>
-    <div class="max-w-4xl mx-auto mt-12">
+    <div class="max-w-4xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
         <Tab :tabs="tabs">
             <div class="bg-white shadow sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6">
@@ -75,11 +75,12 @@ const handleChangePassword = async () => {
                     class="border-t border-gray-200 px-4 py-5 sm:px-6 bg-gray-50">
                     <h1 class="text-lg font-medium text-gray-900 mb-4">Change Password</h1>
                     <input v-model="formRef.username" type="text" autocomplete="username" class="hidden">
-                    <div class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-1">
+                    <div class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
                         <div class="sm:col-span-1">
                             <label class="text-sm font-medium text-gray-500">Old Password</label>
                             <div class="mt-1 text-sm text-gray-900">
                                 <input v-model="formRef.old_password" type="password" autocomplete="current-password"
+                                    required
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
                             </div>
                         </div>
@@ -87,13 +88,15 @@ const handleChangePassword = async () => {
                             <label class="text-sm font-medium text-gray-500">New Password</label>
                             <div class="mt-1 text-sm text-gray-900">
                                 <input v-model="formRef.new_password" type="password" autocomplete="new-password"
+                                    required
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
                             </div>
                         </div>
                         <div class="sm:col-span-1">
                             <label class="text-sm font-medium text-gray-500">Confirm Password</label>
                             <div class="mt-1 text-sm text-gray-900">
-                                <input v-model="formRef.new_password_confirmation" type="password" autocomplete="new-password"
+                                <input v-model="formRef.new_password_confirmation" type="password"
+                                    autocomplete="new-password" required
                                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
                             </div>
                         </div>
