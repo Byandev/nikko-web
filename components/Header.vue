@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
+import { authStore } from '~/store/authStore';
+
+const { user } = storeToRefs(authStore());
 
 const { status, signOut } = useAuth();
 const isAuthenticated = computed(() => status.value === 'authenticated');
@@ -27,7 +30,12 @@ const handleLogout = async () => {
         <div class="relative flex justify-end space-x-4 group">
             <template v-if="isAuthenticated">
                 <div @click="toggleDropdown" class="cursor-pointer">
-                    <Icon icon="iconamoon:profile-circle-fill" width="40" height="40" class="text-primary sm:w-50 sm:h-50" />
+                    <template v-if="user.avatar?.original_url">
+                        <img :src="user.avatar?.original_url" alt="User Avatar" class="h-10 w-10 object-cover rounded-full">
+                    </template>
+                    <template v-else>
+                        <Icon icon="iconamoon:profile-circle-fill" width="40" height="40" class="text-primary sm:w-50 sm:h-50" />
+                    </template>
                 </div>
                 <div v-if="showDropdown" class="absolute right-0 mt-10 sm:mt-14 w-48 bg-white border rounded-lg shadow-lg z-50">
                     <NuxtLink to="/freelancer-dashboard" @click="closeDropdown"
