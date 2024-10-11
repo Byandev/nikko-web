@@ -79,7 +79,7 @@ const verifyOTP = async () => {
                             <label class="text-sm font-medium text-gray-500">Email</label>
                             <div class="mt-1 text-sm text-gray-900">
                                 <input v-model="maskedEmail" type="email" autocomplete="email" disabled
-                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 cursor-not-allowed">
                             </div>
                         </div>
                     </div>
@@ -108,7 +108,7 @@ const verifyOTP = async () => {
                   autocomplete="email"
                   required
                   placeholder="Enter New Email"
-                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100 cursor-not-allowed"
+                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100"
                 />
               </div>
               <div class="sm:col-span-2 flex items-center">
@@ -120,7 +120,7 @@ const verifyOTP = async () => {
                     autocomplete="one-time-code"
                     required
                     placeholder="Enter OTP"
-                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100 cursor-not-allowed"
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100"
                   />
                   <Button
                     @click="sendEmailVerification"
