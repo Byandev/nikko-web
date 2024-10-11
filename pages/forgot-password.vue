@@ -103,7 +103,7 @@ onMounted(startResendTimer);
     <div class="flex justify-center items-center h-full lg:h-[700px] bg-gradient-to-r ">
         <form @submit.prevent="handleForgotPassword"
             class="relative bg-white p-8 rounded-lg shadow-2xl max-w-md w-full transform transition-all duration-300 hover:scale-105">
-            <NuxtLink to="/" class="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
+            <NuxtLink to="/login" class="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
                 <Icon icon="mdi:arrow-left" width="24" height="24" />
             </NuxtLink>
             <div class="flex justify-center items-center mb-6">
