@@ -55,15 +55,13 @@ const uploadImage = async (type: string) => {
 </script>
 
 <template>
-    <div
-        class="mt-8 text-center relative max-w-6xl mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white p-4">
+    <div class="mt-8 text-center relative max-w-6xl mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white p-4">
         <div class="relative group">
             <img :src="bannerUrl" alt="Banner" class="w-full h-36 object-cover rounded-t-lg" />
             <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-50"></div>
             <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300">
                 <label class="cursor-pointer text-white">
-                    <div @click="isBannerModalOpen = true"
-                        class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
+                    <div @click="isBannerModalOpen = true" class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
                         <Icon icon="ic:outline-edit" width="24" height="24" class="text-primary" />
                     </div>
                 </label>
@@ -71,26 +69,21 @@ const uploadImage = async (type: string) => {
         </div>
         <div class="relative">
             <div class="absolute -bottom-24 left-1/2 transform -translate-x-1/2 sm:left-8 sm:translate-x-0 group">
-                <img :src="avatarUrl" alt="Avatar"
-                    class="w-36 h-36 rounded-full border-4 border-white shadow-lg" />
-                <div
-                    class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                <img :src="avatarUrl" alt="Avatar" class="w-36 h-36 rounded-full border-4 border-white shadow-lg" />
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
                     <label class="cursor-pointer text-white">
-                        <div @click="isAvatarModalOpen = true"
-                            class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
+                        <div @click="isAvatarModalOpen = true" class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
                             <Icon icon="ic:outline-edit" width="24" height="24" class="text-primary" />
                         </div>
                     </label>
                 </div>
-                <div class="mt-2 text-lg font-semibold text-white bg-primary p-2 rounded-lg shadow-sm inline-block">
-                    $50/hr</div>
+                <div class="mt-2 text-lg font-semibold text-white bg-primary p-2 rounded-lg shadow-sm inline-block">$50/hr</div>
             </div>
         </div>
         <div class="mt-20 sm:mt-4 mb-4 px-4 flex flex-col sm:flex-row items-center sm:items-start">
             <div class="sm:ml-40 mt-4 sm:mt-0 text-left">
                 <h2 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h2>
-                <p class="mt-2 text-md text-gray-600">Joined on {{ new Date(user.created_at).toLocaleString('en-US', {
-                    month: 'long', day: 'numeric', year: 'numeric' }) }}</p>
+                <p class="mt-2 text-md text-gray-600">Joined on {{ new Date(user.created_at).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) }}</p>
                 <div class="mt-2 flex items-center space-x-2">
                     <Icon icon="twemoji:flag-for-flag-philippines" width="15" height="15" />
                     <span class="text-sm text-black font-semibold">Philippines</span>
@@ -104,8 +97,7 @@ const uploadImage = async (type: string) => {
                 <p class="text-sm text-gray-500 mb-4">Please select an image file to upload as your avatar.</p>
                 <div class="sm:col-span-2 mb-4 flex items-center">
                     <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Image</label>
-                    <input type="file" accept="image/*" required
-                        @change="event => updatePhoto(event,'AVATAR' as ModalType)"
+                    <input type="file" accept="image/*" required @change="event => updatePhoto(event,'AVATAR' as ModalType)"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100" />
                 </div>
             </template>
