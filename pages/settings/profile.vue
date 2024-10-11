@@ -2,7 +2,7 @@
 import { required } from '@vuelidate/validators';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { User as UpdateResponse } from '~/types/models/User';
-import { authStore } from '~/store/auth';
+import { authStore } from '~/store/authStore';
 
 const { user } = storeToRefs(authStore());
 

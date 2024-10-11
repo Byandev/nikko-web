@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { authStore } from '~/store/auth';
+import { authStore } from '~/store/authStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import { maskEmail } from '~/utils/helper';
 import { useSubmit } from '~/composables/useSubmit';
