@@ -97,24 +97,43 @@ const verifyOTP = async () => {
                 Verify Email
             </template>
             <template #content>
-                <p class="text-sm text-gray-500 mb-4">An OTP has been sent to your email. Please enter it below to
-                    verify your email address.</p>
-                <div class="sm:col-span-2 mb-4 flex items-center">
-                    <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Email</label>
-                    <form @submit.prevent="sendEmailVerification" class="flex flex-row mt-1 text-sm text-gray-900 w-3/4">
-                        <input v-model="changeEmailForm.email" type="email" autocomplete="email" required
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100 cursor-not-allowed">
-                        <Button class=" whitespace-nowrap" type="submit" text="Send OTP" background="none" foreground="black"
-                            :is-loading="isLoading" :is-wide="false"></Button>
-                    </form >
+              <p class="text-sm text-gray-500 mb-4">
+                An OTP has been sent to your email. Please enter it below to verify your email address.
+              </p>
+              <div class="sm:col-span-2 mb-4 flex items-center">
+                <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Email</label>
+                <input
+                  v-model="changeEmailForm.email"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  placeholder="Enter New Email"
+                  class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100 cursor-not-allowed"
+                />
+              </div>
+              <div class="sm:col-span-2 flex items-center">
+                <label class="text-sm font-medium text-gray-500 w-1/4 text-left">OTP</label>
+                <div class="flex flex-row mt-1 text-sm text-gray-900 w-full">
+                  <input
+                    v-model="changeEmailForm.token"
+                    type="text"
+                    autocomplete="one-time-code"
+                    required
+                    placeholder="Enter OTP"
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100 cursor-not-allowed"
+                  />
+                  <Button
+                    @click="sendEmailVerification"
+                    class="whitespace-nowrap ml-2"
+                    type="submit"
+                    text="Send OTP"
+                    background="none"
+                    foreground="black"
+                    :is-loading="isLoading"
+                    :is-wide="false"
+                  ></Button>
                 </div>
-                <div class="sm:col-span-2 flex items-center">
-                    <label class="text-sm font-medium text-gray-500 w-1/4 text-left">OTP</label>
-                    <div class="mt-1 text-sm text-gray-900 w-3/4">
-                        <input v-model="changeEmailForm.token" type="text" placeholder="Enter OTP"
-                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                    </div>
-                </div>
+              </div>
             </template>
             <template #actions>
                 <div class="flex justify-end space-x-2">
