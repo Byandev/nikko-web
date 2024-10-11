@@ -1,6 +1,6 @@
 <template>
     <div
-        class="mt-8 text-center relative max-w-6xl mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white shadow-lg p-4">
+        class="mt-8 text-center relative max-w-6xl mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white p-4">
         <div class="cover-photo relative group">
             <img :src="coverPhotoUrl" alt="Cover Photo" class="w-full h-36 object-cover rounded-t-lg" />
             <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-50"></div>
@@ -14,7 +14,8 @@
             </div>
         </div>
         <div class="relative">
-            <div class="profile-picture absolute -bottom-24 left-1/2 transform -translate-x-1/2 sm:left-8 sm:translate-x-0 group">
+            <div
+                class="profile-picture absolute -bottom-24 left-1/2 transform -translate-x-1/2 sm:left-8 sm:translate-x-0 group">
                 <img :src="profilePictureUrl" alt="Profile Picture"
                     class="w-36 h-36 rounded-full border-4 border-white shadow-lg" />
                 <div
@@ -26,7 +27,7 @@
                         <input type="file" class="hidden" @change="updateProfilePicture" />
                     </label>
                 </div>
-            
+
                 <div class="mt-2 text-lg font-semibold text-gray-700 bg-gray-100 p-2 rounded-lg shadow-sm inline-block">
                     $50/hr
                 </div>
@@ -35,7 +36,7 @@
         <div class="mt-20 sm:mt-4 mb-4 px-4 flex flex-col sm:flex-row items-center sm:items-start">
             <div class="sm:ml-40 mt-4 sm:mt-0 text-left">
                 <h2 class="text-2xl font-bold text-gray-900">John Doe</h2>
-                <p class="mt-2 text-md text-gray-600">Web Developer</p>
+                <p class="mt-2 text-md text-gray-600">Joined Oct 10 2024</p>
                 <div class="mt-2 flex items-center space-x-2">
                     <Icon icon="twemoji:flag-for-flag-philippines" width="15" height="15" />
                     <span class=" text-sm text-black font-semibold">Philippines</span>
