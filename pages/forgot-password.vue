@@ -62,20 +62,7 @@ const handleForgotPassword = async () => {
         }
     } else {
         // Send password reset email
-        try {
-            isLoading.value = true;
-            await sendPasswordResetRequest('/v1/auth/forgot-password', {
-                method: 'POST',
-                body: {
-                    email: forgetPasswordForm.value.email,
-                },
-            });
-            showOtpInput.value = true;
-        } catch (error) {
-            console.error('Error sending password reset email:', error);
-        } finally {
-            isLoading.value = false;
-        }
+        resendOtp();
     }
 };
 
@@ -89,18 +76,17 @@ const resendOtp = async () => {
                 email: forgetPasswordForm.value.email,
             },
         });
+        showOtpInput.value = true;
     } catch (error) {
         console.error('Error resending OTP:', error);
     } finally {
         isLoading.value = false;
     }
 };
-
-onMounted(startResendTimer);
 </script>
 
 <template>
-    <div class="flex justify-center items-center h-full lg:h-[700px] bg-gradient-to-r ">
+    <div class="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8">
         <form @submit.prevent="handleForgotPassword"
             class="relative bg-white p-8 rounded-lg shadow-2xl max-w-md w-full transform transition-all duration-300 hover:scale-105">
             <NuxtLink to="/login" class="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
