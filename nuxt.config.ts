@@ -30,7 +30,7 @@ export default defineNuxtConfig({
     provider: {
       type: "local",
       pages: {
-        login: "/",
+        login: "/login",
       },
       endpoints: {
         signIn: { path: "v1/auth/login", method: "post" },
