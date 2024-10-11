@@ -74,7 +74,7 @@ const handleForgotPassword = async () => {
 </script>
 
 <template>
-    <div class="flex justify-center items-center h-full lg:h-[700px] bg-gradient-to-r from-blue-500 to-purple-600">
+    <div class="flex justify-center items-center h-full lg:h-[700px] bg-gradient-to-r ">
         <form @submit.prevent="handleForgotPassword"
             class="relative bg-white p-8 rounded-lg shadow-2xl max-w-md w-full transform transition-all duration-300 hover:scale-105">
             <button v-if="showOtpInput" @click="resetForm" type="button" class="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
