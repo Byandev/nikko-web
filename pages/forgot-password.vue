@@ -54,7 +54,7 @@ const handleForgotPassword = async () => {
             isLoading.value = false;
         }
     } else {
-        // Send password reset email
+        // Send password reset email otp
         try {
             isLoading.value = true;
             await sendPasswordResetRequest('/v1/auth/forgot-password', {
