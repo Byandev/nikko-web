@@ -222,7 +222,7 @@ const submitForm = async () => {
                           <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                             <Icon icon="mdi:lock-check" :ssr="true" />
-                            <input id="password_confirmation" v-model="formRef.password_confirmation"
+                            <input id="password_confirmation" v-model="formRef.password_confirmation" autocomplete="new-password"
                               :class="{ 'ring-red-300': v$.password_confirmation.$error, 'ring-gray-300': !v$.password_confirmation.$error }"
                               class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none"
                               type="password">

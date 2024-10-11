@@ -5,6 +5,7 @@ import type { User as UpdateResponse } from '~/types/models/User';
 import { authStore } from '~/store/authStore';
 
 const { user } = storeToRefs(authStore());
+const { updateUser } = authStore();
 
 const tabs = [
     { name: 'Profile', href: '/settings/profile', current: true },
@@ -45,6 +46,7 @@ const handleUpdate = async () => {
                 last_name: UpdateForm.value.last_name,
             },
         });
+        updateUser();
     } catch (error) {
         console.error('Error updating profile:', error);
     } finally {

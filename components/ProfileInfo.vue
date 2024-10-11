@@ -5,32 +5,53 @@ import { authStore } from '@/store/authStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import { useSubmit } from '~/composables/useSubmit';
 
-const { user } = authStore();
+enum ModalType {
+    AVATAR = 'AVATAR',
+    BANNER = 'BANNER',
+}
+
+const { user } = storeToRefs(authStore());
 const isAvatarModalOpen = ref(false);
 const isBannerModalOpen = ref(false);
 const isLoading = ref(false);
 
-const bannerUrl = ref(user.banner?.original_url || 'https://wallpapers.com/images/hd/grey-aesthetic-pattern-190rmn46ypy7vq2q.jpg');
-const avatarUrl = ref(user.avatar?.original_url || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
+const defaultBannerUrl = 'https://wallpapers.com/images/hd/grey-aesthetic-pattern-190rmn46ypy7vq2q.jpg';
+const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+
+const bannerUrl = ref(user.value?.banner?.original_url || defaultBannerUrl);
+const avatarUrl = ref(user.value?.avatar?.original_url || defaultAvatarUrl);
 
 const { sendRequest: sendRequest } = useSubmit<{ data: { expires_at: string } }, ApiErrorResponse>();
 
-const updatePhoto = async (event: Event) => {
-    const file = (event.target as HTMLInputElement).files?.[0];
+const avatarFile = ref<File | null>(null);
+const bannerFile = ref<File | null>(null);
+
+const updatePhoto = (event: Event, type: ModalType) => {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
+    if (files) {
+        type === 'AVATAR' ? avatarFile.value = files[0] : bannerFile.value = files[0];
+    }
+};
+
+const uploadImage = async (type: string) => {
+    const file = type === 'AVATAR' ? avatarFile.value : bannerFile.value;
     try {
         isLoading.value = true;
-        await sendRequest('/v1/medias', {
+        const response = await sendRequest('/v1/medias', {
             method: 'POST',
             body: {
                 file: file,
+                type: type,
             },
         });
+        console.log(response);
     } catch (error) {
-        console.error('Error sending password reset email:', error);
+        console.error('Error uploading photo:', error);
     } finally {
         isLoading.value = false;
     }
-};  
+};
 </script>
 
 <template>
@@ -84,7 +105,7 @@ const updatePhoto = async (event: Event) => {
                 <div class="sm:col-span-2 mb-4 flex items-center">
                     <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Image</label>
                     <input type="file" accept="image/*" required
-                        @change="event => updatePhoto(event)"
+                        @change="event => updatePhoto(event,'AVATAR' as ModalType)"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100" />
                 </div>
             </template>
@@ -93,7 +114,7 @@ const updatePhoto = async (event: Event) => {
                     <Button type="button" text="Cancel" background="white" foreground="black" :is-loading="isLoading"
                         :is-wide="false" @click="isAvatarModalOpen = false"></Button>
                     <Button type="button" text="Upload" background="primary" foreground="white" :is-loading="isLoading"
-                        :is-wide="false" @click="uploadAvatar"></Button>
+                        :is-wide="false" @click="() => uploadImage('avatar')"></Button>
                 </div>
             </template>
         </Modal>
@@ -104,7 +125,7 @@ const updatePhoto = async (event: Event) => {
                 <p class="text-sm text-gray-500 mb-4">Please select an image file to upload as your banner.</p>
                 <div class="sm:col-span-2 mb-4 flex items-center">
                     <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Image</label>
-                    <input type="file" accept="image/*" required @change="event => updatePhoto(event)"
+                    <input type="file" accept="image/*" required @change="event => updatePhoto(event, 'BANNER' as ModalType)"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100" />
                 </div>
             </template>
@@ -113,7 +134,7 @@ const updatePhoto = async (event: Event) => {
                     <Button type="button" text="Cancel" background="white" foreground="black" :is-loading="isLoading"
                         :is-wide="false" @click="isBannerModalOpen = false"></Button>
                     <Button type="button" text="Upload" background="primary" foreground="white" :is-loading="isLoading"
-                        :is-wide="false" @click="uploadBanner"></Button>
+                        :is-wide="false" @click="() => uploadImage('banner')"></Button>
                 </div>
             </template>
         </Modal>

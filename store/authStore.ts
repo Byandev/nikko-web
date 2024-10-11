@@ -1,8 +1,8 @@
-import {defineStore} from 'pinia';
-import type {User} from '~/types/models/User';
+import { defineStore } from 'pinia';
+import type { User } from '~/types/models/User';
 
 export const authStore = defineStore('auth', () => {
-    const {data} = useAuth();
+    const { data, getSession } = useAuth();
 
     const user = ref<User>(data.value?.data || null);
     const hasAuthenticatedUser = computed(() => Boolean(user.value));
@@ -14,8 +14,19 @@ export const authStore = defineStore('auth', () => {
                 user.value = data.value?.data;
             }
         },
-        {immediate: true}
+        { immediate: true }
     );
 
-    return {user, hasAuthenticatedUser};
+    const updateUser = async () => {
+        try {
+            await getSession();
+            if (data.value?.data) {
+                user.value = data.value.data;
+            }
+        } catch (error) {
+            console.error('Failed to update user:', error);
+        }
+    };
+
+    return { user, hasAuthenticatedUser, updateUser };
 });
