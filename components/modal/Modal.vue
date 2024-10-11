@@ -37,9 +37,9 @@ watch(() => props.modelValue, (newVal) => {
             <DialogPanel class="relative transform overflow-hidden rounded-lg bg-white px-6 pb-6 pt-5 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-8">
               <div>
                 <div class="mt-3 text-center">
-                  <DialogTitle as="h3" class="text-lg font-semibold leading-6 text-gray-900">
+                  <h3 class="text-lg font-semibold leading-6 text-gray-900">
                     <slot name="title">Default Title</slot>
-                  </DialogTitle>
+                  </h3>
                   <div class="mt-4">
                     <slot name="content">
                       <p class="text-sm text-gray-500">Default content goes here.</p>

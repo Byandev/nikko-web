@@ -9,7 +9,7 @@ import { maskEmail } from '~/utils/helper';
 definePageMeta({
     auth: {
         unauthenticatedOnly: true,
-        navigateAuthenticatedTo: '/dashboard',
+        navigateAuthenticatedTo: '/find-work',
     },
 });
 
@@ -44,9 +44,9 @@ const handleResetPassword = async () => {
 </script>
 
 <template>
-    <div class="flex justify-center items-center h-full lg:h-[700px] bg-gradient-to-r from-blue-500 to-purple-600">
+    <div class="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8">
         <form @submit.prevent="handleResetPassword"
-            class="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full transform transition-all duration-300 hover:scale-105">
+            class="relative bg-white p-8 rounded-lg shadow-2xl max-w-md w-full transform transition-all duration-300 hover:scale-105">
             <NuxtLink to="/forgot-password" class="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
                 <Icon icon="mdi:arrow-left" width="24" height="24" />
             </NuxtLink>
@@ -55,13 +55,15 @@ const handleResetPassword = async () => {
             </div>
             <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Reset Password</h2>
             <p class="text-gray-600 mb-6 text-center">Please enter your new password for <strong>{{ maskEmail(email) }}</strong></p>
+            <!-- Hidden username field for accessibility -->
+            <input type="email" v-model="email" autocomplete="username" class="hidden" />
             <div class="mb-6">
-                <input type="password" v-model="resetPasswordForm.password" placeholder="New Password" required
+                <input type="password" v-model="resetPasswordForm.password" placeholder="New Password" required autocomplete="new-password"
                     class="w-full px-4 py-2 text-lg border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
             </div>
             <div class="mb-6">
                 <input type="password" v-model="resetPasswordForm.password_confirmation" placeholder="Confirm Password"
-                    required
+                    required autocomplete="new-password"
                     class="w-full px-4 py-2 text-lg border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
             </div>
             <Button text="Reset Password" background="primary" foreground="white" :is-loading="isLoading"

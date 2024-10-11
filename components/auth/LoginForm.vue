@@ -52,7 +52,7 @@ const submitForm = async () => {
 
         await getSession()
 
-        await router.push("/dashboard");
+        await router.push("/find-work");
     } catch (error) {
         console.error(error as ApiErrorResponse)
     } finally {
@@ -121,7 +121,7 @@ const submitForm = async () => {
                                                 <div class="mt-2">
                                                     <div
                                                         class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                                        <Icon icon="mdi:email" :ssr="true" />
+                                                        <Icon icon="mdi:email" />
                                                         <input id="email" v-model="formRef.email" autocomplete="email"
                                                             :class="{ 'ring-red-300': v$.email.$error, 'ring-gray-300': !v$.email.$error }"
                                                             class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none"
@@ -138,7 +138,7 @@ const submitForm = async () => {
                                                 <div class="mt-2">
                                                     <div
                                                         class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                                        <Icon icon="mdi:lock" :ssr="true" />
+                                                        <Icon icon="mdi:lock" />
                                                         <input id="password" v-model="formRef.password"
                                                             autocomplete="current-password"
                                                             :class="{ 'ring-red-300': v$.password.$error, 'ring-gray-300': !v$.password.$error }"

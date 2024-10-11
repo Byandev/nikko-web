@@ -2,9 +2,10 @@
 import { required } from '@vuelidate/validators';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { User as UpdateResponse } from '~/types/models/User';
-import { authStore } from '~/store/auth';
+import { authStore } from '~/store/authStore';
 
 const { user } = storeToRefs(authStore());
+const { updateUser } = authStore();
 
 const tabs = [
     { name: 'Profile', href: '/settings/profile', current: true },
@@ -45,6 +46,7 @@ const handleUpdate = async () => {
                 last_name: UpdateForm.value.last_name,
             },
         });
+        updateUser();
     } catch (error) {
         console.error('Error updating profile:', error);
     } finally {
@@ -54,7 +56,7 @@ const handleUpdate = async () => {
 </script>
 
 <template>
-    <div class="max-w-4xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
         <Tab :tabs="tabs">
             <div class="bg-white shadow sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6">
