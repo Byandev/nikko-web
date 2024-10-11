@@ -12,6 +12,7 @@ const tabs = [
 ];
 
 const { user } = storeToRefs(authStore());
+const { updateUser } = authStore();
 
 const changeEmailForm = ref({
     email: '',
@@ -69,6 +70,7 @@ const verifyOTP = async () => {
                 token: changeEmailForm.value.token,
             },
         });
+        updateUser();
         isModalOpen.value = false;
     } catch (error) {
         console.error('Error sending password reset email:', error);
