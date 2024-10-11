@@ -80,7 +80,7 @@ const verifyOTP = async () => {
 </script>
 
 <template>
-    <div class="max-w-4xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
         <Tab :tabs="tabs">
             <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6">

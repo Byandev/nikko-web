@@ -6,7 +6,7 @@ const welcomeMessage = ref('Welcome to Nikko Industries!');
 definePageMeta({
   auth: {
     unauthenticatedOnly: true,
-    navigateAuthenticatedTo: '/dashboard',
+    navigateAuthenticatedTo: '/find-work',
   },
 });
 </script>

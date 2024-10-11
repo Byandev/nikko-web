@@ -9,7 +9,7 @@ import { maskEmail } from '~/utils/helper';
 definePageMeta({
     auth: {
         unauthenticatedOnly: true,
-        navigateAuthenticatedTo: '/dashboard',
+        navigateAuthenticatedTo: '/find-work',
     },
 });
 

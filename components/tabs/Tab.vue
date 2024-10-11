@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         <div class="sm:hidden">
             <label for="tabs" class="sr-only">Select a tab</label>
             <select id="tabs" name="tabs"

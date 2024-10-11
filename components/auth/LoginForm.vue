@@ -52,7 +52,7 @@ const submitForm = async () => {
 
         await getSession()
 
-        await router.push("/dashboard");
+        await router.push("/find-work");
     } catch (error) {
         console.error(error as ApiErrorResponse)
     } finally {

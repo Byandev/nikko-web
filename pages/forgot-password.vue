@@ -8,7 +8,7 @@ import { useResetPasswordStore } from '~/store/resetPasswordStore';
 definePageMeta({
     auth: {
         unauthenticatedOnly: true,
-        navigateAuthenticatedTo: '/dashboard',
+        navigateAuthenticatedTo: '/find-work',
     },
 });
 

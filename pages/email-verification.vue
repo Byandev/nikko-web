@@ -35,7 +35,7 @@ const verifyCode = async () => {
             body: JSON.stringify({ code: enteredCode }),
         });
         
-        await router.push("/dashboard");
+        await router.push("/find-work");
     } catch (error) {
         console.error('Verification failed:', error);
     } finally {
@@ -77,7 +77,7 @@ onMounted( async () => {
         isLoading.value = true;
         await fetchCurrentUser('/v1/auth/profile');
         if (currentUser?.value?.data.email_verified_at) {
-            await router.push('/dashboard');
+            await router.push('/find-work');
         }
     } catch (error) {
         console.error('Error during onMounted:', error);

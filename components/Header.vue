@@ -30,7 +30,7 @@ const handleLogout = async () => {
                     <Icon icon="iconamoon:profile-circle-fill" width="40" height="40" class="text-primary sm:w-50 sm:h-50" />
                 </div>
                 <div v-if="showDropdown" class="absolute right-0 mt-10 sm:mt-14 w-48 bg-white border rounded-lg shadow-lg z-50">
-                    <NuxtLink to="/#" @click="closeDropdown"
+                    <NuxtLink to="/freelancer-dashboard" @click="closeDropdown"
                         class="block px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-t-lg">
                         <div class="flex items-center space-x-2">
                             <Icon icon="mdi:account-circle" width="24" height="24" class="text-primary" />
