@@ -92,7 +92,7 @@ const uploadImage = async (type: string) => {
         </div>
 
         <Modal :modelValue="isAvatarModalOpen" @update:modelValue="isAvatarModalOpen = $event">
-            <template #title>Upload Avatar</template>
+            <template #title>    Avatar</template>
             <template #content>
                 <p class="text-sm text-gray-500 mb-4">Please select an image file to upload as your avatar.</p>
                 <div class="sm:col-span-2 mb-4 flex items-center">
