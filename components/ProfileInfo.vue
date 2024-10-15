@@ -55,7 +55,7 @@ const uploadImage = async (type: string) => {
 </script>
 
 <template>
-    <div class="mt-8 text-center relative max-w-6xl mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white p-4">
+    <div class="text-center relative mx-auto border border-gray-300 rounded-lg overflow-hidden bg-white p-4">
         <div class="relative group">
             <img :src="bannerUrl" alt="Banner" class="w-full h-36 object-cover rounded-t-lg" />
             <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-50"></div>
