@@ -1,0 +1,3 @@
+<template>
+    Client Dashboard
+</template>
