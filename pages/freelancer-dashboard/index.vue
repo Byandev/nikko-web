@@ -1,7 +1,7 @@
 <template>
-  <div class="my-8">
-    <ProfileInfo class="max-w-6xl mx-auto" />
-    <div class="max-w-6xl lg:mx-auto grid grid-cols-1 lg:grid-cols-3 gap-4 mt-5 mx-5">
+  <div class="my-8 lg:mx-auto mx-5">
+    <ProfileInfo class="max-w-6xl" />
+    <div class="max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-4 mt-5">
 
       <!-- Left Column -->
       <div class="col-span-1">
