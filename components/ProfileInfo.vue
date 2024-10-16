@@ -12,6 +12,8 @@ enum MediaType {
 }
 
 const { user } = storeToRefs(authStore());
+const { updateUser } = authStore();
+
 const isAvatarModalOpen = ref(false);
 const isBannerModalOpen = ref(false);
 const isLoading = ref(false);
@@ -62,6 +64,7 @@ const uploadImage = async (type: MediaType) => {
                 }),
             });
             console.log(response);
+            isAvatarModalOpen.value = false;
         } else {
             // Update the banner
             const response = await sendRequest(`/v1/auth/profile`, {
@@ -71,11 +74,13 @@ const uploadImage = async (type: MediaType) => {
                 }),
             });
             console.log(response);
+            isBannerModalOpen.value = false;
         }
 
     } catch (error) {
         console.error('Error uploading photo:', error);
     } finally {
+        updateUser();
         isLoading.value = false;
     }
 };
