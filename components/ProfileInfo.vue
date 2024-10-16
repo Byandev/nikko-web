@@ -38,7 +38,6 @@ const updateImage = (event: Event) => {
     const file = target?.files?.[0];
     if (file) {
         Image.value = file;
-        console.log('Uploading image:', file);
     }
 };
 
@@ -51,8 +50,6 @@ const uploadImage = async (type: MediaType) => {
         } else {
             return;
         }
-
-        console.log('Uploading image:', Image.value);
 
         // Upload image and Get the ID
         const UploadImageResponse = await sendRequest('/v1/medias', {
@@ -78,7 +75,6 @@ const uploadImage = async (type: MediaType) => {
                     banner: UploadImageResponse.data.id,
                 }),
             });
-            console.log(response);
             isBannerModalOpen.value = false;
         }
 
