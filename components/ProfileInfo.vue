@@ -24,9 +24,9 @@ const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-p
 const bannerUrl = ref(user.value?.banner?.original_url || defaultBannerUrl);
 const avatarUrl = ref(user.value?.avatar?.original_url || defaultAvatarUrl);
 
-watch(user, (newUser) => {
-    bannerUrl.value = newUser?.banner?.original_url || defaultBannerUrl;
-    avatarUrl.value = newUser?.avatar?.original_url || defaultAvatarUrl;
+watch(user, (newMedia) => {
+    bannerUrl.value = newMedia?.banner?.original_url || defaultBannerUrl;
+    avatarUrl.value = newMedia?.avatar?.original_url || defaultAvatarUrl;
 });
 
 const { sendRequest: sendRequest } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
