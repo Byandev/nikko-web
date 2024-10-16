@@ -48,6 +48,7 @@ const uploadImage = async (type: MediaType) => {
         if (Image.value) {
             formData.append('file', Image.value);
         } else {
+            console.error('No image selected.');
             return;
         }
 
@@ -59,17 +60,16 @@ const uploadImage = async (type: MediaType) => {
 
         if(type === 'AVATAR') {
             // Update the avatar
-            const response = await sendRequest(`/v1/auth/profile`, {
+            await sendRequest(`/v1/auth/profile`, {
                 method: 'PUT',
                 body: JSON.stringify({
                     avatar: UploadImageResponse.data.id,
                 }),
             });
-            console.log(response);
             isAvatarModalOpen.value = false;
         } else {
             // Update the banner
-            const response = await sendRequest(`/v1/auth/profile`, {
+            await sendRequest(`/v1/auth/profile`, {
                 method: 'PUT',
                 body: JSON.stringify({
                     banner: UploadImageResponse.data.id,
@@ -125,7 +125,7 @@ const uploadImage = async (type: MediaType) => {
         </div>
 
         <Modal :modelValue="isAvatarModalOpen" @update:modelValue="isAvatarModalOpen = $event">
-            <template #title>    Avatar</template>
+            <template #title>Avatar</template>
             <template #content>
                 <p class="text-sm text-gray-500 mb-4">Please select an image file to upload as your avatar.</p>
                 <div class="sm:col-span-2 mb-4 flex items-center">
