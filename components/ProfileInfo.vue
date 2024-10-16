@@ -4,8 +4,9 @@ import { Icon } from '@iconify/vue/dist/iconify.js';
 import { authStore } from '@/store/authStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import { useSubmit } from '~/composables/useSubmit';
+import type { Media as MediaResponse } from '~/types/models/Media';
 
-enum ModalType {
+enum MediaType {
     AVATAR = 'AVATAR',
     BANNER = 'BANNER',
 }
@@ -21,31 +22,57 @@ const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-p
 const bannerUrl = ref(user.value?.banner?.original_url || defaultBannerUrl);
 const avatarUrl = ref(user.value?.avatar?.original_url || defaultAvatarUrl);
 
-const { sendRequest: sendRequest } = useSubmit<{ data: { expires_at: string } }, ApiErrorResponse>();
+const { sendRequest: sendRequest } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
 
-const avatarFile = ref<File | null>(null);
-const bannerFile = ref<File | null>(null);
+const Image = ref<File | null>(null);
 
-const updatePhoto = (event: Event, type: ModalType) => {
+const updateImage = (event: Event) => {
     const target = event.target as HTMLInputElement;
-    const files = target.files;
-    if (files) {
-        type === 'AVATAR' ? avatarFile.value = files[0] : bannerFile.value = files[0];
+    const file = target?.files?.[0];
+    if (file) {
+        Image.value = file;
+        console.log('Uploading image:', file);
     }
 };
 
-const uploadImage = async (type: string) => {
-    const file = type === 'AVATAR' ? avatarFile.value : bannerFile.value;
+const uploadImage = async (type: MediaType) => {
     try {
         isLoading.value = true;
-        const response = await sendRequest('/v1/medias', {
+        const formData = new FormData();
+        if (Image.value) {
+            formData.append('file', Image.value);
+        } else {
+            return;
+        }
+
+        console.log('Uploading image:', Image.value);
+
+        // Upload image and Get the ID
+        const UploadImageResponse = await sendRequest('/v1/medias', {
             method: 'POST',
-            body: {
-                file: file,
-                type: type,
-            },
+            body: formData,
         });
-        console.log(response);
+
+        if(type === 'AVATAR') {
+            // Update the avatar
+            const response = await sendRequest(`/v1/auth/profile`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    avatar: UploadImageResponse.data.id,
+                }),
+            });
+            console.log(response);
+        } else {
+            // Update the banner
+            const response = await sendRequest(`/v1/auth/profile`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    banner: UploadImageResponse.data.id,
+                }),
+            });
+            console.log(response);
+        }
+
     } catch (error) {
         console.error('Error uploading photo:', error);
     } finally {
@@ -97,7 +124,7 @@ const uploadImage = async (type: string) => {
                 <p class="text-sm text-gray-500 mb-4">Please select an image file to upload as your avatar.</p>
                 <div class="sm:col-span-2 mb-4 flex items-center">
                     <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Image</label>
-                    <input type="file" accept="image/*" required @change="event => updatePhoto(event,'AVATAR' as ModalType)"
+                    <input type="file" accept="image/*" required @change="event => updateImage(event)"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100" />
                 </div>
             </template>
@@ -106,7 +133,7 @@ const uploadImage = async (type: string) => {
                     <Button type="button" text="Cancel" background="white" foreground="black" :is-loading="isLoading"
                         :is-wide="false" @click="isAvatarModalOpen = false"></Button>
                     <Button type="button" text="Upload" background="primary" foreground="white" :is-loading="isLoading"
-                        :is-wide="false" @click="() => uploadImage('avatar')"></Button>
+                        :is-wide="false" @click="() => uploadImage('AVATAR' as MediaType)"></Button>
                 </div>
             </template>
         </Modal>
@@ -117,7 +144,7 @@ const uploadImage = async (type: string) => {
                 <p class="text-sm text-gray-500 mb-4">Please select an image file to upload as your banner.</p>
                 <div class="sm:col-span-2 mb-4 flex items-center">
                     <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Image</label>
-                    <input type="file" accept="image/*" required @change="event => updatePhoto(event, 'BANNER' as ModalType)"
+                    <input type="file" accept="image/*" required @change="event => updateImage(event)"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 bg-gray-100" />
                 </div>
             </template>
@@ -126,7 +153,7 @@ const uploadImage = async (type: string) => {
                     <Button type="button" text="Cancel" background="white" foreground="black" :is-loading="isLoading"
                         :is-wide="false" @click="isBannerModalOpen = false"></Button>
                     <Button type="button" text="Upload" background="primary" foreground="white" :is-loading="isLoading"
-                        :is-wide="false" @click="() => uploadImage('banner')"></Button>
+                        :is-wide="false" @click="() => uploadImage('BANNER' as MediaType)"></Button>
                 </div>
             </template>
         </Modal>
