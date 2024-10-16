@@ -1,24 +1,47 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
+import type { ApiErrorResponse } from '~/types/api/response/error';
+import { authStore } from '~/store/authStore';
+import type { Account } from '~/types/models/Account';
+import { useAddDetailsStore } from '~/store/addDetailsStore';
 
-defineProps<{
-  formData: {
-    profileTitle: string;
-    profileBio: string;
-  };
-}>();
+const { user } = storeToRefs(authStore());
 
-const emit = defineEmits(['updateProfileTitle', 'updateProfileBio']);
+const { Profile } = storeToRefs(useAddDetailsStore());
+const { setProfile } = useAddDetailsStore();
 
-const updateProfileTitle = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  emit('updateProfileTitle', target.value);
+interface FormData {
+  title: string;
+  bio: string;
+}
+
+const ProfileForm = ref<FormData>({
+  title: Profile.value.title ?? '',
+  bio: Profile.value.bio ?? '',
+});
+
+const { sendRequest: UpdateBio } = useSubmit<{data : Account }, ApiErrorResponse>();
+
+const SubmitProfile = async () => {
+  try {
+    const response = await UpdateBio(`/v1/auth/accounts/${user.value.id}`, {
+      method: 'PUT',
+      body: {
+        title: ProfileForm.value.title,
+        bio: ProfileForm.value.bio,
+      },
+    });
+    setProfile(response.data.title, response.data.bio);
+  } catch (error) {
+    console.log('Error updating profile:', error);
+  }
 };
 
-const updateProfileBio = (event: Event) => {
-  const target = event.target as HTMLTextAreaElement;
-  emit('updateProfileBio', target.value);
-};
+defineExpose({
+  SubmitProfile,
+});
+
+
 </script>
 
 <template>
@@ -34,7 +57,7 @@ const updateProfileBio = (event: Event) => {
       <div class="mt-2">
         <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
           <Icon icon="mdi:account" :ssr="true" />
-          <input type="text" id="profileTitle" v-model="formData.profileTitle" @input="updateProfileTitle" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+          <input type="text" id="profileTitle" v-model="ProfileForm.title" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
         </div>
       </div>
     </div>
@@ -47,7 +70,7 @@ const updateProfileBio = (event: Event) => {
       <div class="mt-2">
         <div class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
           <Icon icon="mdi:account-details" :ssr="true" />
-          <textarea id="profileBio" v-model="formData.profileBio" @input="updateProfileBio" rows="4" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
+          <textarea id="profileBio" v-model="ProfileForm.bio" rows="4" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
         </div>
       </div>
     </div>
