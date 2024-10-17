@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { Icon } from '@iconify/vue/dist/iconify.js';
 import ProfileForm from '~/components/multi-step-forms/ProfileForm.vue';
 import LanguagesForm from '~/components/multi-step-forms/LanguagesForm.vue';
+import SkillsForm from '~/components/multi-step-forms/SkillsForm.vue';
 
 const currentStep = ref(1);
 
@@ -28,6 +29,12 @@ const nextStep = () => {
   if (currentStep.value === 2) {
     if (languagesRef.value) {
       languagesRef.value.SubmitLanguage();
+    }
+  }
+
+  if (currentStep.value === 3) {
+    if (skillsRef.value) {
+      skillsRef.value.SubmitSkills();
     }
   }
 
@@ -58,6 +65,7 @@ const updateStepStates = () => {
 
 const profileRef = ref<InstanceType<typeof ProfileForm> | null>(null);
 const languagesRef = ref<InstanceType<typeof LanguagesForm> | null>(null);
+const skillsRef = ref<InstanceType<typeof SkillsForm> | null>(null);
 
 const submitForm = () => {
 
@@ -76,7 +84,7 @@ const submitForm = () => {
       <LanguagesForm ref="languagesRef" />
     </div>
     <div v-if="currentStep === 3">
-      <!-- Step 3 Component -->
+      <SkillsForm ref="skillsRef" />
     </div>
     <div v-if="currentStep === 4">
       <!-- Step 4 Component -->

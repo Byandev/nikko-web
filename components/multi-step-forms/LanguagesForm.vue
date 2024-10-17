@@ -36,7 +36,7 @@ const SubmitLanguage = async () => {
         });
         setLanguages(ProfileForm.value.languages); // Update the store with the local copy
     } catch (error) {
-        console.log('Error updating profile:', error);
+        console.log('Error updating languages:', error);
     }
 };
 
