@@ -77,7 +77,7 @@ onMounted( async () => {
         isLoading.value = true;
         await fetchCurrentUser('/v1/auth/profile');
         if (currentUser?.value?.data.email_verified_at) {
-            await router.push('/find-work');
+            await router.push('/contact-info');
         }
     } catch (error) {
         console.error('Error during onMounted:', error);
