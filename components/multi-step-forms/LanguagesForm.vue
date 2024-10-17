@@ -26,7 +26,16 @@ const ProfileForm = ref<FormData>({
 
 const { sendRequest: updateLanguages } = useSubmit<{ data: Account }, ApiErrorResponse>();
 
+const validateForm = () => {
+    return ProfileForm.value.languages.every(language => language.name.trim() !== '' && language.proficiency.trim() !== '');
+};
+
 const SubmitLanguage = async () => {
+    if (!validateForm()) {
+        console.log('Error: All fields must be filled out.');
+        return;
+    }
+
     try {
        await updateLanguages(`/v1/auth/accounts/${user.value.id}`, {
             method: 'PUT',
