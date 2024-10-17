@@ -4,6 +4,7 @@ import type { Language } from '~/types/models/Language';
 import type { Skill } from '~/types/models/Skill';
 import { useFetchData } from '~/composables/useFetchData';
 import type { ApiErrorResponse } from '~/types/api/response/error';
+import type { WorkExperience } from '~/types/models/WorkExperience';
 
 export const useAddDetailsStore = defineStore("addDetails", () => {
 
@@ -16,6 +17,7 @@ export const useAddDetailsStore = defineStore("addDetails", () => {
 
     const Languages = ref<Language[]>([]);
     const Skills = ref<Skill[]>([]);
+    const WorkExperiences = ref<WorkExperience[]>([]);
 
     const setProfile = (title: string, bio: string) => {
         Profile.value.title = title;
@@ -30,6 +32,10 @@ export const useAddDetailsStore = defineStore("addDetails", () => {
         Skills.value = skills;
     }
 
+    const setWorkExperiences = (workExperiences: WorkExperience[]) => {
+        WorkExperiences.value = workExperiences;
+    }
+
     onMounted(async () => {
         await fetchSkills('/v1/skills');
     });
@@ -41,6 +47,8 @@ export const useAddDetailsStore = defineStore("addDetails", () => {
         setLanguages,
         Skills,
         setSkills,
-        ListSkills
+        ListSkills,
+        WorkExperiences,
+        setWorkExperiences
     }
 });

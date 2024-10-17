@@ -4,6 +4,7 @@ import { Icon } from '@iconify/vue/dist/iconify.js';
 import ProfileForm from '~/components/multi-step-forms/ProfileForm.vue';
 import LanguagesForm from '~/components/multi-step-forms/LanguagesForm.vue';
 import SkillsForm from '~/components/multi-step-forms/SkillsForm.vue';
+import WorkExperiencesForm from '~/components/multi-step-forms/WorkExperiencesForm.vue';
 
 const currentStep = ref(1);
 
@@ -14,9 +15,10 @@ interface Step {
 
 const steps = ref<Step[]>([
   { label: 'Profile', state: 'current' },
-  { label: 'Step 2', state: 'upcoming' },
-  { label: 'Step 3', state: 'upcoming' },
-  { label: 'Step 4', state: 'upcoming' },
+  { label: 'Languages', state: 'upcoming' },
+  { label: 'Skills', state: 'upcoming' },
+  { label: 'Work Experience', state: 'upcoming' },
+  { label: 'Education', state: 'upcoming' }, // Add the new step
 ]);
 
 const nextStep = () => {
@@ -37,6 +39,18 @@ const nextStep = () => {
       skillsRef.value.SubmitSkills();
     }
   }
+
+  if (currentStep.value === 4) {
+    if (workExperiencesRef.value) {
+      workExperiencesRef.value.SubmitWorkExperience();
+    }
+  }
+
+  // if (currentStep.value === 5) {
+  //   if (educationRef.value) {
+  //     educationRef.value.SubmitEducation();
+  //   }
+  // }
 
   if (currentStep.value < steps.value.length) {
     currentStep.value++;
@@ -66,9 +80,10 @@ const updateStepStates = () => {
 const profileRef = ref<InstanceType<typeof ProfileForm> | null>(null);
 const languagesRef = ref<InstanceType<typeof LanguagesForm> | null>(null);
 const skillsRef = ref<InstanceType<typeof SkillsForm> | null>(null);
+const workExperiencesRef = ref<InstanceType<typeof WorkExperiencesForm> | null>(null);
 
 const submitForm = () => {
-
+  // Final submission logic
 };
 </script>
 
@@ -87,10 +102,13 @@ const submitForm = () => {
       <SkillsForm ref="skillsRef" />
     </div>
     <div v-if="currentStep === 4">
-      <!-- Step 4 Component -->
+      <WorkExperiencesForm ref="workExperiencesRef" />
+    </div>
+    <div v-if="currentStep === 5">
+      <!-- <EducationForm ref="educationRef" /> -->
     </div>
 
-    <div :class="{ 'justify-end': currentStep === 1, 'justify-between': currentStep !== 1}" class="flex  mt-5">
+    <div :class="{ 'justify-end': currentStep === 1, 'justify-between': currentStep !== 1}" class="flex mt-5">
       <span @click="prevStep" class="flex flex-row justify-center items-center"
         :class="{'cursor-not-allowed text-gray-400 hidden': currentStep === 1, 'cursor-pointer text-primary': currentStep !== 1}"
         :disabled="currentStep === 1">
