@@ -107,7 +107,7 @@ const handleSubmit = async () => {
                     <div
                         class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                         <Icon icon="mdi:home" :ssr="true" />
-                        <input type="text" id="street-address" name="street-address" v-model="contactInfo.streetAddress"
+                        <input type="text" id="street-address" name="street-address" v-model="contactInfo.streetAddress" required
                             class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                     </div>
                 </div>
@@ -122,7 +122,7 @@ const handleSubmit = async () => {
                         <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                             <Icon icon="mdi:earth" :ssr="true" />
-                            <input type="text" id="country" name="country" v-model="contactInfo.countryCode"
+                            <input type="text" id="country" name="country" v-model="contactInfo.countryCode" required
                                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
                     </div>
@@ -136,7 +136,7 @@ const handleSubmit = async () => {
                         <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                             <Icon icon="mdi:city" :ssr="true" />
-                            <input type="text" id="city" name="city" v-model="contactInfo.city"
+                            <input type="text" id="city" name="city" v-model="contactInfo.city" required
                                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
                     </div>
@@ -152,7 +152,7 @@ const handleSubmit = async () => {
                         <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                             <Icon icon="mdi:mailbox" :ssr="true" />
-                            <input type="text" id="postal-code" name="postal-code" v-model="contactInfo.postal"
+                            <input type="text" id="postal-code" name="postal-code" v-model="contactInfo.postal" required
                                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
                     </div>
@@ -166,7 +166,7 @@ const handleSubmit = async () => {
                         <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                             <Icon icon="mdi:map-marker" :ssr="true" />
-                            <input type="text" id="state-code" name="state-code" v-model="contactInfo.stateCode"
+                            <input type="text" id="state-code" name="state-code" v-model="contactInfo.stateCode" required
                                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
                     </div>
@@ -181,7 +181,7 @@ const handleSubmit = async () => {
                         <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                             <Icon icon="mdi:phone" :ssr="true" />
-                            <input type="text" id="phone-number" name="phone-number" v-model="contactInfo.phoneNumber"
+                            <input type="text" id="phone-number" name="phone-number" v-model="contactInfo.phoneNumber" required
                                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
                     </div>
