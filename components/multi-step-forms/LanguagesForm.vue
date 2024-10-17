@@ -8,6 +8,8 @@ import { Proficiency } from '~/types/models/Language';
 
 const { user } = storeToRefs(authStore());
 
+const { updateUser } = authStore();
+
 const { Languages } = storeToRefs(useAddDetailsStore());
 const { setLanguages } = useAddDetailsStore();
 
@@ -19,21 +21,22 @@ interface FormData {
 }
 
 const ProfileForm = ref<FormData>({
-    languages: Languages.value.length > 0 ? Languages.value : [{ name: '', proficiency: '' }],
+    languages: Languages.value.length > 0 ? [...Languages.value] : [{ name: '', proficiency: '' }],
 });
 
 const { sendRequest: updateLanguages } = useSubmit<{ data: Account }, ApiErrorResponse>();
 
 const SubmitLanguage = async () => {
     try {
-        const response = await updateLanguages(`/v1/auth/accounts/${user.value.id}`, {
+       await updateLanguages(`/v1/auth/accounts/${user.value.id}`, {
             method: 'PUT',
             body: {
                 languages: ProfileForm.value.languages,
             },
         });
-        console.log('Languages',response.data.languages);
-        setLanguages(response.data.languages);
+        await updateUser();
+        console.log('Profile updated successfully', user.value.languages);  
+        setLanguages(ProfileForm.value.languages); // Update the store with the local copy
     } catch (error) {
         console.log('Error updating profile:', error);
     }
@@ -46,8 +49,6 @@ defineExpose({
 const addLanguage = () => {
     ProfileForm.value.languages.push({ name: '', proficiency: '' });
 };  
-
-
 </script>
 
 <template>

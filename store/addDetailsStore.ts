@@ -21,6 +21,7 @@ export const useAddDetailsStore = defineStore("addDetails", () => {
     }
 
     const setLanguages = (languages: Language[]) => {
+        console.log(languages);
         Languages.value = languages;
     }
 
