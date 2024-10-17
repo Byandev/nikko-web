@@ -51,8 +51,8 @@ const addLanguage = () => {
 
 <template>
     <div class="flex flex-col items-center justify-center">
-        <h1 class="text-2xl font-bold mb-4">Write a Title for your Profile</h1>
-        <span class="text-gray-600 mb-4">Your impression matters. Describe your expertise uniquely to stand out.</span>
+        <h1 class="text-2xl font-bold mb-4">Languages You Speak</h1>
+        <span class="text-gray-600 mb-4">List the languages you are proficient in and your level of proficiency.</span>
 
         <div v-for="(language, index) in ProfileForm.languages" :key="index" class="flex flex-row gap-5">
             <!-- Language -->
