@@ -1,10 +1,7 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
 import { Icon } from '@iconify/vue/dist/iconify.js';
-
-import StepOne from '~/pages/sign-up/multi-step-forms/step-one.vue';
-import StepTwo from '~/pages/sign-up/multi-step-forms/step-two.vue';
-import StepThree from '~/pages/sign-up/multi-step-forms/step-three.vue';
-import StepFour from '~/pages/sign-up/multi-step-forms/step-four.vue';
+import ProfileForm from '~/components/multi-step-forms/ProfileForm.vue'; // Correct the import path if necessary
 
 const currentStep = ref(1);
 
@@ -14,45 +11,20 @@ interface Step {
 }
 
 const steps = ref<Step[]>([
-  { label: 'Step 1', state: 'current' },
+  { label: 'Profile', state: 'current' },
   { label: 'Step 2', state: 'upcoming' },
   { label: 'Step 3', state: 'upcoming' },
   { label: 'Step 4', state: 'upcoming' },
 ]);
 
-interface FormData {
-  profileTitle: string;
-  profileBio: string;
-  languages: {
-    language: string;
-    level: string;
-  }[];
-}
-
-const formData = ref<FormData>({
-  profileTitle: '',
-  profileBio: '',
-  languages: [
-    {
-      language: '',
-      level: '',
-    },
-  ],
-});
-
-const addLanguage = () => {
-  formData.value.languages.push({
-    language: '',
-    level: '',
-  });
-};
-
-
-watch(formData, (newVal, oldVal) => {
-  console.log('Form data changed:', newVal);
-}, { deep: true });
-
 const nextStep = () => {
+  if (currentStep.value = 1)
+  {
+    if (profileRef.value) {
+      profileRef.value.SubmitProfile();
+    }
+  }
+
   if (currentStep.value < steps.value.length) {
     currentStep.value++;
     updateStepStates();
@@ -78,8 +50,10 @@ const updateStepStates = () => {
   });
 };
 
+const profileRef = ref<InstanceType<typeof ProfileForm> | null>(null);
+
 const submitForm = () => {
-  console.log('Form submitted:', formData.value);
+
 };
 </script>
 
@@ -89,21 +63,19 @@ const submitForm = () => {
       <ProgressBar :steps="steps" />
     </div>
     <div v-if="currentStep === 1">
-      <StepOne :formData="formData" @update-profile-title="formData.profileTitle = $event" @update-profile-bio="formData.profileBio = $event" />
+      <ProfileForm ref="profileRef" />
     </div>
     <div v-if="currentStep === 2">
-      <StepTwo :formData="formData" @add-language="addLanguage" />
+      <!-- Step 2 Component -->
     </div>
     <div v-if="currentStep === 3">
-      <StepThree :formData="formData" />
+      <!-- Step 3 Component -->
     </div>
     <div v-if="currentStep === 4">
-      <StepFour :formData="formData" />
+      <!-- Step 4 Component -->
     </div>
 
-    <div
-      :class="{ 'justify-end': currentStep === 1, 'justify-between': currentStep !== 1}"
-      class="flex  mt-5">
+    <div :class="{ 'justify-end': currentStep === 1, 'justify-between': currentStep !== 1}" class="flex  mt-5">
       <span @click="prevStep" class="flex flex-row justify-center items-center"
         :class="{'cursor-not-allowed text-gray-400 hidden': currentStep === 1, 'cursor-pointer text-primary': currentStep !== 1}"
         :disabled="currentStep === 1">
