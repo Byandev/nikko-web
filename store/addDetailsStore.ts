@@ -1,4 +1,10 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+
+interface Language {
+    name: string;
+    proficiency: string;
+}
 
 export const useAddDetailsStore = defineStore("addDetails", () => {
 
@@ -7,13 +13,21 @@ export const useAddDetailsStore = defineStore("addDetails", () => {
         bio: '',
     });
 
+    const Languages = ref<Language[]>([]);
+
     const setProfile = (title: string, bio: string) => {
         Profile.value.title = title;
         Profile.value.bio = bio;
     }
 
-    return{
+    const setLanguages = (languages: Language[]) => {
+        Languages.value = languages;
+    }
+
+    return {
         Profile,
         setProfile,
+        Languages,
+        setLanguages
     }
 });

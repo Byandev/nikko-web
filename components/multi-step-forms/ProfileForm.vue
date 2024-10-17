@@ -31,6 +31,7 @@ const SubmitProfile = async () => {
         bio: ProfileForm.value.bio,
       },
     });
+    console.log('Profile', response.data);
     setProfile(response.data.title, response.data.bio);
   } catch (error) {
     console.log('Error updating profile:', error);

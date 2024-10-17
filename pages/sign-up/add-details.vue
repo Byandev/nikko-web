@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { Icon } from '@iconify/vue/dist/iconify.js';
-import ProfileForm from '~/components/multi-step-forms/ProfileForm.vue'; // Correct the import path if necessary
+import ProfileForm from '~/components/multi-step-forms/ProfileForm.vue';
+import LanguagesForm from '~/components/multi-step-forms/LanguagesForm.vue';
 
 const currentStep = ref(1);
 
@@ -18,10 +19,15 @@ const steps = ref<Step[]>([
 ]);
 
 const nextStep = () => {
-  if (currentStep.value = 1)
-  {
+  if (currentStep.value === 1) {
     if (profileRef.value) {
       profileRef.value.SubmitProfile();
+    }
+  }
+  
+  if (currentStep.value === 2) {
+    if (languagesRef.value) {
+      languagesRef.value.SubmitLanguage();
     }
   }
 
@@ -51,6 +57,7 @@ const updateStepStates = () => {
 };
 
 const profileRef = ref<InstanceType<typeof ProfileForm> | null>(null);
+const languagesRef = ref<InstanceType<typeof LanguagesForm> | null>(null);
 
 const submitForm = () => {
 
@@ -66,7 +73,7 @@ const submitForm = () => {
       <ProfileForm ref="profileRef" />
     </div>
     <div v-if="currentStep === 2">
-      <!-- Step 2 Component -->
+      <LanguagesForm ref="languagesRef" />
     </div>
     <div v-if="currentStep === 3">
       <!-- Step 3 Component -->
