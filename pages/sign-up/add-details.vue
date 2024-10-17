@@ -5,8 +5,10 @@ import ProfileForm from '~/components/multi-step-forms/ProfileForm.vue';
 import LanguagesForm from '~/components/multi-step-forms/LanguagesForm.vue';
 import SkillsForm from '~/components/multi-step-forms/SkillsForm.vue';
 import WorkExperiencesForm from '~/components/multi-step-forms/WorkExperiencesForm.vue';
+import EducationHistoryForm from '~/components/multi-step-forms/EducationHistoryForm.vue';
 
 const currentStep = ref(1);
+const router = useRouter();
 
 interface Step {
   label: string;
@@ -46,12 +48,6 @@ const nextStep = () => {
     }
   }
 
-  // if (currentStep.value === 5) {
-  //   if (educationRef.value) {
-  //     educationRef.value.SubmitEducation();
-  //   }
-  // }
-
   if (currentStep.value < steps.value.length) {
     currentStep.value++;
     updateStepStates();
@@ -81,9 +77,13 @@ const profileRef = ref<InstanceType<typeof ProfileForm> | null>(null);
 const languagesRef = ref<InstanceType<typeof LanguagesForm> | null>(null);
 const skillsRef = ref<InstanceType<typeof SkillsForm> | null>(null);
 const workExperiencesRef = ref<InstanceType<typeof WorkExperiencesForm> | null>(null);
+const educationRef = ref<InstanceType<typeof EducationHistoryForm> | null>(null);
 
 const submitForm = () => {
-  // Final submission logic
+  if (educationRef.value) {
+      educationRef.value.SubmitEducationHistory();
+  }
+  router.push('/freelancer-dashboard');
 };
 </script>
 
@@ -105,7 +105,7 @@ const submitForm = () => {
       <WorkExperiencesForm ref="workExperiencesRef" />
     </div>
     <div v-if="currentStep === 5">
-      <!-- <EducationForm ref="educationRef" /> -->
+      <EducationHistoryForm ref="educationRef" />
     </div>
 
     <div :class="{ 'justify-end': currentStep === 1, 'justify-between': currentStep !== 1}" class="flex mt-5">
