@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import {router} from "next/client";
-
 const emits = defineEmits<{ (e: 'submit'): void; (e: 'back'): void; }>();
 
 import _ from 'lodash';
@@ -9,6 +7,7 @@ import moment from 'moment'
 import {Icon} from '@iconify/vue';
 import {Country, ICountry} from 'country-state-city';
 
+const router = useRouter();
 import {authStore} from '~/store/authStore';
 import {accountStore} from "~/store/accountStore";
 
@@ -55,7 +54,7 @@ const submitForm = async () => {
       account.value.educations = response.data.educations
     }
 
-    await router.push('/freelancer-dashboard')
+    router.push('/freelancer-dashboard')
     console.log('Education history updated:', response);
   } catch (error) {
     console.log('Error updating work experience:', error);

@@ -86,7 +86,7 @@ const handleSubmit = async () => {
   if (user.value.accounts[0].type === 'CLIENT') {
     return router.push('/client-dashboard');
   } else {
-    return router.push('/sign-up/add-details');
+    return router.push(`/onboarding/${user.value.accounts[0].id}`);
   }
 };
 </script>
