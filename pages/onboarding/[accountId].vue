@@ -8,7 +8,7 @@ import EducationHistoryForm from "~/components/multi-step-forms/EducationHistory
 import SkillsForm from "~/components/multi-step-forms/SkillsForm.vue";
 import ProfileForm from "~/components/multi-step-forms/ProfileForm.vue";
 
-const currentStep = ref(3);
+const currentStep = ref(5);
 </script>
 
 <template>
