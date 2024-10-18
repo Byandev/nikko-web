@@ -72,6 +72,7 @@ const handleSubmit = async () => {
 
   user.value.email_verified_at = response.data.email_verified_at
 
+
   if (user.value.accounts[0].type === 'CLIENT') {
     await router.push('/client-dashboard');
   } else {
