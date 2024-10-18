@@ -65,17 +65,17 @@ const handleSubmit = async () => {
     form.value.avatar = uploadAvatarResponse.data.id
   }
 
-  await updateProfile(`/v1/auth/profile`, {
+ const response = await updateProfile(`/v1/auth/profile`, {
     method: 'PUT',
     body: form.value
   });
 
-  await updateUser();
+  user.value.email_verified_at = response.data.email_verified_at
 
   if (user.value.accounts[0].type === 'CLIENT') {
-    return router.push('/client-dashboard');
+    await router.push('/client-dashboard');
   } else {
-    return router.push(`/onboarding/${user.value.accounts[0].id}`);
+    await router.push(`/onboarding/${user.value.accounts[0].id}`);
   }
 };
 </script>
@@ -156,7 +156,7 @@ const handleSubmit = async () => {
             <div
                 class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
               <Icon icon="mdi:city" :ssr="true" />
-              <input type="text" id="city" name="city" v-model="contactInfo.city" required
+              <input type="text" id="city" name="city" v-model="form.city" required
                      class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
             </div>
           </div>
