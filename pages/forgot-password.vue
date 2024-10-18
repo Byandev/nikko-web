@@ -51,7 +51,7 @@ const submitForm = async () => {
                 },
             });
             resetPasswordData.value = { email: form.value.email, token: form.value.token };
-            router.push('/reset-password');
+            await router.push('/reset-password');
         } catch (error) {
             console.error('Error sending password reset email:', error);
         } 
