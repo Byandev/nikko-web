@@ -9,7 +9,7 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-  
+
   runtimeConfig: {
     public: {
       apiURL: process.env.API_URL,

@@ -17,9 +17,7 @@ export interface Account {
     created_at: string;
     updated_at: string;
     user: User;
-    languages: Language[];
     skills: Skill[];
     educations: Education[];
     work_experiences: WorkExperience[];
-     
 }

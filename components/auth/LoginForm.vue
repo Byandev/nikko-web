@@ -4,34 +4,34 @@ import { useSubmit } from "~/composables/useSubmit";
 import type { AuthenticationResponse } from "~/types/api/response/auth";
 import type { ApiErrorResponse } from "~/types/api/response/error";
 import { Icon } from '@iconify/vue';
+import {accountStore} from "~/store/accountStore";
 
 const router = useRouter();
 const route = useRoute();
 const { getSession } = useAuth()
 const { setToken } = useAuthState()
+const { account } = storeToRefs(accountStore())
 
-const { sendRequest: logIn } = useSubmit<AuthenticationResponse, ApiErrorResponse>()
+const { sendRequest: logIn, pending: isLoading } = useSubmit<AuthenticationResponse, ApiErrorResponse>()
 
-interface RegisterForm {
+interface LoginForm {
     email: string;
     password: string;
     remember_me: boolean;
 }
 
-const RegisterForm = ref<RegisterForm>({
+const form = ref<LoginForm>({
     email: '',
     password: '',
     remember_me: false,
 });
 
-const RegisterRules = {
+const rules = {
     email: { required, email },
     password: { required},
 };
 
-const { formRef, v$ } = useValidation(RegisterForm, RegisterRules);
-
-const isLoading = ref(false);
+const { formRef, v$ } = useValidation(form, rules);
 
 const submitForm = async () => {
 
@@ -39,14 +39,15 @@ const submitForm = async () => {
     if (v$.value.$invalid) return;
 
     try {
-        isLoading.value = true;
         const response = await logIn('/v1/auth/login', {
             method: 'POST',
             body: {
-                email: RegisterForm.value.email,
-                password: RegisterForm.value.password,
+                email: form.value.email,
+                password: form.value.password,
             },
         });
+
+        account.value = response.user.accounts[0];
 
         setToken(response?.access_token as string)
 
@@ -54,9 +55,7 @@ const submitForm = async () => {
 
         await router.push("/find-work");
     } catch (error) {
-        console.error(error as ApiErrorResponse)
-    } finally {
-        isLoading.value = false;
+        console.error(error)
     }
 };
 </script>

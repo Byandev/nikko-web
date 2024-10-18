@@ -1,5 +1,6 @@
 import type { Account } from "./Account"
 import type { Media } from "./Media"
+import type {Language} from "~/types/models/Language";
 
 export interface User {
     id: number
@@ -18,4 +19,5 @@ export interface User {
     avatar: Media | null
     banner: Media | null
     accounts: Account[]
+    languages?: Language[]
 }
