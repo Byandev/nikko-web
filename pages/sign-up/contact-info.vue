@@ -8,7 +8,6 @@ definePageMeta({
 import {ref} from 'vue';
 const router = useRouter();
 import {Icon} from '@iconify/vue/dist/iconify.js';
-import {City, Country, ICity, ICountry, IState, State} from 'country-state-city';
 
 import {authStore} from '~/store/authStore';
 
@@ -41,16 +40,6 @@ const form = ref<{
   country_code:user.value.country_code ?? '',
   phone_number: user.value.phone_number ?? '',
   street_address: user.value.street_address ?? '',
-});
-
-const countriesOptions = ref<ICountry[]>(Country.getAllCountries());
-const stateOptions = computed<IState[]>(() => form.value.country_code ? State.getStatesOfCountry(form.value.country_code) : []);
-const cityOptions = computed<ICity[]>(() => {
-  if (form.value.country_code && form.value.state_code) {
-    return City.getCitiesOfState(form.value.country_code, form.value.state_code)
-  } else {
-    return []
-  }
 });
 
 async function changeAvatar(event: Event) {
@@ -164,13 +153,12 @@ const handleSubmit = async () => {
             City
           </label>
           <div class="mt-2">
-            <select v-model="form.city"
-                    class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-              <option :value="city.name" class="truncate text-sm leading-6 " v-for="city in cityOptions"
-                      :key="city.name">
-                {{ city.name }}
-              </option>
-            </select>
+            <div
+                class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+              <Icon icon="mdi:city" :ssr="true" />
+              <input type="text" id="city" name="city" v-model="contactInfo.city" required
+                     class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+            </div>
           </div>
         </div>
 
