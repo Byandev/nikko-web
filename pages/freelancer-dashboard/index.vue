@@ -1,3 +1,10 @@
+<script setup lang="ts">
+
+definePageMeta({
+  middleware: ['verify']
+});
+</script>
+
 <template>
   <div class="my-8 lg:mx-auto mx-5">
     <ProfileInfo class="max-w-6xl mx-auto " />

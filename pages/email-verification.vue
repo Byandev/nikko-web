@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { useFetchData } from '~/composables/useFetchData';
 import { useSubmit } from '~/composables/useSubmit';
 import { Icon } from '@iconify/vue';
-import type { User as UserResponse } from '~/types/models/User';
 import type { VerificationResponse } from "~/types/api/response/verfication";
 import type { ApiErrorResponse } from '~/types/api/response/error';
+import {authStore} from "~/store/authStore";
 
 const router = useRouter();
 const code = ref(Array(6).fill(''));
@@ -14,9 +13,9 @@ const resendButtonText = ref('Resend Code');
 const countdown = ref(60);
 let timer: ReturnType<typeof setInterval> | null = null;
 
-const { data: currentUser, fetchData: fetchCurrentUser } = useFetchData<{ data: UserResponse }, ApiErrorResponse>();
 const { sendRequest: resendEmailVerification } = useSubmit<VerificationResponse, ApiErrorResponse>();
 const { sendRequest: verifyEmail } = useSubmit<VerificationResponse, ApiErrorResponse>();
+const { user } = authStore();
 
 const focusNext = (event: Event, index: number) => {
     const input = event.target as HTMLInputElement;
@@ -30,11 +29,12 @@ const verifyCode = async () => {
     const enteredCode = code.value.join('');
     try {
         isLoading.value = true;
-        const response = await verifyEmail('/v1/auth/email-verification/verify', {
+
+        await verifyEmail('/v1/auth/email-verification/verify', {
             method: 'POST',
             body: JSON.stringify({ code: enteredCode }),
         });
-        
+
         await router.push("/sign-up/contact-info");
     } catch (error) {
         console.error('Verification failed:', error);
@@ -71,20 +71,6 @@ const startTimer = () => {
         }
     }, 1000);
 };
-
-onMounted( async () => {
-    try {
-        isLoading.value = true;
-        await fetchCurrentUser('/v1/auth/profile');
-        if (currentUser?.value?.data.email_verified_at) {
-            await router.push('/find-work');
-        }
-    } catch (error) {
-        console.error('Error during onMounted:', error);
-    } finally {
-        isLoading.value = false;
-    }
-});
 </script>
 
 <template>
@@ -95,7 +81,7 @@ onMounted( async () => {
             </div>
             <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Email Verification</h2>
             <p class="text-gray-600 mb-6 text-center">Please enter the 6-digit code sent to your email: <strong> {{
-                    currentUser?.data.email }} </strong></p>
+                    user?.email }} </strong></p>
             <div class="mb-6">
                 <div class="flex justify-center gap-2">
                     <input type="text" maxlength="1" v-for="n in 6" :key="n" v-model="code[n - 1]"
