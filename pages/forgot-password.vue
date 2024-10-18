@@ -14,14 +14,13 @@ definePageMeta({
 
 const router = useRouter();
 
-const forgetPasswordForm = ref({
+const form = ref({
     email: '',
     token: '',
 });
 
-const { setEmail, setToken } = useResetPasswordStore();
+const { resetPasswordData } = storeToRefs(useResetPasswordStore());
 
-const isLoading = ref(false);
 const showOtpInput = ref(false);
 const isResendDisabled = ref(false);
 const resendTimer = ref(60);
@@ -38,56 +37,49 @@ const startResendTimer = () => {
     }, 1000);
 };
 
-const { sendRequest: sendPasswordResetRequest } = useSubmit<{ data: { expires_at: string } }, ApiErrorResponse>();
+const { sendRequest: sendPasswordResetRequest, pending: isSubmitting } = useSubmit<{ data: { expires_at: string } }, ApiErrorResponse>();
 
-const handleForgotPassword = async () => {
+const submitForm = async () => {
     if (showOtpInput.value) {
         // Reset password
         try {
-            isLoading.value = true;
             await sendPasswordResetRequest('/v1/auth/reset-password/check', {
                 method: 'POST',
                 body: {
-                    email: forgetPasswordForm.value.email,
-                    token: forgetPasswordForm.value.token,
+                    email: form.value.email,
+                    token: form.value.token,
                 },
             });
-            setEmail(forgetPasswordForm.value.email);
-            setToken(forgetPasswordForm.value.token);
+            resetPasswordData.value = { email: form.value.email, token: form.value.token };
             router.push('/reset-password');
         } catch (error) {
             console.error('Error sending password reset email:', error);
-        } finally {
-            isLoading.value = false;
-        }
+        } 
     } else {
         // Send password reset email
-        resendOtp();
+        resendOTP();
     }
 };
 
-const resendOtp = async () => {
+const resendOTP = async () => {
     startResendTimer();
     try {
-        isLoading.value = true;
         await sendPasswordResetRequest('/v1/auth/forgot-password', {
             method: 'POST',
             body: {
-                email: forgetPasswordForm.value.email,
+                email: form.value.email,
             },
         });
         showOtpInput.value = true;
     } catch (error) {
         console.error('Error resending OTP:', error);
-    } finally {
-        isLoading.value = false;
-    }
+    } 
 };
 </script>
 
 <template>
     <div class="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8">
-        <form @submit.prevent="handleForgotPassword"
+        <form @submit.prevent="submitForm"
             class="relative bg-white p-8 rounded-lg shadow-2xl max-w-md w-full transform transition-all duration-300 hover:scale-105">
             <NuxtLink to="/login" class="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
                 <Icon icon="mdi:arrow-left" width="24" height="24" />
@@ -98,32 +90,32 @@ const resendOtp = async () => {
             <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Forgot Password</h2>
             <p class="text-gray-600 mb-6 text-center">
                 <span v-if="showOtpInput">
-                    We sent OTP to <strong>{{ forgetPasswordForm.email }}</strong>
+                    We sent OTP to <strong>{{ form.email }}</strong>
                 </span>
                 <span v-else>
                     Please enter the email you registered to reset your password.
                 </span>
             </p>
             <div v-if="showOtpInput" class="mb-6">
-                <input type="text" v-model="forgetPasswordForm.token" placeholder="Enter OTP" required
+                <input type="text" v-model="form.token" placeholder="Enter OTP" required
                     class="w-full px-4 py-2 text-lg border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
 
                 <div class="flex flex-col items-center mt-4">
                     <p class="text-sm text-gray-500 mb-2">
                         Didn't receive the OTP? Click below to resend.
                     </p>
-                    <button @click="resendOtp" type="button" :disabled="isResendDisabled"
+                    <button @click="resendOTP" type="button" :disabled="isResendDisabled"
                         class="text-primary transition-all duration-200 disabled:text-gray-400 disabled:cursor-not-allowed">
                         Resend OTP <span v-if="isResendDisabled">({{ resendTimer }}s)</span>
                     </button>
                 </div>
             </div>
             <div v-else class="mb-6">
-                <input type="email" v-model="forgetPasswordForm.email" placeholder="Email" required
+                <input type="email" v-model="form.email" placeholder="Email" required
                     class="w-full px-4 py-2 text-lg border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
             </div>
             <Button :text="showOtpInput ? 'Verify OTP' : 'Submit'" background="primary" foreground="white"
-                :is-loading="isLoading" :is-wide="true" type="submit"></Button>
+                :is-loading="isSubmitting" :is-wide="true" type="submit"></Button>
         </form>
     </div>
 </template>
