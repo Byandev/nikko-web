@@ -24,14 +24,14 @@ const { sendRequest: UpdateBio } = useSubmit<{data : Account }, ApiErrorResponse
 
 const SubmitProfile = async () => {
   try {
-    const response = await UpdateBio(`/v1/auth/accounts/${user.value.id}`, {
+    await UpdateBio(`/v1/auth/accounts/${user.value.id}`, {
       method: 'PUT',
       body: {
         title: ProfileForm.value.title,
         bio: ProfileForm.value.bio,
       },
     });
-    setProfile(response.data.title, response.data.bio);
+    setProfile(ProfileForm.title, ProfileForm.bio);
   } catch (error) {
     console.log('Error updating profile:', error);
   }

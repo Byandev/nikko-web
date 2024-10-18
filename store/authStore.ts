@@ -12,6 +12,7 @@ export const authStore = defineStore('auth', () => {
         () => {
             if (data.value?.data) {
                 user.value = data.value?.data;
+                console.log('User:', user.value);
             }
         },
         { immediate: true }

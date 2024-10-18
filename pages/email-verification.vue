@@ -35,7 +35,7 @@ const verifyCode = async () => {
             body: JSON.stringify({ code: enteredCode }),
         });
         
-        await router.push("/find-work");
+        await router.push("/sign-up/contact-info");
     } catch (error) {
         console.error('Verification failed:', error);
     } finally {
