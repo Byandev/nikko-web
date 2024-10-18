@@ -15,7 +15,7 @@ let timer: ReturnType<typeof setInterval> | null = null;
 
 const { sendRequest: resendEmailVerification } = useSubmit<VerificationResponse, ApiErrorResponse>();
 const { sendRequest: verifyEmail } = useSubmit<VerificationResponse, ApiErrorResponse>();
-const { user } = authStore();
+const { user } = storeToRefs(authStore());
 
 const focusNext = (event: Event, index: number) => {
     const input = event.target as HTMLInputElement;
@@ -34,6 +34,8 @@ const verifyCode = async () => {
             method: 'POST',
             body: JSON.stringify({ code: enteredCode }),
         });
+
+        user.value.email_verified_at = new Date();
 
         await router.push("/sign-up/contact-info");
     } catch (error) {
