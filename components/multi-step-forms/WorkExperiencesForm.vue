@@ -36,16 +36,19 @@ const {sendRequest: updateWorkExperience, pending: isSubmitting} = useSubmit<{ d
 
 const form = ref<Partial<WorkExperience>[]>(account.value?.work_experiences?.length ? account.value?.work_experiences : [initialValue]);
 
-
-
 const submitForm = async () => {
   try {
-    await updateWorkExperience(`/v1/auth/accounts/${user.value.id}`, {
+   const response = await updateWorkExperience(`/v1/auth/accounts/${user.value.id}`, {
       method: 'PUT',
       body: {
         work_experiences: form.value,
       }
     });
+
+    if (account.value) {
+      account.value.work_experiences = response.data.work_experiences
+    }
+
     emits('submit')
   } catch (error) {
     console.log('Error updating work experience:', error);

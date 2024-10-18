@@ -2,6 +2,7 @@
 definePageMeta({middleware: ['verify'] });
 
 import {ref} from "vue";
+
 import WorkExperiencesForm from "~/components/multi-step-forms/WorkExperiencesForm.vue";
 import LanguagesForm from "~/components/multi-step-forms/LanguagesForm.vue";
 import EducationHistoryForm from "~/components/multi-step-forms/EducationHistoryForm.vue";
@@ -26,10 +27,10 @@ const currentStep = ref(5);
       <SkillsForm @back="currentStep--" @submit="currentStep++" />
     </div>
     <div v-if="currentStep === 4">
-      <WorkExperiencesForm ref="workExperiencesRef" />
+      <WorkExperiencesForm @back="currentStep--" @submit="currentStep++" />
     </div>
     <div v-if="currentStep === 5">
-      <EducationHistoryForm ref="educationRef" />
+      <EducationHistoryForm @back="currentStep--" @submit="currentStep++" />
     </div>
 
   </div>
