@@ -128,13 +128,11 @@ definePageMeta({
           <Section>
             <template #header>
               <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Show Your Talent</h2>
+                <h2 class="text-2xl font-bold">Portfolio</h2>
               </div>
             </template>
             <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Show Your Talent Section</p>
-              </div>
+              <PorfolioSection />
             </template>
           </Section>
 
@@ -151,6 +149,7 @@ definePageMeta({
             </template>
           </Section>
 
+          <!-- Portfolio -->
           <Section>
             <template #header>
               <div class="flex justify-between items-center">
