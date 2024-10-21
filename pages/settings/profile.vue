@@ -13,9 +13,8 @@ const tabs = [
     { name: 'Security & Password', href: '/settings/security-and-password', current: false },
 ];
     
-const { sendRequest: updateProfile } = useSubmit<UpdateResponse, ApiErrorResponse>();
+const { sendRequest: updateProfile, pending: isSubmitting } = useSubmit<UpdateResponse, ApiErrorResponse>();
 
-const isLoading = ref(false);
 
 interface RegisterForm {
     first_name: string;
@@ -38,7 +37,6 @@ const handleUpdate = async () => {
     if (v$.value.$invalid) return;
 
     try {
-        isLoading.value = true;
         await updateProfile('/v1/auth/profile', {
             method: 'PUT',
             body: {
@@ -49,9 +47,7 @@ const handleUpdate = async () => {
         updateUser();
     } catch (error) {
         console.error('Error updating profile:', error);
-    } finally {
-        isLoading.value = false;
-    }
+    } 
 };
 </script>
 
@@ -87,7 +83,7 @@ const handleUpdate = async () => {
                     </div>
                     <!-- Update Button -->
                     <div class="mt-6 flex justify-end">
-                        <Button text="Update" background="primary" foreground="white" :is-loading="isLoading"
+                        <Button text="Update" background="primary" foreground="white" :is-loading="isSubmitting"
                             :is-wide="false" type="submit"></Button>
                     </div>
                 </form>

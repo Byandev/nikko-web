@@ -7,14 +7,12 @@ import {authStore} from "~/store/authStore";
 
 const router = useRouter();
 const code = ref(Array(6).fill(''));
-const isLoading = ref(false);
 const isResendDisabled = ref(false);
 const resendButtonText = ref('Resend Code');
 const countdown = ref(60);
 let timer: ReturnType<typeof setInterval> | null = null;
 
-const { sendRequest: resendEmailVerification } = useSubmit<VerificationResponse, ApiErrorResponse>();
-const { sendRequest: verifyEmail } = useSubmit<VerificationResponse, ApiErrorResponse>();
+const { sendRequest: handleEmailVerification, pending: isSubmitting  } = useSubmit<VerificationResponse, ApiErrorResponse>();
 const { user } = storeToRefs(authStore());
 
 const focusNext = (event: Event, index: number) => {
@@ -28,9 +26,7 @@ const focusNext = (event: Event, index: number) => {
 const verifyCode = async () => {
     const enteredCode = code.value.join('');
     try {
-        isLoading.value = true;
-
-        await verifyEmail('/v1/auth/email-verification/verify', {
+        await handleEmailVerification('/v1/auth/email-verification/verify', {
             method: 'POST',
             body: JSON.stringify({ code: enteredCode }),
         });
@@ -40,23 +36,18 @@ const verifyCode = async () => {
         await router.push("/sign-up/contact-info");
     } catch (error) {
         console.error('Verification failed:', error);
-    } finally {
-        isLoading.value = false;
-    }
+    } 
 };
 
 const resendCode = async () => {
     try {
-        isLoading.value = true;
-        await resendEmailVerification('/v1/auth/email-verification/resend', {
+        await handleEmailVerification('/v1/auth/email-verification/resend', {
             method: 'POST',
         });
         startTimer();
     } catch (error) {
         console.error('Resend code failed:', error);
-    } finally {
-        isLoading.value = false;
-    }
+    } 
 };
 
 const startTimer = () => {
@@ -90,10 +81,10 @@ const startTimer = () => {
                         @input="focusNext($event, n - 1)"
                         class="w-12 h-12 text-center text-lg border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
-                <Button @click="resendCode" :text="resendButtonText" background="gray" foreground="primary" :is-loading="isLoading"
+                <Button @click="resendCode" :text="resendButtonText" background="gray" foreground="primary" :is-loading="isSubmitting"
                     :is-wide="true" type="button"></Button>
             </div>
-            <Button text="Confirm Code" background="primary" foreground="white" :is-loading="isLoading" :is-wide="true"
+            <Button text="Confirm Code" background="primary" foreground="white" :is-loading="isSubmitting" :is-wide="true"
                 type="submit"></Button>
         </form>
     </div>
