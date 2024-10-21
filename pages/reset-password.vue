@@ -13,39 +13,34 @@ definePageMeta({
     },
 });
 
-const { resetData } = useResetPasswordStore();
-const { email, token } = storeToRefs(useResetPasswordStore());
+const { resetPasswordData } = storeToRefs(useResetPasswordStore());
 
-const resetPasswordForm = ref({
+const form = ref({
     password: '',
     password_confirmation: '',
 });
 
 const router = useRouter();
-const isLoading = ref(false);
 
-const { sendRequest: sendPasswordReset } = useSubmit<{ message: string }, ApiErrorResponse>();
+const { sendRequest: resetPassword, pending: isSubmitting } = useSubmit<{ message: string }, ApiErrorResponse>();
 
-const handleResetPassword = async () => {
+const submitForm = async () => {
     try {
-        isLoading.value = true;
-        await sendPasswordReset('/v1/auth/reset-password', {
+        await resetPassword('/v1/auth/reset-password', {
             method: 'POST',
-            body: JSON.stringify({ email: email.value, token: token.value, password: resetPasswordForm.value.password, password_confirmation: resetPasswordForm.value.password_confirmation }),
+            body: JSON.stringify({ email: resetPasswordData.value.email, token: resetPasswordData.value.token, password: form.value.password, password_confirmation: form.value.password_confirmation }),
         });
-        resetData();
+        resetPasswordData.value = { email: '', token: '' };
         await router.push("/login");
     } catch (error) {
         console.error('Password reset failed:', error);
-    } finally {
-        isLoading.value = false;
     }
 };
 </script>
 
 <template>
     <div class="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8">
-        <form @submit.prevent="handleResetPassword"
+        <form @submit.prevent="submitForm"
             class="relative bg-white p-8 rounded-lg shadow-2xl max-w-md w-full transform transition-all duration-300 hover:scale-105">
             <NuxtLink to="/forgot-password" class="absolute top-4 left-4 text-gray-600 hover:text-gray-800">
                 <Icon icon="mdi:arrow-left" width="24" height="24" />
@@ -54,19 +49,19 @@ const handleResetPassword = async () => {
                 <Icon icon="mdi:lock-reset" :ssr="true" width="96" height="96" class="text-primary" />
             </div>
             <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Reset Password</h2>
-            <p class="text-gray-600 mb-6 text-center">Please enter your new password for <strong>{{ maskEmail(email) }}</strong></p>
+            <p class="text-gray-600 mb-6 text-center">Please enter your new password for <strong>{{ maskEmail(resetPasswordData.email) }}</strong></p>
             <!-- Hidden username field for accessibility -->
-            <input type="email" v-model="email" autocomplete="username" class="hidden" />
+            <input type="email" v-model="resetPasswordData.email" autocomplete="username" class="hidden" />
             <div class="mb-6">
-                <input type="password" v-model="resetPasswordForm.password" placeholder="New Password" required autocomplete="new-password"
+                <input type="password" v-model="form.password" placeholder="New Password" required autocomplete="new-password"
                     class="w-full px-4 py-2 text-lg border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
             </div>
             <div class="mb-6">
-                <input type="password" v-model="resetPasswordForm.password_confirmation" placeholder="Confirm Password"
+                <input type="password" v-model="form.password_confirmation" placeholder="Confirm Password"
                     required autocomplete="new-password"
                     class="w-full px-4 py-2 text-lg border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200" />
             </div>
-            <Button text="Reset Password" background="primary" foreground="white" :is-loading="isLoading"
+            <Button text="Reset Password" background="primary" foreground="white" :is-loading="isSubmitting"
                 :is-wide="true" type="submit"></Button>
         </form>
     </div>
