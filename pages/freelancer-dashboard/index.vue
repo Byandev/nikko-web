@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import EducationSection from '~/components/freelancer-dashboard/EducationSection.vue';
+
 
 definePageMeta({
   middleware: ['verify']
@@ -159,9 +161,7 @@ definePageMeta({
 
             </template>
             <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Share Your Education Section</p>
-              </div>
+              <EducationSection />
             </template>
           </Section>
 
