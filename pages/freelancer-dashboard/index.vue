@@ -172,9 +172,7 @@ definePageMeta({
               </div>
             </template>
             <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Share Your Professional Journey Section</p>
-              </div>
+              <WorkExperienceSection />
             </template>
           </Section>
         </div>

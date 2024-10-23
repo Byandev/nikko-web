@@ -268,7 +268,10 @@ const handleSubmit = async () => {
 
 <Modal :modelValue="isViewModalOpen" @update:modelValue="isViewModalOpen = $event">
     <template #title>
-        View Portfolio
+        <div class="flex items-center space-x-2 justify-center">
+            <Icon icon="mdi:eye" class="text-primary-600" width="24" height="24" />
+            <span>View Portfolio</span>
+        </div>
     </template>
     <template #content>
         <div v-if="isLoadingPortfolioDetails" class="animate-pulse">
@@ -279,25 +282,37 @@ const handleSubmit = async () => {
         </div>
         <div v-else-if="currentPortfolio" class="space-y-4 text-left">
             <div class="sm:col-span-2">
-                <label class="text-sm font-medium text-gray-500">Title</label>
+                <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
+                    <Icon icon="mdi:label" class="text-primary-600" width="20" height="20" />
+                    <span>Title</span>
+                </label>
                 <div class="mt-1 text-lg font-semibold text-gray-900">
                     {{ currentPortfolio.data.title }}
                 </div>
             </div>
             <div class="sm:col-span-2">
-                <label class="text-sm font-medium text-gray-500">Description</label>
+                <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
+                    <Icon icon="mdi:note-text" class="text-primary-600" width="20" height="20" />
+                    <span>Description</span>
+                </label>
                 <div class="mt-1 text-sm text-gray-900">
                     {{ currentPortfolio.data.description }}
                 </div>
             </div>
             <div class="sm:col-span-2">
-                <label class="text-sm font-medium text-gray-500">Url</label>
+                <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
+                    <Icon icon="mdi:web" class="text-primary-600" width="20" height="20" />
+                    <span>Url</span>
+                </label>
                 <div class="mt-1 text-sm text-gray-900">
                     <a :href="currentPortfolio.data.url" target="_blank" class="text-primary-600 hover:text-primary-800">{{ currentPortfolio.data.url }}</a>
                 </div>
             </div>
             <div class="sm:col-span-2">
-                <label class="text-sm font-medium text-gray-500">Images</label>
+                <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
+                    <Icon icon="mdi:image" class="text-primary-600" width="20" height="20" />
+                    <span>Images</span>
+                </label>
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="carousel">
                         <div v-for="image in currentPortfolio.data.images" :key="image.id" class="carousel-item">

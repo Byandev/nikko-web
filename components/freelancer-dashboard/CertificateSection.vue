@@ -276,7 +276,10 @@ const handleSubmit = async () => {
 
 <Modal :modelValue="isViewModalOpen" @update:modelValue="isViewModalOpen = $event">
     <template #title>
-        View Certificate
+        <div class="flex items-center space-x-2 justify-center">
+            <Icon icon="mdi:certificate" class="text-primary-600" width="24" height="24" />
+            <span>View Certificate</span>
+        </div>
     </template>
     <template #content>
         <div v-if="isLoadingCertificateDetails" class="animate-pulse">
@@ -287,31 +290,46 @@ const handleSubmit = async () => {
         </div>
         <div v-else-if="currentCertificate" class="space-y-4 text-left">
             <div class="sm:col-span-2">
-                <label class="text-sm font-medium text-gray-500">Title</label>
+                <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
+                    <Icon icon="mdi:label" class="text-primary-600" width="20" height="20" />
+                    <span>Title</span>
+                </label>
                 <div class="mt-1 text-lg font-semibold text-gray-900">
                     {{ currentCertificate.data.title }}
                 </div>
             </div>
             <div class="sm:col-span-2">
-                <label class="text-sm font-medium text-gray-500">Issue Date</label>
+                <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
+                    <Icon icon="mdi:calendar" class="text-primary-600" width="20" height="20" />
+                    <span>Issue Date</span>
+                </label>
                 <div class="mt-1 text-sm text-gray-900">
                     {{ currentCertificate.data.issued_date }}
                 </div>
             </div>
             <div class="sm:col-span-2">
-                <label class="text-sm font-medium text-gray-500">Url</label>
+                <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
+                    <Icon icon="mdi:web" class="text-primary-600" width="20" height="20" />
+                    <span>Url</span>
+                </label>
                 <div class="mt-1 text-sm text-gray-900">
                     <a :href="currentCertificate.data.url" target="_blank" class="text-primary-600 hover:text-primary-800">{{ currentCertificate.data.url }}</a>
                 </div>
             </div>
             <div class="sm:col-span-2">
-                <label class="text-sm font-medium text-gray-500">Reference ID</label>
+                <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
+                    <Icon icon="mdi:identifier" class="text-primary-600" width="20" height="20" />
+                    <span>Reference ID</span>
+                </label>
                 <div class="mt-1 text-sm text-gray-900">
                     {{ currentCertificate.data.reference_id }}
                 </div>
             </div>
             <div class="sm:col-span-2">
-                <label class="text-sm font-medium text-gray-500">Image</label>
+                <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
+                    <Icon icon="mdi:image" class="text-primary-600" width="20" height="20" />
+                    <span>Image</span>
+                </label>
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="carousel">
                         <div v-if="currentCertificate.data.image" class="carousel-item">
