@@ -143,9 +143,7 @@ definePageMeta({
               </div>
             </template>
             <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Certifications Section</p>
-              </div>
+              <CertificateSection />
             </template>
           </Section>
 
