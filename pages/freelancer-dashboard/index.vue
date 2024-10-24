@@ -47,22 +47,7 @@ definePageMeta({
         <SkillsSection />
 
         <!-- Tools Section -->
-        <Section class="mt-5">
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Tools</h2>
-              <div>
-                <button class="text-blue-500">Request Tools</button>
-                <button class="text-gray-500 ml-5">Edit</button>
-              </div>
-            </div>
-          </template>
-          <template #content>
-            <div class="mt-4">
-              <p class="text-gray-500">Tools Section</p>
-            </div>
-          </template>
-        </Section>
+        <ToolsSection />
 
         <!-- Verification Section -->
         <Section class="mt-5">

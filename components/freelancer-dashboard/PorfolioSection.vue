@@ -39,7 +39,6 @@ const { data: portfolios, fetchData: fetchPortfolio, pending: isLoadingPortfolio
 const { data: currentPortfolio, fetchData: fetchPortfolioDetails, pending: isLoadingPortfolioDetails } = useFetchData<{ data: Portfolio }, ApiErrorResponse>();
 
 fetchPortfolio(`v1/accounts/${account.value?.id}/portfolios`);
-console.log(portfolios);
 
 const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
