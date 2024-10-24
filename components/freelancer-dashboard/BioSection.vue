@@ -80,15 +80,17 @@ const submitBio = () => {
                     <div class="sm:col-span-2 text-start">
                         <label for="bio-title" class="text-sm font-medium text-gray-500">Title</label>
                         <div class="mt-1 text-sm text-gray-900">
-                            <input id="bio-title" v-model="newTitle" type="text"
-                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2 mb-4" />
+                            <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
+                                <input id="bio-title" v-model="newTitle" type="text" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                            </div>
                         </div>
                     </div>
                     <div class="sm:col-span-2 text-start">
                         <label for="bio-textarea" class="text-sm font-medium text-gray-500">Bio</label>
                         <div class="mt-1 text-sm text-gray-900">
-                            <textarea id="bio-textarea" v-model="newBio"
-                                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"></textarea>
+                            <div class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-500">
+                                <textarea id="bio-textarea" v-model="newBio" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
+                            </div>
                         </div>
                     </div>
                 </template>

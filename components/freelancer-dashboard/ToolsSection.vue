@@ -43,7 +43,7 @@ const submitTools = async () => {
 
     isEditModalOpen.value = false;
   } catch (error) {
-    console.log('Error updating tools:', error);
+    console.error('Error updating tools:', error);
   }
 };
 
@@ -69,7 +69,7 @@ const requestTool = async () => {
     selectedToolId.value = null;
     isRequestModalOpen.value = false;
   } catch (error) {
-    console.log('Error requesting tool:', error);
+    console.error('Error requesting tool:', error);
   }
 };
 
@@ -80,7 +80,6 @@ const onSelect = (event: Event) => {
   if (tool && !selectedTools.value.some(t => t.id === tool.id)) {
     selectedTools.value.push(tool);
   }
-  console.log('Selected Tools after onSelect:', selectedTools.value);
 }
 
 const onRemoveSelectedTool = (idx: number) => {
@@ -99,14 +98,17 @@ const onCancelEdit = async () => {
       <div class="flex justify-between items-center">
         <h2 class="text-2xl font-bold">Tools</h2>
         <div>
-          <button class="text-blue-500" @click="isRequestModalOpen = true">Request Tools</button>
+          <button class="text-blue-500" @click="isRequestModalOpen = true">Add Tools</button>
           <button class="text-gray-500 ml-5" @click="isEditModalOpen = true">Edit</button>
         </div>
       </div>
     </template>
     <template #content>
       <div class="flex flex-wrap">
-        <div v-for="(tool, idx) in account?.tools" :key="`selected-tool-${tool.id}`" class="mr-2 my-1">
+        <div v-if="account?.tools.length === 0" class="text-gray-500">
+          No tools yet.
+        </div>
+        <div v-else v-for="(tool, idx) in account?.tools" :key="`selected-tool-${tool.id}`" class="mr-2 my-1">
           <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
             {{tool.name}}
           </span>
@@ -143,7 +145,7 @@ const onCancelEdit = async () => {
 
   <Modal v-model="isRequestModalOpen" @close="isRequestModalOpen = false">
     <template #title>
-      <h3 class="text-lg font-medium leading-6 text-gray-900">Request New Tool</h3>
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Add New Tool</h3>
     </template>
     <template #content>
       <div class="mt-4 w-full">
@@ -178,7 +180,7 @@ const onCancelEdit = async () => {
     </template>
     <template #actions>
       <Button @click="isRequestModalOpen = false" text="Cancel" type="button" background="white" foreground="primary" />
-      <Button @click="requestTool" text="Request" type="button" background="primary" foreground="white" />
+      <Button @click="requestTool" text="Add" type="button" background="primary" foreground="white" />
     </template>
   </Modal>
 </template>

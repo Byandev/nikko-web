@@ -37,7 +37,7 @@ const submitForm = async () => {
     user.value.languages = response.data.user.languages
     emits('submit')
   } catch (error) {
-    console.log('Error updating languages:', error);
+    console.error('Error updating languages:', error);
   }
 };
 

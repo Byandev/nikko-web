@@ -138,18 +138,16 @@ const uploadImage = async (type: MediaType) => {
                         </div>
                     </label>
                 </div>
-                <div class="mt-2 text-lg font-semibold text-white bg-primary p-2 rounded-lg shadow-sm inline-block">
-                    $50/hr</div>
             </div>
         </div>
         <div class="mt-20 sm:mt-4 mb-4 px-4 flex flex-col sm:flex-row items-center sm:items-start">
-            <div class="sm:ml-40 mt-4 sm:mt-0 text-left">
+            <div class="sm:ml-44 mt-4 sm:mt-0 text-center sm:text-left">
                 <h2 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h2>
                 <p class="mt-2 text-md text-gray-600">Joined on {{ new Date(user.created_at).toLocaleString('en-US', {
                     month: 'long', day: 'numeric', year: 'numeric' }) }}</p>
-                <div class="mt-2 flex items-center space-x-2">
-                    <Icon icon="twemoji:flag-for-flag-philippines" width="15" height="15" />
-                    <span class="text-sm text-black font-semibold">Philippines</span>
+                <div class="mt-2 flex items-center space-x-2 justify-center sm:justify-start">
+                    <Icon icon="mdi:map-marker" width="15" height="15" />
+                    <span class="text-sm text-black font-semibold">{{ user.country_code }}</span>
                 </div>
             </div>
         </div>

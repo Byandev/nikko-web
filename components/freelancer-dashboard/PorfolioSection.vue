@@ -195,76 +195,80 @@ const handleSubmit = async () => {
         </div>
 </div>
 
-<Modal :modelValue="isModalOpen" @update:modelValue="isModalOpen = $event">
-        <template #title>
-                {{ isEditing ? 'Edit Portfolio' : 'Add Portfolio' }}
-        </template>
-        <template #content>
-                <form class="space-y-4 text-left">
-                    <div class="sm:col-span-2">
-                        <label for="title" class="text-sm font-medium text-gray-500">Title</label>
-                        <div class="mt-1 text-sm text-gray-900">
-                            <input v-model="form.title" type="text" id="title" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                        </div>
+<Modal :modelValue="isModalOpen" @update:modelValue="isModalOpen = $event" class="sm:max-w-lg w-full sm:w-auto">
+    <template #title>
+        {{ isEditing ? 'Edit Portfolio' : 'Add Portfolio' }}
+    </template>
+    <template #content>
+        <form class="space-y-4 text-left">
+            <div class="w-full sm:col-span-2">
+                <label for="title" class="text-sm font-medium text-gray-500">Title <span class="text-red-500">*</span></label>
+                <div class="mt-1 text-sm text-gray-900">
+                    <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+                        <Icon icon="mdi:label" :ssr="true" />
+                        <input v-model="form.title" type="text" id="title" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                     </div>
-                    <div class="sm:col-span-2">
-                        <label for="description" class="text-sm font-medium text-gray-500">Description</label>
-                        <div class="mt-1 text-sm text-gray-900">
-                            <textarea v-model="form.description" id="description" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"></textarea>
-                        </div>
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label for="url" class="text-sm font-medium text-gray-500">Url</label>
-                        <div class="mt-1 text-sm text-gray-900">
-                            <input v-model="form.url" type="url" id="url" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                        </div>
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label for="file" class="text-sm font-medium text-gray-500">File Attachment</label>
-                        <div 
-                            class="mt-1 text-sm text-gray-900 border-2 border-dashed rounded-md p-4 cursor-pointer"
-                            @click="handleClick"
-                        >
-                            <input type="file" id="file" multiple @change="handleFileChange" class="hidden" accept="image/*">
-                            <p class="text-center text-gray-500">Click to select files</p>
-                        </div>
-                    </div>
-                </form>
-                <div v-if="selectedFiles.length || form.images.length" class="mt-4">
-                    <ul class="mt-2 space-y-4">
-                        <li v-for="file in selectedFiles" :key="file.name" class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
-                            <div class="flex items-center space-x-2 w-full">
-                                <Icon icon="mdi:file" class="text-gray-500" width="24" height="24" />
-                                <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96" :title="file.name">{{ file.name }}</span>
-                            </div>
-                            <button @click="handleRemoveFile(file.name)" class="text-red-500 hover:text-red-700">
-                                <Icon icon="mdi:close" width="16" height="16" />
-                            </button>
-                        </li>
-                        <li v-for="image in form.images" :key="image.id" class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
-                            <div class="flex items-center space-x-2 w-full">
-                                <Icon icon="mdi:file" class="text-gray-500" width="24" height="24" />
-                                <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96" :title="image.file_name">{{ image.file_name }}</span>
-                            </div>
-                            <button @click="handleRemoveFile(String(image.file_name))" class="text-red-500 hover:text-red-700">
-                                <Icon icon="mdi:close" width="16" height="16" />
-                            </button>
-                        </li>
-                    </ul>
                 </div>
-        </template>
-        <template #actions>
-                <div class="flex justify-end space-x-2">
-                        <Button type="button" text="Cancel" background="white" foreground="black" 
-                                :is-wide="false" @click="{isModalOpen = false;
-                                form = { ...initialValue };
-                                }"></Button>
-                        <Button type="button" text="Save" background="primary" foreground="white"
-                                :is-wide="false" @click="handleSubmit" :is-loading="isSubmitting || isUploading"></Button>
+            </div>
+            <div class="w-full sm:col-span-2">
+                <label for="description" class="text-sm font-medium text-gray-500">Description <span class="text-red-500">*</span></label>
+                <div class="mt-1 text-sm text-gray-900">
+                    <div class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+                        <Icon icon="mdi:note-text" :ssr="true" />
+                        <textarea v-model="form.description" id="description" rows="3" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
+                    </div>
                 </div>
-        </template>
+            </div>
+            <div class="w-full sm:col-span-2">
+                <label for="url" class="text-sm font-medium text-gray-500">Url <span class="text-red-500">*</span></label>
+                <div class="mt-1 text-sm text-gray-900">
+                    <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+                        <Icon icon="mdi:web" :ssr="true" />
+                        <input v-model="form.url" type="url" id="url" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                    </div>
+                </div>
+            </div>
+            <div class="w-full sm:col-span-2">
+                <label for="file" class="text-sm font-medium text-gray-500">File Attachment <span class="text-red-500">*</span></label>
+                <div class="mt-1 text-sm text-gray-900">
+                    <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500 cursor-pointer" @click="handleClick">
+                        <Icon icon="mdi:file" :ssr="true" />
+                        <input type="file" id="file" multiple @change="handleFileChange" class="hidden" accept="image/*">
+                        <p class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">Click to select files</p>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div v-if="selectedFiles.length || form.images.length" class="mt-4">
+            <ul class="mt-2 space-y-4">
+                <li v-for="file in selectedFiles" :key="file.name" class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
+                    <div class="flex items-center space-x-2 w-full">
+                        <Icon icon="mdi:file" class="text-gray-500" width="24" height="24" />
+                        <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96" :title="file.name">{{ file.name }}</span>
+                    </div>
+                    <button @click="handleRemoveFile(file.name)" class="text-red-500 hover:text-red-700">
+                        <Icon icon="mdi:close" width="16" height="16" />
+                    </button>
+                </li>
+                <li v-for="image in form.images" :key="image.id" class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
+                    <div class="flex items-center space-x-2 w-full">
+                        <Icon icon="mdi:file" class="text-gray-500" width="24" height="24" />
+                        <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96" :title="image.file_name">{{ image.file_name }}</span>
+                    </div>
+                    <button @click="handleRemoveFile(String(image.file_name))" class="text-red-500 hover:text-red-700">
+                        <Icon icon="mdi:close" width="16" height="16" />
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </template>
+    <template #actions>
+        <div class="flex justify-end space-x-2">
+            <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" @click="{isModalOpen = false; form = { ...initialValue };}"></Button>
+            <Button type="button" text="Save" background="primary" foreground="white" :is-wide="false" @click="handleSubmit" :is-loading="isSubmitting || isUploading"></Button>
+        </div>
+    </template>
 </Modal>
-
 <Modal :modelValue="isViewModalOpen" @update:modelValue="isViewModalOpen = $event">
     <template #title>
         <div class="flex items-center space-x-2 justify-center">

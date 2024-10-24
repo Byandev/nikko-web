@@ -1,10 +1,5 @@
 <script setup lang="ts">
 import EducationSection from '~/components/freelancer-dashboard/EducationSection.vue';
-import { authStore } from '~/store/authStore';
-
-const { updateUser } = authStore();
-
-updateUser();
 
 definePageMeta({
   middleware: ['verify']
@@ -52,20 +47,6 @@ definePageMeta({
 
         <!-- Tools Section -->
         <ToolsSection />
-
-        <!-- Verification Section -->
-        <Section class="mt-5">
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Verification</h2>
-            </div>
-          </template>
-          <template #content>
-            <div class="mt-4">
-              <p class="text-gray-500">Verification Section</p>
-            </div>
-          </template>
-        </Section>
 
       </div>
 
@@ -116,9 +97,7 @@ definePageMeta({
             <template #header>
               <div class="flex justify-between items-center">
                 <h2 class="text-2xl font-bold">Share Your Education</h2>
-                <div>
-                  <button class="text-blue-500">Add Education</button>
-                </div>
+                
               </div>
 
             </template>
