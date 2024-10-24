@@ -1,18 +1,21 @@
 <script setup lang="ts">
 const emits = defineEmits<{ (e: 'submit'): void; }>();
 
-import {Icon} from '@iconify/vue';
-import type {Account} from '~/types/models/Account';
-import type {ApiErrorResponse} from '~/types/api/response/error';
+import { Icon } from '@iconify/vue';
+import type { Account } from '~/types/models/Account';
+import type { ApiErrorResponse } from '~/types/api/response/error';
 
-import {authStore} from '~/store/authStore';
-import {accountStore} from "~/store/accountStore";
+import { authStore } from '~/store/authStore';
+import { accountStore } from "~/store/accountStore";
+import { email, required } from '@vuelidate/validators';
+import { useValidation } from '#imports';
+import { rule } from 'postcss';
 
 const route = useRoute();
-const {user} = storeToRefs(authStore());
-const {account} = storeToRefs(accountStore())
+const { user } = storeToRefs(authStore());
+const { account } = storeToRefs(accountStore())
 
-const {sendRequest: updateAccount} = useSubmit<{ data: Account }, ApiErrorResponse>();
+const { sendRequest: updateAccount } = useSubmit<{ data: Account }, ApiErrorResponse>();
 
 interface FormValues {
   title: string;
@@ -24,8 +27,18 @@ const form = ref<FormValues>({
   bio: account.value?.bio ?? '',
 });
 
+const rules = {
+  title: { required, email },
+  bio: { required },
+};
+
+const { formRef, v$ } = useValidation(form, rules);
+
 
 const submitForm = async () => {
+  v$.value.$touch();
+  if (v$.value.$invalid) return;
+
   try {
     await updateAccount(`/v1/auth/accounts/${route.params.accountId}`, {
       method: 'PUT',
@@ -60,11 +73,13 @@ const submitForm = async () => {
         </label>
         <div class="mt-2">
           <div
-              class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
-            <Icon icon="mdi:account" :ssr="true"/>
-            <input required type="text" id="profileTitle" v-model="form.title"
-                   class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+            class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+            <Icon icon="mdi:account" :ssr="true" />
+            <input type="text" id="profileTitle" v-model="formRef.title"
+              class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
           </div>
+          <span v-if="v$.title.$error" class="text-red-900 text-sm">{{
+              v$.title.$errors[0].$message }}</span>
         </div>
       </div>
 
@@ -75,16 +90,18 @@ const submitForm = async () => {
         </label>
         <div class="mt-2">
           <div
-              class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
-            <Icon icon="mdi:account-details" :ssr="true"/>
-            <textarea required id="profileBio" v-model="form.bio" rows="4"
-                      class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
+            class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+            <Icon icon="mdi:account-details" :ssr="true" />
+            <textarea id="profileBio" v-model="formRef.bio" rows="4"
+              class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
           </div>
+          <span v-if="v$.bio.$error" class="text-red-900 text-sm">{{
+              v$.bio.$errors[0].$message }}</span>
         </div>
       </div>
 
       <div class="flex mt-5 justify-end w-full">
-        <Button text="Submit" type="submit" background="primary" foreground="white"/>
+        <Button text="Submit" type="submit" background="primary" foreground="white" />
       </div>
     </form>
   </div>
