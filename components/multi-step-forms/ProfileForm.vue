@@ -4,15 +4,11 @@ const emits = defineEmits<{ (e: 'submit'): void; }>();
 import { Icon } from '@iconify/vue';
 import type { Account } from '~/types/models/Account';
 import type { ApiErrorResponse } from '~/types/api/response/error';
-
-import { authStore } from '~/store/authStore';
 import { accountStore } from "~/store/accountStore";
-import { email, required } from '@vuelidate/validators';
+import { required } from '@vuelidate/validators';
 import { useValidation } from '#imports';
-import { rule } from 'postcss';
 
 const route = useRoute();
-const { user } = storeToRefs(authStore());
 const { account } = storeToRefs(accountStore())
 
 const { sendRequest: updateAccount } = useSubmit<{ data: Account }, ApiErrorResponse>();
@@ -28,7 +24,7 @@ const form = ref<FormValues>({
 });
 
 const rules = {
-  title: { required, email },
+  title: { required },
   bio: { required },
 };
 
