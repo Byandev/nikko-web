@@ -5,12 +5,15 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import { accountStore } from '~/store/accountStore';
 import { EmploymentType } from '~/types/models/WorkExperience';
 import _ from 'lodash';
+import moment from 'moment';
 
 const isModalOpen = ref(false);
 const isViewModalOpen = ref(false);
 const isDeleteModalOpen = ref(false);
 const isEditing = ref(false);
 const workExperienceToDelete = ref<WorkExperience | null>(null);
+
+const monthOptions = computed(() => moment.months());
 
 interface FormValues {
     job_title: string;
@@ -55,7 +58,7 @@ const handleEdit = async (workExperienceId: string) => {
     isEditing.value = true;
     isModalOpen.value = true;
     await fetchWorkExperienceDetails(`/v1/accounts/${account.value?.id}/work-experiences/${workExperienceId}`);
-    
+
     if (currentWorkExperience && currentWorkExperience.value?.data) {
         form.value = {
             job_title: currentWorkExperience.value.data.job_title,
@@ -103,7 +106,7 @@ const handleDelete = async () => {
     }
 };
 
-const handleSubmit = async () => {
+const submitForm = async () => {
     try {
         // Submit the work experience
         await submitWorkExperience(isEditing.value ? `/v1/work-experiences/${currentWorkExperience.value?.data.id}` : '/v1/work-experiences', {
@@ -139,25 +142,34 @@ const handleSubmit = async () => {
             </div>
         </div>
     </div>
-    <div v-else-if="workExperiences?.data && workExperiences.data.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div v-for="workExperience in workExperiences.data" :key="workExperience.id" class="bg-white rounded-lg shadow-md overflow-hidden">
+    <div v-else-if="workExperiences?.data && workExperiences.data.length > 0"
+        class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div v-for="workExperience in workExperiences.data" :key="workExperience.id"
+            class="bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4">
                 <h3 class="text-lg font-semibold text-gray-900">{{ workExperience.job_title }}</h3>
                 <p class="mt-2 text-sm text-gray-600"><strong>Company: </strong>{{ workExperience.company }}</p>
-                <p class="mt-2 text-sm text-gray-600"><strong>Employment: </strong>{{ _.capitalize(_.startCase(workExperience.employment)) }}</p>
+                <p class="mt-2 text-sm text-gray-600"><strong>Employment: </strong>{{
+                    _.capitalize(_.startCase(workExperience.employment)) }}</p>
                 <p class="mt-2 text-sm text-gray-600"><strong>Location: </strong>{{ workExperience.country }}</p>
                 <p class="mt-2 text-sm text-gray-600"><strong>Website: </strong>{{ workExperience.website }}</p>
-                <p class="mt-2 text-sm text-gray-600"><strong>Start Date:</strong>{{ workExperience.start_month }}/{{ workExperience.start_year }} <strong>End Date: </strong>{{ workExperience.is_current ? 'Present' : `${workExperience.end_month}/${workExperience.end_year}` }}</p>
+                <p class="mt-2 text-sm text-gray-600"><strong>Start Date:</strong>{{ workExperience.start_month }}/{{
+                    workExperience.start_year }} <strong>End Date: </strong>{{ workExperience.is_current ? 'Present' :
+                        `${workExperience.end_month}/${workExperience.end_year}` }}</p>
                 <p class="mt-4 text-sm text-gray-600"><strong></strong>{{ workExperience.description }}</p>
                 <div class="flex flex-row gap-5 mt-4">
-                    <button @click="handleView(String(workExperience.id))" class="inline-block text-primary hover:text-primary-dark transition-colors">View</button>
-                    <button @click="handleEdit(String(workExperience.id))" class="inline-block text-blue-600 hover:text-blue-800 transition-colors">Edit</button>
-                    <button @click="confirmDelete(workExperience)" class="inline-block text-red-600 hover:text-red-800 transition-colors">Delete</button>
+                    <button @click="handleView(String(workExperience.id))"
+                        class="inline-block text-primary hover:text-primary-dark transition-colors">View</button>
+                    <button @click="handleEdit(String(workExperience.id))"
+                        class="inline-block text-blue-600 hover:text-blue-800 transition-colors">Edit</button>
+                    <button @click="confirmDelete(workExperience)"
+                        class="inline-block text-red-600 hover:text-red-800 transition-colors">Delete</button>
                 </div>
             </div>
         </div>
         <div class="flex justify-center items-center rounded-lg border border-primary border-dashed p-4">
-            <button @click="isModalOpen = true" class="bg-primary-600 text-primary px-4 py-2 rounded-md hover:bg-primary-700 flex items-center transition-colors">
+            <button @click="isModalOpen = true"
+                class="bg-primary-600 text-primary px-4 py-2 rounded-md hover:bg-primary-700 flex items-center transition-colors">
                 <Icon icon="mdi:plus" class="mr-2" width="20" height="20" />
                 Add Work Experience
             </button>
@@ -168,96 +180,217 @@ const handleSubmit = async () => {
         <h3 class="mt-2 text-sm font-semibold text-gray-900">No work experience</h3>
         <p class="mt-1 text-sm text-gray-500">Get started by adding your work experience.</p>
         <div class="mt-6 flex justify-center">
-            <Button @click="isModalOpen=true" text="New Work Experience" type="button" foreground="white" background="primary"/>
+            <Button @click="isModalOpen = true" text="New Work Experience" type="button" foreground="white"
+                background="primary" />
         </div>
     </div>
-    
+
     <Modal :modelValue="isModalOpen" @update:modelValue="isModalOpen = $event">
-            <template #title>
-                    {{ isEditing ? 'Edit Work Experience' : 'Add Work Experience' }}
-            </template>
-            <template #content>
-                    <form class="space-y-4 text-left">
-                        <div class="sm:col-span-2">
-                            <label for="job_title" class="text-sm font-medium text-gray-500">Job Title</label>
-                            <div class="mt-1 text-sm text-gray-900">
-                                <input v-model="form.job_title" type="text" id="job_title" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                            </div>
+        <template #title>
+            {{ isEditing ? 'Edit Work Experience' : 'Add Work Experience' }}
+        </template>
+        <template #content>
+            <form class="max-w-lg w-full space-y-4 text-left">
+                
+                <!-- Job Title -->
+                <div class="mt-4">
+                    <label for="jobTitle" class="block text-sm font-medium leading-6 text-gray-900">
+                        Job Title <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-2">
+                        <div
+                            class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+                            <Icon icon="mdi:account" :ssr="true" />
+                            <input required type="text" id="jobTitle" v-model="form.job_title"
+                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
-                        <div class="sm:col-span-2">
-                            <label for="company_website" class="text-sm font-medium text-gray-500">Company & Website</label>
-                            <div class="mt-1 text-sm text-gray-900 flex space-x-4">
-                                <div class="w-1/2">
-                                    <input v-model="form.company" type="text" id="company" placeholder="Company" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                                </div>
-                                <div class="w-1/2">
-                                    <input v-model="form.website" type="url" id="website" placeholder="Website" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label for="country_employment" class="text-sm font-medium text-gray-500">Country & Employment</label>
-                            <div class="mt-1 text-sm text-gray-900 flex space-x-4">
-                                <div class="w-1/2">
-                                    <input v-model="form.country" type="text" id="country" placeholder="Country" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                                </div>
-                                <div class="w-1/2">
-                                    <select v-model="form.employment" id="employment" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                                        <option value="" disabled>Select employment type</option>
-                                        <option v-for="employmentType in Object.values(EmploymentType).map(type => _.capitalize(_.startCase(type)))" :key="employmentType" :value="employmentType">{{ employmentType }}</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label for="description" class="text-sm font-medium text-gray-500">Description</label>
-                            <div class="mt-1 text-sm text-gray-900">
-                                <textarea v-model="form.description" id="description" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"></textarea>
-                            </div>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label for="start_date" class="text-sm font-medium text-gray-500">Start Date</label>
-                            <div class="mt-1 text-sm text-gray-900 flex space-x-4">
-                                <div class="w-1/2">
-                                    <input v-model="form.start_month" type="number" id="start_month" placeholder="Month" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                                </div>
-                                <div class="w-1/2">
-                                    <input v-model="form.start_year" type="number" id="start_year" placeholder="Year" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="sm:col-span-2">
-                            <label for="is_current" class="text-sm font-medium text-gray-500">Is Current</label>
-                            <div class="mt-1 text-sm text-gray-900">
-                                <input v-model="form.is_current" type="checkbox" id="is_current" class="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                            </div>
-                        </div>
-                        <div v-if="!form.is_current" class="sm:col-span-2">
-                            <label for="end_date" class="text-sm font-medium text-gray-500">End Date</label>
-                            <div class="mt-1 text-sm text-gray-900 flex space-x-4">
-                                <div class="w-1/2">
-                                    <input v-model="form.end_month" type="number" id="end_month" placeholder="Month" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                                </div>
-                                <div class="w-1/2">
-                                    <input v-model="form.end_year" type="number" id="end_year" placeholder="Year" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-            </template>
-            <template #actions>
-                    <div class="flex justify-end space-x-2">
-                            <Button type="button" text="Cancel" background="white" foreground="black" 
-                                    :is-wide="false" @click="{isModalOpen = false;
-                                    form = { ...initialValue };
-                                    }"></Button>
-                            <Button type="button" text="Save" background="primary" foreground="white"
-                                    :is-wide="false" @click="handleSubmit" :is-loading="isSubmitting"></Button>
                     </div>
-            </template>
+                </div>
+
+                <div class="mt-4 flex flex-row space-x-4">
+                    <!-- Company Name -->
+                    <div class="w-1/2">
+                        <label for="companyName" class="block text-sm font-medium leading-6 text-gray-900">
+                            Company Name <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <div
+                                class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+                                <Icon icon="mdi:office-building" :ssr="true" />
+                                <input required type="text" id="companyName" v-model="form.company"
+                                    class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Website -->
+                    <div class="w-1/2">
+                        <label for="website" class="block text-sm font-medium leading-6 text-gray-900">
+                            Website <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <div
+                                class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+                                <Icon icon="mdi:web" :ssr="true" />
+                                <input required type="url" id="website" v-model="form.website"
+                                    class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Country -->
+                <div class="mt-4">
+                    <label for="country" class="block text-sm font-medium leading-6 text-gray-900">
+                        Country <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-2">
+                        <div
+                            class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                            <Icon icon="mdi:earth" :ssr="true" />
+                            <input type="text" id="country" name="country" v-model="form.country" required
+                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="mt-4">
+                    <label for="description" class="block text-sm font-medium leading-6 text-gray-900">
+                        Description <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-2">
+                        <div
+                            class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+                            <Icon icon="mdi:note-text" :ssr="true" />
+                            <textarea id="description" v-model="form.description" rows="4"
+                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Start Month and Start Year -->
+                <div class="mt-4 flex flex-row space-x-4">
+                    <!-- Start Month -->
+                    <div class="w-1/2">
+                        <label for="startMonth" class="block text-sm font-medium leading-6 text-gray-900">
+                            Start Month <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <select required v-model="form.start_month"
+                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                <option :value="0">Select Month</option>
+                                <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
+                                    :key="`start-month-${monthIndex}`" :value="monthIndex + 1">
+                                    {{ month }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Start Year -->
+                    <div class="w-1/2">
+                        <label for="startYear" class="block text-sm font-medium leading-6 text-gray-900">
+                            Start Year <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <select required v-model="form.start_year"
+                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                <option :value="0">Select Year</option>
+                                <option class="truncate text-sm leading-6"
+                                    v-for="(year, yearIndex) in _.range(2000, 2025)"
+                                    :key="`start-year-${yearIndex}`" :value="year">
+                                    {{ year }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Is Current -->
+                <div class="mt-4">
+                    <label for="isCurrent" class="block text-sm font-medium leading-6 text-gray-900">
+                        Is Current <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-2">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="isCurrent" v-model="form.is_current"
+                                class="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
+                            <label for="isCurrent" class="ml-2 block text-sm text-gray-900">Currently working
+                                here</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- End Month and End Year (conditionally rendered) -->
+                <div v-if="!form.is_current" class="mt-4 flex flex-row space-x-4">
+                    <!-- End Month -->
+                    <div class="w-1/2">
+                        <label for="endMonth" class="block text-sm font-medium leading-6 text-gray-900">
+                            End Month <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <select :required="!form.is_current" v-model="form.end_month"
+                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                <option :value="0">Select Month</option>
+                                <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
+                                    :key="`end-month-${monthIndex}`" :value="monthIndex + 1">
+                                    {{ month }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- End Year -->
+                    <div class="w-1/2">
+                        <label for="endYear" class="block text-sm font-medium leading-6 text-gray-900">
+                            End Year <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <select :required="!form.is_current" v-model="form.end_year"
+                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                <option :value="0">Select Year</option>
+                                <option class="truncate text-sm leading-6"
+                                    v-for="(year, yearIndex) in _.range(2000, 2025)"
+                                    :key="`end-year-${yearIndex}`" :value="year">
+                                    {{ year }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employment Type -->
+                <div class="mt-4">
+                    <label for="employment" class="block text-sm font-medium leading-6 text-gray-900">
+                        Employment Type <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-2">
+                        <select required id="employment" v-model="form.employment"
+                            class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                            <option class="truncate text-sm leading-6" value="">Select employment type</option>
+                            <option class="truncate text-sm leading-6" v-for="(type) in EmploymentType"
+                                :key="`type-${type}`" :value="type">
+                                {{ _.capitalize(_.startCase(type)) }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </template>
+        <template #actions>
+            <div class="flex justify-end space-x-2">
+                <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" @click="{
+                    isModalOpen = false;
+                    form = { ...initialValue };
+                }"></Button>
+                <Button type="button" text="Save" background="primary" foreground="white" :is-wide="false"
+                    @click="submitForm" :is-loading="isSubmitting"></Button>
+            </div>
+        </template>
     </Modal>
-    
-        <Modal :modelValue="isViewModalOpen" @update:modelValue="isViewModalOpen = $event">
+
+    <Modal :modelValue="isViewModalOpen" @update:modelValue="isViewModalOpen = $event">
         <template #title>
             <div class="flex items-center space-x-2 justify-center">
                 <Icon icon="mdi:briefcase" class="text-primary-600" width="24" height="24" />
@@ -299,7 +432,9 @@ const handleSubmit = async () => {
                                 <span>Website</span>
                             </label>
                             <div class="mt-1 text-sm text-gray-900">
-                                <a :href="currentWorkExperience.data.website" target="_blank" class="text-primary-600 hover:text-primary-800">{{ currentWorkExperience.data.website }}</a>
+                                <a :href="currentWorkExperience.data.website" target="_blank"
+                                    class="text-primary-600 hover:text-primary-800">{{
+                                        currentWorkExperience.data.website }}</a>
                             </div>
                         </div>
                     </div>
@@ -327,8 +462,8 @@ const handleSubmit = async () => {
                         </div>
                     </div>
                 </div>
-                
-                
+
+
                 <div class="sm:col-span-2">
                     <label class="text-sm font-medium text-gray-500 flex items-center space-x-2">
                         <Icon icon="mdi:note-text" class="text-primary-600" width="20" height="20" />
@@ -369,12 +504,12 @@ const handleSubmit = async () => {
         </template>
         <template #actions>
             <div class="flex justify-end space-x-2">
-                <Button type="button" text="Close" background="white" foreground="black" 
-                        :is-wide="false" @click="isViewModalOpen = false"></Button>
+                <Button type="button" text="Close" background="white" foreground="black" :is-wide="false"
+                    @click="isViewModalOpen = false"></Button>
             </div>
         </template>
     </Modal>
-    
+
     <Modal :modelValue="isDeleteModalOpen" @update:modelValue="isDeleteModalOpen = $event">
         <template #title>
             Confirm Delete
@@ -384,10 +519,10 @@ const handleSubmit = async () => {
         </template>
         <template #actions>
             <div class="flex justify-end space-x-2">
-                <Button type="button" text="Cancel" background="white" foreground="black" 
-                        :is-wide="false" @click="isDeleteModalOpen = false"></Button>
-                <Button type="button" text="Delete" background="red" foreground="primary"
-                        :is-wide="false" @click="handleDelete" :is-loading="isDeleting"></Button>
+                <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false"
+                    @click="isDeleteModalOpen = false"></Button>
+                <Button type="button" text="Delete" background="red" foreground="primary" :is-wide="false"
+                    @click="handleDelete" :is-loading="isDeleting"></Button>
             </div>
         </template>
     </Modal>

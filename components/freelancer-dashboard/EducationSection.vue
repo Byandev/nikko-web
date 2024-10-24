@@ -4,6 +4,7 @@ import type { Education } from '~/types/models/Education';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
+import moment from 'moment';
 
 const isModalOpen = ref(false);
 const isViewModalOpen = ref(false);
@@ -33,6 +34,8 @@ const initialValue: FormValues = {
 
 const form = ref<FormValues>({ ...initialValue });
 
+const monthOptions = computed(() => moment.months());
+
 const { account } = storeToRefs(accountStore());
 
 const { sendRequest: submitEducation, pending: isSubmitting } = useSubmit<{ data: Education }, ApiErrorResponse>();
@@ -46,7 +49,7 @@ const handleEdit = async (educationId: string) => {
     isEditing.value = true;
     isModalOpen.value = true;
     await fetchEducationDetails(`/v1/accounts/${account.value?.id}/educations/${educationId}`);
-    
+
     if (currentEducation && currentEducation.value?.data) {
         form.value = {
             degree: currentEducation.value.data.degree,
@@ -127,21 +130,28 @@ const handleSubmit = async () => {
         </div>
     </div>
     <div v-else-if="educations?.data && educations.data.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div v-for="education in educations.data" :key="education.id" class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div v-for="education in educations.data" :key="education.id"
+            class="bg-white rounded-lg shadow-md overflow-hidden">
             <div class="p-4">
                 <h3 class="text-lg font-semibold text-gray-900">{{ education.degree }}</h3>
                 <p class="mt-2 text-sm text-gray-600"><strong>Country: </strong>{{ education.country }}</p>
-                <p class="mt-2 text-sm text-gray-600"><strong>Start Date:</strong>{{ education.start_month }}/{{ education.start_year }} <strong>End Date: </strong>{{ education.end_month }}/{{ education.end_year }}</p>
+                <p class="mt-2 text-sm text-gray-600"><strong>Start Date:</strong>{{ education.start_month }}/{{
+                    education.start_year }} <strong>End Date: </strong>{{ education.end_month }}/{{ education.end_year
+                    }}</p>
                 <p class="mt-4 text-sm text-gray-600">{{ education.description }}</p>
                 <div class="flex flex-row gap-5 mt-4">
-                    <button @click="handleView(String(education.id))" class="inline-block text-primary hover:text-primary-dark transition-colors">View</button>
-                    <button @click="handleEdit(String(education.id))" class="inline-block text-blue-600 hover:text-blue-800 transition-colors">Edit</button>
-                    <button @click="confirmDelete(education)" class="inline-block text-red-600 hover:text-red-800 transition-colors">Delete</button>
+                    <button @click="handleView(String(education.id))"
+                        class="inline-block text-primary hover:text-primary-dark transition-colors">View</button>
+                    <button @click="handleEdit(String(education.id))"
+                        class="inline-block text-blue-600 hover:text-blue-800 transition-colors">Edit</button>
+                    <button @click="confirmDelete(education)"
+                        class="inline-block text-red-600 hover:text-red-800 transition-colors">Delete</button>
                 </div>
             </div>
         </div>
         <div class="flex justify-center items-center rounded-lg border border-primary border-dashed p-4">
-            <button @click="isModalOpen = true" class="bg-primary-600 text-primary px-4 py-2 rounded-md hover:bg-primary-700 flex items-center transition-colors">
+            <button @click="isModalOpen = true"
+                class="bg-primary-600 text-primary px-4 py-2 rounded-md hover:bg-primary-700 flex items-center transition-colors">
                 <Icon icon="mdi:plus" class="mr-2" width="20" height="20" />
                 Add Education
             </button>
@@ -152,53 +162,135 @@ const handleSubmit = async () => {
         <h3 class="mt-2 text-sm font-semibold text-gray-900">No education</h3>
         <p class="mt-1 text-sm text-gray-500">Get started by adding your education.</p>
         <div class="mt-6 flex justify-center">
-            <Button @click="isModalOpen=true" text="New Education" type="button" foreground="white" background="primary"/>
+            <Button @click="isModalOpen = true" text="New Education" type="button" foreground="white"
+                background="primary" />
         </div>
     </div>
-    
+
     <Modal :modelValue="isModalOpen" @update:modelValue="isModalOpen = $event">
         <template #title>
             {{ isEditing ? 'Edit Education' : 'Add Education' }}
         </template>
         <template #content>
-            <form class="space-y-4 text-left">
-                <div class="sm:col-span-2">
-                    <label for="degree" class="text-sm font-medium text-gray-500">Degree</label>
-                    <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.degree" type="text" id="degree" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                    </div>
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="country" class="text-sm font-medium text-gray-500">Country</label>
-                    <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.country" type="text" id="country" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                    </div>
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="description" class="text-sm font-medium text-gray-500">Description</label>
-                    <div class="mt-1 text-sm text-gray-900">
-                        <textarea v-model="form.description" id="description" rows="3" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2"></textarea>
-                    </div>
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="start_date" class="text-sm font-medium text-gray-500">Start Date</label>
-                    <div class="mt-1 text-sm text-gray-900 flex space-x-4">
-                        <div class="w-1/2">
-                            <input v-model="form.start_month" type="number" id="start_month" placeholder="Month" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
-                        </div>
-                        <div class="w-1/2">
-                            <input v-model="form.start_year" type="number" id="start_year" placeholder="Year" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+            <form class="w-full max-w-lg text-start">
+                
+                <!-- Degree -->
+                <div class="mt-4">
+                    <label for="degree" class="block text-sm font-medium leading-6 text-gray-900">
+                        Degree <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-2">
+                        <div
+                            class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+                            <Icon icon="mdi:school" :ssr="true" />
+                            <input required type="text" id="degree" v-model="form.degree"
+                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
                     </div>
                 </div>
-                <div class="sm:col-span-2">
-                    <label for="end_date" class="text-sm font-medium text-gray-500">End Date</label>
-                    <div class="mt-1 text-sm text-gray-900 flex space-x-4">
-                        <div class="w-1/2">
-                            <input v-model="form.end_month" type="number" id="end_month" placeholder="Month" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+
+                <!-- Country -->
+                <div class="mt-4">
+                    <label for="country" class="block text-sm font-medium leading-6 text-gray-900">
+                        Country <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-2">
+                        <div
+                            class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                            <Icon icon="mdi:earth" :ssr="true" />
+                            <input type="text" id="country" name="country" v-model="form.country" required
+                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
-                        <div class="w-1/2">
-                            <input v-model="form.end_year" type="number" id="end_year" placeholder="Year" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="mt-4">
+                    <label for="description" class="block text-sm font-medium leading-6 text-gray-900">
+                        Description <span class="text-red-500">*</span>
+                    </label>
+                    <div class="mt-2">
+                        <div
+                            class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
+                            <Icon icon="mdi:note-text" :ssr="true" />
+                            <textarea required id="description" v-model="form.description" rows="4"
+                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Start Month and Start Year -->
+                <div class="mt-4 flex flex-row space-x-4">
+                    <!-- Start Month -->
+                    <div class="w-1/2">
+                        <label for="startMonth" class="block text-sm font-medium leading-6 text-gray-900">
+                            Start Month <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <select required v-model="form.start_month"
+                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                <option :value="0">Select Month</option>
+                                <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
+                                    :key="`start-month-${monthIndex}`" :value="monthIndex + 1">
+                                    {{ month }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Start Year -->
+                    <div class="w-1/2">
+                        <label for="startYear" class="block text-sm font-medium leading-6 text-gray-900">
+                            Start Year <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <select required v-model="form.start_year"
+                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                <option :value="0">Select Year</option>
+                                <option class="truncate text-sm leading-6"
+                                    v-for="(year, yearIndex) in _.range(2000, 2025)"
+                                    :key="`start-year-${yearIndex}`" :value="year">
+                                    {{ year }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- End Month and End Year -->
+                <div class="mt-4 flex flex-row space-x-4">
+                    <!-- End Month -->
+                    <div class="w-1/2">
+                        <label for="startMonth" class="block text-sm font-medium leading-6 text-gray-900">
+                            End Month <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <select v-model="form.end_month"
+                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                <option :value="0">Select Month</option>
+                                <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
+                                    :key="`start-month-${monthIndex}`" :value="monthIndex + 1">
+                                    {{ month }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- End Year -->
+                    <div class="w-1/2">
+                        <label for="startYear" class="block text-sm font-medium leading-6 text-gray-900">
+                            End Year <span class="text-red-500">*</span>
+                        </label>
+                        <div class="mt-2">
+                            <select v-model="form.end_year"
+                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                                <option :value="0">Select Year</option>
+                                <option class="truncate text-sm leading-6"
+                                    v-for="(year, yearIndex) in _.range(2000, 2025)"
+                                    :key="`start-year-${yearIndex}`" :value="year">
+                                    {{ year }}
+                                </option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -206,16 +298,16 @@ const handleSubmit = async () => {
         </template>
         <template #actions>
             <div class="flex justify-end space-x-2">
-                <Button type="button" text="Cancel" background="white" foreground="black" 
-                        :is-wide="false" @click="{isModalOpen = false;
-                        form = { ...initialValue };
-                        }"></Button>
-                <Button type="button" text="Save" background="primary" foreground="white"
-                        :is-wide="false" @click="handleSubmit" :is-loading="isSubmitting"></Button>
+                <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" @click="{
+                    isModalOpen = false;
+                    form = { ...initialValue };
+                }"></Button>
+                <Button type="button" text="Save" background="primary" foreground="white" :is-wide="false"
+                    @click="handleSubmit" :is-loading="isSubmitting"></Button>
             </div>
         </template>
     </Modal>
-    
+
     <Modal :modelValue="isViewModalOpen" @update:modelValue="isViewModalOpen = $event">
         <template #title>
             <div class="flex items-center space-x-2 justify-center">
@@ -277,12 +369,12 @@ const handleSubmit = async () => {
         </template>
         <template #actions>
             <div class="flex justify-end space-x-2">
-                <Button type="button" text="Close" background="white" foreground="black" 
-                        :is-wide="false" @click="isViewModalOpen = false"></Button>
+                <Button type="button" text="Close" background="white" foreground="black" :is-wide="false"
+                    @click="isViewModalOpen = false"></Button>
             </div>
         </template>
     </Modal>
-    
+
     <Modal :modelValue="isDeleteModalOpen" @update:modelValue="isDeleteModalOpen = $event">
         <template #title>
             Confirm Delete
@@ -292,10 +384,10 @@ const handleSubmit = async () => {
         </template>
         <template #actions>
             <div class="flex justify-end space-x-2">
-                <Button type="button" text="Cancel" background="white" foreground="black" 
-                        :is-wide="false" @click="isDeleteModalOpen = false"></Button>
-                <Button type="button" text="Delete" background="red" foreground="primary"
-                        :is-wide="false" @click="handleDelete" :is-loading="isDeleting"></Button>
+                <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false"
+                    @click="isDeleteModalOpen = false"></Button>
+                <Button type="button" text="Delete" background="red" foreground="primary" :is-wide="false"
+                    @click="handleDelete" :is-loading="isDeleting"></Button>
             </div>
         </template>
     </Modal>

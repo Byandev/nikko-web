@@ -102,7 +102,7 @@ const onCancelEdit = async () => {
       <div class="flex justify-between items-center">
         <h2 class="text-2xl font-bold">Skills</h2>
         <div>
-          <button class="text-blue-500" @click="isRequestModalOpen = true">Request Skills</button>
+          <button class="text-blue-500" @click="isRequestModalOpen = true">Add Skills</button>
           <button class="text-gray-500 ml-5" @click="isEditModalOpen = true">Edit</button>
         </div>
       </div>
@@ -146,7 +146,7 @@ const onCancelEdit = async () => {
 
   <Modal v-model="isRequestModalOpen" @close="isRequestModalOpen = false">
     <template #title>
-      <h3 class="text-lg font-medium leading-6 text-gray-900">Request New Skill</h3>
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Add New Skill</h3>
     </template>
     <template #content>
       <div class="mt-4 w-full">
@@ -181,7 +181,7 @@ const onCancelEdit = async () => {
     </template>
     <template #actions>
       <Button @click="isRequestModalOpen = false" text="Cancel" type="button" background="white" foreground="primary" />
-      <Button @click="requestSkill" text="Request" type="button" background="primary" foreground="white" />
+      <Button @click="requestSkill" text="Add" type="button" background="primary" foreground="white" />
     </template>
   </Modal>
 </template>

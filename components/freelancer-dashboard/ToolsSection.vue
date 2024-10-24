@@ -43,7 +43,7 @@ const submitTools = async () => {
 
     isEditModalOpen.value = false;
   } catch (error) {
-    console.log('Error updating tools:', error);
+    console.error('Error updating tools:', error);
   }
 };
 
@@ -69,7 +69,7 @@ const requestTool = async () => {
     selectedToolId.value = null;
     isRequestModalOpen.value = false;
   } catch (error) {
-    console.log('Error requesting tool:', error);
+    console.error('Error requesting tool:', error);
   }
 };
 
@@ -80,7 +80,6 @@ const onSelect = (event: Event) => {
   if (tool && !selectedTools.value.some(t => t.id === tool.id)) {
     selectedTools.value.push(tool);
   }
-  console.log('Selected Tools after onSelect:', selectedTools.value);
 }
 
 const onRemoveSelectedTool = (idx: number) => {
@@ -99,7 +98,7 @@ const onCancelEdit = async () => {
       <div class="flex justify-between items-center">
         <h2 class="text-2xl font-bold">Tools</h2>
         <div>
-          <button class="text-blue-500" @click="isRequestModalOpen = true">Request Tools</button>
+          <button class="text-blue-500" @click="isRequestModalOpen = true">Add Tools</button>
           <button class="text-gray-500 ml-5" @click="isEditModalOpen = true">Edit</button>
         </div>
       </div>

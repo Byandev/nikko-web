@@ -205,33 +205,33 @@ const handleSubmit = async () => {
         <template #content>
                 <form class="space-y-4 text-left">
                     <div class="sm:col-span-2">
-                        <label for="title" class="text-sm font-medium text-gray-500">Title</label>
+                        <label for="title" class="text-sm font-medium text-gray-500">Title <span class="text-red-500">*</span></label>
                         <div class="mt-1 text-sm text-gray-900">
-                            <input v-model="form.title" type="text" id="title" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                            <input v-model="form.title" type="text" id="title" class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                         </div>
                     </div>
                     <div class="sm:col-span-2">
-                        <label for="issued_date" class="text-sm font-medium text-gray-500">Issue Date</label>
+                        <label for="issued_date" class="text-sm font-medium text-gray-500">Issue Date <span class="text-red-500">*</span></label>
                         <div class="mt-1 text-sm text-gray-900">
-                            <input v-model="form.issued_date" type="date" id="issued_date" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                            <input v-model="form.issued_date" type="date" id="issued_date" class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                         </div>
                     </div>
                     <div class="sm:col-span-2">
-                        <label for="url" class="text-sm font-medium text-gray-500">Url</label>
+                        <label for="url" class="text-sm font-medium text-gray-500">Url <span class="text-red-500">*</span></label>
                         <div class="mt-1 text-sm text-gray-900">
-                            <input v-model="form.url" type="url" id="url" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                            <input v-model="form.url" type="url" id="url" class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                         </div>
                     </div>
                     <div class="sm:col-span-2">
-                        <label for="reference_id" class="text-sm font-medium text-gray-500">Reference ID</label>
+                        <label for="reference_id" class="text-sm font-medium text-gray-500">Reference ID <span class="text-red-500">*</span></label>
                         <div class="mt-1 text-sm text-gray-900">
-                            <input v-model="form.reference_id" type="text" id="reference_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2">
+                            <input v-model="form.reference_id" type="text" id="reference_id" class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                         </div>
                     </div>
                     <div class="sm:col-span-2">
-                        <label for="file" class="text-sm font-medium text-gray-500">File Attachment</label>
+                        <label for="file" class="text-sm font-medium text-gray-500">File Attachment <span class="text-red-500">*</span></label>
                         <div 
-                            class="mt-1 text-sm text-gray-900 border-2 border-dashed rounded-md p-4 cursor-pointer"
+                            class="mt-1 text-sm text-gray-900 ring-2 ring-gray-300 ring-dashed rounded-md p-4 cursor-pointer"
                             @click="handleClick"
                         >
                             <input type="file" id="file" @change="handleFileChange" class="hidden" accept="image/*">
