@@ -8,9 +8,8 @@ const tabs = [
     { name: 'Security & Password', href: '/settings/security-and-password', current: true },
 ];
 
-const { sendRequest: changePassword } = useSubmit<{message: string}, ApiErrorResponse>();
+const { sendRequest: changePassword, pending: isSubmitting } = useSubmit<{message: string}, ApiErrorResponse>();
 
-const isLoading = ref(false);
 
 interface PasswordForm {
     username: string;
@@ -40,7 +39,6 @@ const handleChangePassword = async () => {
     if (v$.value.$invalid) return;
 
     try {
-        isLoading.value = true;
         await changePassword('/v1/auth/change-password', {
             method: 'POST',
             body: {
@@ -52,9 +50,7 @@ const handleChangePassword = async () => {
         });
     } catch (error) {
         console.error('Error changing password:', error);
-    } finally {
-        isLoading.value = false;
-    }   
+    } 
 };
 </script>
 
@@ -103,7 +99,7 @@ const handleChangePassword = async () => {
                     </div>
                     <!-- Save Button -->
                     <div class="mt-6 flex justify-end">
-                        <Button text="Save" background="primary" foreground="white" :is-loading="isLoading"
+                        <Button text="Save" background="primary" foreground="white" :is-loading="isSubmitting"
                             :is-wide="false" type="submit"></Button>
                     </div>
                 </form>

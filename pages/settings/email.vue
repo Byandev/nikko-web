@@ -21,7 +21,6 @@ const changeEmailForm = ref({
 
 const maskedEmail = computed(() => maskEmail(user.value.email));
 
-const isLoading = ref(false);
 const isModalOpen = ref(false);
 const isResendDisabled = ref(false);
 const resendTimer = ref(60);
@@ -30,7 +29,7 @@ const resendOTPText = computed(() => {
     return isResendDisabled.value ? `Send OTP (${resendTimer.value}s)` : 'Send OTP';
 });
 
-const { sendRequest: sendRequest } = useSubmit<{ data: { expires_at: string } }, ApiErrorResponse>();
+const { sendRequest: sendRequest, pending: isSubmitting } = useSubmit<{ data: { expires_at: string } }, ApiErrorResponse>();
 
 const startResendTimer = () => {
     isResendDisabled.value = true;
@@ -46,7 +45,6 @@ const startResendTimer = () => {
 
 const sendEmailVerification = async () => {
     try {
-        isLoading.value = true;
         await sendRequest('/v1/auth/change-email', {
             method: 'POST',
             body: {
@@ -56,14 +54,11 @@ const sendEmailVerification = async () => {
         startResendTimer();
     } catch (error) {
         console.error('Error sending password reset email:', error);
-    } finally {
-        isLoading.value = false;
-    }
+    } 
 };
 
 const verifyOTP = async () => {
     try {
-        isLoading.value = true;
         await sendRequest('/v1/auth/change-email/verify', {
             method: 'POST',
             body: {
@@ -74,9 +69,7 @@ const verifyOTP = async () => {
         isModalOpen.value = false;
     } catch (error) {
         console.error('Error sending password reset email:', error);
-    } finally {
-        isLoading.value = false;
-    }
+    } 
 };
 
 </script>
@@ -108,7 +101,7 @@ const verifyOTP = async () => {
                     <!-- Update Button -->
                     <div class="mt-6 flex justify-end">
                         <Button @click="isModalOpen = true" text="Update Email" background="primary" foreground="white"
-                            :is-loading="isLoading" :is-wide="false" type="button"></Button>
+                            :is-loading="isSubmitting" :is-wide="false" type="button"></Button>
                     </div>
                 </div>
             </div>
@@ -137,15 +130,15 @@ const verifyOTP = async () => {
                         <Button @click="sendEmailVerification" :disabled="isResendDisabled"
                             :class="{ 'cursor-not-allowed': isResendDisabled }"
                             class="whitespace-nowrap ml-2" type="submit" :text="resendOTPText" background="none"
-                            foreground="black" :is-loading="isLoading" :is-wide="false"></Button>
+                            foreground="black" :is-loading="isSubmitting" :is-wide="false"></Button>
                     </div>
                 </div>
             </template>
             <template #actions>
                 <div class="flex justify-end space-x-2">
-                    <Button type="button" text="Cancel" background="white" foreground="black" :is-loading="isLoading"
+                    <Button type="button" text="Cancel" background="white" foreground="black" :is-loading="isSubmitting"
                         :is-wide="false" @click="isModalOpen = false"></Button>
-                    <Button type="button" text="Verify" background="primary" foreground="white" :is-loading="isLoading"
+                    <Button type="button" text="Verify" background="primary" foreground="white" :is-loading="isSubmitting"
                         :is-wide="false" @click="verifyOTP"></Button>
                 </div>
             </template>

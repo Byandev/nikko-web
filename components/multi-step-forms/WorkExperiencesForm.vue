@@ -10,7 +10,8 @@ import {authStore} from '~/store/authStore';
 import {accountStore} from "~/store/accountStore";
 
 import type {Account} from '~/types/models/Account';
-import {EmploymentType, WorkExperience} from '~/types/models/WorkExperience';
+import type  {WorkExperience} from '~/types/models/WorkExperience';
+import {EmploymentType} from '~/types/models/WorkExperience';
 import type {ApiErrorResponse} from '~/types/api/response/error';
 
 const {user} = storeToRefs(authStore());
@@ -69,10 +70,10 @@ const removeWorkExperienceForm = (index: number) => {
         class="text-gray-600 mb-4">Share your professional journey and achievements to highlight your expertise.</span>
 
     <form class="max-w-lg w-full" @submit.prevent="submitForm">
-      <div v-for="(form, index) in form" :key="index" class="w-full mb-8">
+      <div v-for="(workExperience, index) in form" :key="index" class="w-full mb-8">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-semibold">Work Experience {{ index + 1 }}</h2>
-          <button v-if="form.length > 1" @click="removeWorkExperienceForm(index as number)" class="text-red-500">
+          <button v-if="form.length > 1" @click="removeWorkExperienceForm(index)" class="text-red-500">
             Remove
           </button>
         </div>
@@ -86,7 +87,7 @@ const removeWorkExperienceForm = (index: number) => {
             <div
                 class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
               <Icon icon="mdi:account" :ssr="true"/>
-              <input required type="text" id="jobTitle" v-model="form.job_title"
+              <input required type="text" id="jobTitle" v-model="workExperience.job_title"
                      class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
             </div>
           </div>
@@ -102,7 +103,7 @@ const removeWorkExperienceForm = (index: number) => {
               <div
                   class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                 <Icon icon="mdi:office-building" :ssr="true"/>
-                <input required type="text" id="companyName" v-model="form.company"
+                <input required type="text" id="companyName" v-model="workExperience.company"
                        class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
               </div>
             </div>
@@ -117,7 +118,7 @@ const removeWorkExperienceForm = (index: number) => {
               <div
                   class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                 <Icon icon="mdi:web" :ssr="true"/>
-                <input required type="url" id="website" v-model="form.website"
+                <input required type="url" id="website" v-model="workExperience.website"
                        class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
               </div>
             </div>
@@ -133,7 +134,7 @@ const removeWorkExperienceForm = (index: number) => {
             <div
                 class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
               <Icon icon="mdi:earth" :ssr="true" />
-              <input type="text" id="country" name="country" v-model="form.country" required
+              <input type="text" id="country" name="country" v-model="workExperience.country" required
                      class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
             </div>
           </div>
@@ -148,7 +149,7 @@ const removeWorkExperienceForm = (index: number) => {
             <div
                 class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
               <Icon icon="mdi:note-text" :ssr="true"/>
-              <textarea id="description" v-model="form.description" rows="4"
+              <textarea id="description" v-model="workExperience.description" rows="4"
                         class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
             </div>
           </div>
@@ -162,7 +163,7 @@ const removeWorkExperienceForm = (index: number) => {
               Start Month <span class="text-red-500">*</span>
             </label>
             <div class="mt-2">
-              <select required v-model="form.start_month"
+              <select required v-model="workExperience.start_month"
                       class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                 <option :value="0">Select Month</option>
                 <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
@@ -180,7 +181,7 @@ const removeWorkExperienceForm = (index: number) => {
               Start Year <span class="text-red-500">*</span>
             </label>
             <div class="mt-2">
-              <select required v-model="form.start_year"
+              <select required v-model="workExperience.start_year"
                       class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                 <option :value="0">Select Year</option>
                 <option class="truncate text-sm leading-6" v-for="(year, yearIndex) in _.range(2000, 2025)"
@@ -200,7 +201,7 @@ const removeWorkExperienceForm = (index: number) => {
           </label>
           <div class="mt-2">
             <div class="flex items-center">
-              <input type="checkbox" id="isCurrent" v-model="form.is_current"
+              <input type="checkbox" id="isCurrent" v-model="workExperience.is_current"
                      class="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500">
               <label for="isCurrent" class="ml-2 block text-sm text-gray-900">Currently working here</label>
             </div>
@@ -208,14 +209,14 @@ const removeWorkExperienceForm = (index: number) => {
         </div>
 
         <!-- End Month and End Year (conditionally rendered) -->
-        <div v-if="!form.is_current" class="mt-4 flex flex-row space-x-4">
+        <div v-if="!workExperience.is_current" class="mt-4 flex flex-row space-x-4">
           <!-- End Month -->
           <div class="w-1/2">
             <label for="startMonth" class="block text-sm font-medium leading-6 text-gray-900">
               End Month <span class="text-red-500">*</span>
             </label>
             <div class="mt-2">
-              <select :required="!form.is_current" v-model="form.end_month"
+              <select :required="!workExperience.is_current" v-model="workExperience.end_month"
                       class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                 <option :value="0">Select Month</option>
                 <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
@@ -233,7 +234,7 @@ const removeWorkExperienceForm = (index: number) => {
               End Year <span class="text-red-500">*</span>
             </label>
             <div class="mt-2">
-              <select :required="!form.is_current" v-model="form.end_year"
+              <select :required="!workExperience.is_current" v-model="workExperience.end_year"
                       class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                 <option :value="0">Select Year</option>
                 <option class="truncate text-sm leading-6" v-for="(year, yearIndex) in _.range(2000, 2025)"
@@ -252,7 +253,7 @@ const removeWorkExperienceForm = (index: number) => {
             Employment Type <span class="text-red-500">*</span>
           </label>
           <div class="mt-2">
-            <select required id="employment" v-model="form.employment"
+            <select required id="employment" v-model="workExperience.employment"
                     class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
               <option class="truncate text-sm leading-6" value="">Select employment type</option>
               <option class="truncate text-sm leading-6" v-for="(type) in EmploymentType" :key="`type-${index}-${type}`" :value="type">
