@@ -15,9 +15,6 @@ export default defineNuxtPlugin(() => {
                 options.headers.set('Authorization', `Bearer ${accessToken.value}`);
             }
         },
-        async onResponseError({response}) {
-            console.log(response._data.message)
-        },
     });
 
     return {

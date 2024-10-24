@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import EducationSection from '~/components/freelancer-dashboard/EducationSection.vue';
+
 
 definePageMeta({
   middleware: ['verify']
@@ -42,40 +44,10 @@ definePageMeta({
         </div>
 
         <!-- Skill Section -->
-        <Section class="mt-5">
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Skills</h2>
-              <div>
-                <button class="text-blue-500">Request Skills</button>
-                <button class="text-gray-500 ml-5">Edit</button>
-              </div>
-            </div>
-          </template>
-          <template #content>
-            <div class="mt-4">
-              <p class="text-gray-500">Skill Section</p>
-            </div>
-          </template>
-        </Section>
+        <SkillsSection />
 
         <!-- Tools Section -->
-        <Section class="mt-5">
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Tools</h2>
-              <div>
-                <button class="text-blue-500">Request Tools</button>
-                <button class="text-gray-500 ml-5">Edit</button>
-              </div>
-            </div>
-          </template>
-          <template #content>
-            <div class="mt-4">
-              <p class="text-gray-500">Tools Section</p>
-            </div>
-          </template>
-        </Section>
+        <ToolsSection />
 
         <!-- Verification Section -->
         <Section class="mt-5">
@@ -143,9 +115,7 @@ definePageMeta({
               </div>
             </template>
             <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Certifications Section</p>
-              </div>
+              <CertificateSection />
             </template>
           </Section>
 
@@ -161,9 +131,7 @@ definePageMeta({
 
             </template>
             <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Share Your Education Section</p>
-              </div>
+              <EducationSection />
             </template>
           </Section>
 
@@ -174,9 +142,7 @@ definePageMeta({
               </div>
             </template>
             <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Share Your Professional Journey Section</p>
-              </div>
+              <WorkExperienceSection />
             </template>
           </Section>
         </div>
