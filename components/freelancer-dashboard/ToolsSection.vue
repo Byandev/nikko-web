@@ -105,7 +105,10 @@ const onCancelEdit = async () => {
     </template>
     <template #content>
       <div class="flex flex-wrap">
-        <div v-for="(tool, idx) in account?.tools" :key="`selected-tool-${tool.id}`" class="mr-2 my-1">
+        <div v-if="account?.tools.length === 0" class="text-gray-500">
+          No tools yet.
+        </div>
+        <div v-else v-for="(tool, idx) in account?.tools" :key="`selected-tool-${tool.id}`" class="mr-2 my-1">
           <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
             {{tool.name}}
           </span>
