@@ -145,7 +145,7 @@ const uploadImage = async (type: MediaType) => {
                 <h2 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h2>
                 <p class="mt-2 text-md text-gray-600">Joined on {{ new Date(user.created_at).toLocaleString('en-US', {
                     month: 'long', day: 'numeric', year: 'numeric' }) }}</p>
-                <div class="mt-2 flex items-center space-x-2">
+                <div class="mt-2 flex items-center space-x-2 justify-center sm:justify-start">
                     <Icon icon="mdi:map-marker" width="15" height="15" />
                     <span class="text-sm text-black font-semibold">Philippines</span>
                 </div>
