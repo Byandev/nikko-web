@@ -53,7 +53,11 @@ const submitForm = async () => {
 
         await getSession()
 
-        await router.push("/find-work");
+        if (account.value.type === "FREELANCER") {
+            await router.push("/freelancer-dashboard");
+        } else if (account.value.type === "CLIENT") {
+            await router.push("/find-work");
+        }
     } catch (error) {
         console.error(error)
     }
