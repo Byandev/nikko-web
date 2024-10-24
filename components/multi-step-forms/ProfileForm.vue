@@ -42,7 +42,7 @@ const submitForm = async () => {
 
     emits('submit');
   } catch (error) {
-    console.log('Error updating profile:', error);
+    console.error('Error updating profile:', error);
   }
 };
 </script>

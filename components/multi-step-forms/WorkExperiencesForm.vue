@@ -50,7 +50,7 @@ const submitForm = async () => {
 
     emits('submit')
   } catch (error) {
-    console.log('Error updating work experience:', error);
+    console.error('Error updating work experience:', error);
   }
 };
 

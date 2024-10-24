@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import EducationSection from '~/components/freelancer-dashboard/EducationSection.vue';
+import { authStore } from '~/store/authStore';
 
+const { updateUser } = authStore();
+
+updateUser();
 
 definePageMeta({
   middleware: ['verify']
@@ -68,21 +72,9 @@ definePageMeta({
       <!-- Right Column -->
       <div class="col-span-1 lg:col-span-2">
         <div class="grid grid-cols-1 gap-5">
-          <Section>
-            <template #header>
-              <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">About</h2>
-                <div>
-                  <button class="text-gray-500 ml-5">Edit</button>
-                </div>
-              </div>
-            </template>
-            <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">About Section</p>
-              </div>
-            </template>
-          </Section>
+          
+          <!-- Biosection -->
+          <BioSection />
 
           <Section>
             <template #header>
