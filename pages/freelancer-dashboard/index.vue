@@ -1,10 +1,5 @@
 <script setup lang="ts">
 import EducationSection from '~/components/freelancer-dashboard/EducationSection.vue';
-import { authStore } from '~/store/authStore';
-
-const { updateUser } = authStore();
-
-updateUser();
 
 definePageMeta({
   middleware: ['verify']
