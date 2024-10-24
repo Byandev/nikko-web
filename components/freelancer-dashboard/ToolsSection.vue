@@ -145,7 +145,7 @@ const onCancelEdit = async () => {
 
   <Modal v-model="isRequestModalOpen" @close="isRequestModalOpen = false">
     <template #title>
-      <h3 class="text-lg font-medium leading-6 text-gray-900">Request New Tool</h3>
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Add New Tool</h3>
     </template>
     <template #content>
       <div class="mt-4 w-full">
@@ -180,7 +180,7 @@ const onCancelEdit = async () => {
     </template>
     <template #actions>
       <Button @click="isRequestModalOpen = false" text="Cancel" type="button" background="white" foreground="primary" />
-      <Button @click="requestTool" text="Request" type="button" background="primary" foreground="white" />
+      <Button @click="requestTool" text="Add" type="button" background="primary" foreground="white" />
     </template>
   </Modal>
 </template>

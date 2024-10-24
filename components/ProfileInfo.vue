@@ -147,7 +147,7 @@ const uploadImage = async (type: MediaType) => {
                     month: 'long', day: 'numeric', year: 'numeric' }) }}</p>
                 <div class="mt-2 flex items-center space-x-2 justify-center sm:justify-start">
                     <Icon icon="mdi:map-marker" width="15" height="15" />
-                    <span class="text-sm text-black font-semibold">Philippines</span>
+                    <span class="text-sm text-black font-semibold">{{ user.country_code }}</span>
                 </div>
             </div>
         </div>
