@@ -10,6 +10,7 @@ import type {ApiErrorResponse} from '~/types/api/response/error';
 import {authStore} from '~/store/authStore';
 import {accountStore} from "~/store/accountStore";
 import {useFetchData} from "~/composables/useFetchData";
+import { helpers, required } from "@vuelidate/validators";
 
 const route = useRoute();
 const {user} = storeToRefs(authStore());
@@ -25,13 +26,26 @@ interface FormValues {
 }
 
 const selectedSkillId = ref<number>(0)
+
 const form = ref<FormValues>({
   skills: (account.value?.skills ?? [])
 });
 
+const rules = {
+  skills: {
+    required: helpers.withMessage('Please select at least one skill', required)
+  }
+}
+
+const {formRef, v$} = useValidation(form, rules);
+
 const skillOptions = computed<Skill[]>(() => (skills.value?.data ?? []).filter(skill => !form.value.skills.find(i => i.id === skill.id)))
 
 const submitForm = async () => {
+  v$.value.$touch();
+
+  if (v$.value.$invalid) return;
+
   try {
    const response = await updateAccount(`/v1/auth/accounts/${route.params.accountId}`, {
       method: 'PUT',
@@ -91,7 +105,7 @@ const onRemoveSkill = (index: number) => {
       </div>
 
       <div class="mt-5 flex flex-wrap">
-        <div v-for="(skill, idx) in form.skills" :key="`selected-skill-${skill.id}`" class="mr-2 my-1">
+        <div v-for="(skill, idx) in formRef.skills" :key="`selected-skill-${skill.id}`" class="mr-2 my-1">
             <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
             {{skill.name}}
             <button @click="onRemoveSkill(idx)" type="button" class="group relative -mr-1 h-3.5 w-3.5 rounded-sm hover:bg-green-600/20">
@@ -103,6 +117,8 @@ const onRemoveSkill = (index: number) => {
             </button>
           </span>
         </div>
+        <span v-if="v$.$error" class="text-red-900 text-sm">{{
+              v$.$errors[0].$message }}</span>
       </div>
 
       <div class="flex mt-5 justify-between w-full">
