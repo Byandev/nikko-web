@@ -17,7 +17,7 @@ interface FormValues {
     issued_date: string;
     url: string;
     reference_id: string;
-    image?: { file_name?: string; id: number };
+    image?: { file_name?: string; id?: number };
 }
 
 const initialValue: FormValues = {
@@ -46,6 +46,7 @@ const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
         selectedFile.value = target.files[0];
+        form.value.image = { file_name: target.files[0].name };
     }
 };
 
@@ -55,11 +56,8 @@ const handleClick = () => {
 };
 
 const handleRemoveFile = () => {
-    if (isEditing.value) {
-        form.value.image = undefined;
-    } else {
-        selectedFile.value = null;
-    }
+    selectedFile.value = null;
+    form.value.image = undefined;
 };
 
 const handleEdit = async (certificateId: string) => {
@@ -110,7 +108,7 @@ const handleDelete = async () => {
 
 const handleSubmit = async () => {
     try {
-        let uploadedImageId;
+        console.log('Selected File', selectedFile.value);
         if (selectedFile.value) {
             const formData = new FormData();
             formData.append('file', selectedFile.value);
@@ -118,25 +116,23 @@ const handleSubmit = async () => {
                 method: 'POST',
                 body: formData,
             });
-            uploadedImageId = uploadResponse.data.id;
+            form.value.image = { id: uploadResponse.data.id, file_name: uploadResponse.data.file_name };
+
+             // Submit the certificate
+            await submitCertificate(isEditing.value ? `/v1/certificates/${currentCertificate.value?.data.id}` : '/v1/certificates', {
+                method: isEditing.value ? 'PUT' : 'POST',
+                headers: account?.value?.id ? {
+                    'X-ACCOUNT-ID': account.value.id.toString(),
+                } : undefined,
+                body: JSON.stringify({
+                    title: form.value.title,
+                    issued_date: form.value.issued_date,
+                    url: form.value.url,
+                    reference_id: form.value.reference_id,
+                    image: form.value.image?.id,
+                }),
+            });
         }
-
-        if (uploadedImageId) {
-            form.value.image = { id: uploadedImageId };
-        }
-
-        // Submit the certificate
-        await submitCertificate(isEditing.value ? `/v1/certificates/${currentCertificate.value?.data.id}` : '/v1/certificates', {
-            method: isEditing.value ? 'PUT' : 'POST',
-            headers: account?.value?.id ? {
-                'X-ACCOUNT-ID': account.value.id.toString(),
-            } : undefined,
-            body: JSON.stringify({
-                ...form.value,
-                image: form.value.image?.id,
-            }),
-        });
-
         // Reset the form and state
         selectedFile.value = null;
         form.value = { ...initialValue };
@@ -187,7 +183,7 @@ const handleSubmit = async () => {
             </div>
         </div>
         <div class="flex justify-center rounded-lg border border-primary border-dashed">
-            <button @click="isModalOpen = true"
+            <button @click="{isModalOpen = true; isEditing = false}"
                 class="bg-primary-600 text-primary px-4 py-2 rounded-md hover:bg-primary-700 flex items-center">
                 <Icon icon="mdi:plus" class="mr-2" width="20" height="20" />
                 Add Certificate
@@ -257,17 +253,6 @@ const handleSubmit = async () => {
             </form>
             <div v-if="selectedFile || form.image" class="mt-4">
                 <ul class="mt-2 space-y-4">
-                    <li v-if="selectedFile"
-                        class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
-                        <div class="flex items-center space-x-2 w-full">
-                            <Icon icon="mdi:file" class="text-gray-500" width="24" height="24" />
-                            <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96"
-                                :title="selectedFile.name">{{ selectedFile.name }}</span>
-                        </div>
-                        <button @click="handleRemoveFile" class="text-red-500 hover:text-red-700">
-                            <Icon icon="mdi:close" width="16" height="16" />
-                        </button>
-                    </li>
                     <li v-if="form.image"
                         class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
                         <div class="flex items-center space-x-2 w-full">

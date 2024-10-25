@@ -106,47 +106,50 @@ const handleDelete = async () => {
 };
 
 const handleSubmit = async () => {
-    try {
-        // Upload each file and collect the responses
-        const uploadPromises = selectedFiles.value.map(file => {
-            const formData = new FormData();
-            formData.append('file', file);
-            return uploadMedia('/v1/medias', {
-                method: 'POST',
-                body: formData,
-            });
-        });
 
-        const uploadResponses = await Promise.all(uploadPromises);
-        const uploadedImages = uploadResponses.map(response => response.data.id);
+  try {
+    // Upload each file and collect the responses
+    const uploadPromises = selectedFiles.value.map(file => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return uploadMedia('/v1/medias', {
+        method: 'POST',
+        body: formData,
+      });
+    });
 
-               // Update the form images with the uploaded image URLs
-        form.value.images = form.value.images.concat(uploadedImages.map(id => ({ id })));
+    const uploadResponses = await Promise.all(uploadPromises);
+    const uploadedImages = uploadResponses.map(response => response.data.id);
 
-        // Submit the portfolio
-        await submitPortfolio(isEditing.value ? `/v1/portfolios/${currentPortfolio.value?.data.id}` : '/v1/portfolios', {
-            method: isEditing.value ? 'PUT' : 'POST',
-            headers: account?.value?.id ? {
-                'X-ACCOUNT-ID': account.value.id.toString(),
-            } : undefined,
-            body: JSON.stringify({
-                ...form.value,
-                images: form.value.images.map(image => image.id),
-            }),
-        });
+    const imageToUpload = ref<{ id: number; file_name?: string }[]>([]);
 
-        // Reset the form and state
-        selectedFiles.value = [];
-        form.value = { ...initialValue };
-        isModalOpen.value = false;
-        isEditing.value = false;
-        currentPortfolio.value = null;
+    // Update the form images with the uploaded image URLs
+    imageToUpload.value = form.value.images.concat(uploadedImages.map(id => ({ id, file_name: '' })));
 
-        // Refetch portfolios
-        fetchPortfolio(`v1/accounts/${account.value?.id}/portfolios`);
-    } catch (error) {
-        console.error(error);
-    }
+    // Submit the portfolio
+    await submitPortfolio(isEditing.value ? `/v1/portfolios/${currentPortfolio.value?.data.id}` : '/v1/portfolios', {
+      method: isEditing.value ? 'PUT' : 'POST',
+      headers: account?.value?.id ? {
+        'X-ACCOUNT-ID': account.value.id.toString(),
+      } : undefined,
+      body: JSON.stringify({
+        ...form.value,
+        images: imageToUpload.value.map(image => image.id),
+      }),
+    });
+
+    // Reset the form and state
+    selectedFiles.value = [];
+    form.value = { ...initialValue };
+    isModalOpen.value = false;
+    isEditing.value = false;
+    currentPortfolio.value = null;
+
+    // Refetch portfolios
+    fetchPortfolio(`v1/accounts/${account.value?.id}/portfolios`);
+  } catch (error) {
+    console.error(error);
+  }
 };
 </script>
 
