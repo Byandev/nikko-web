@@ -75,7 +75,7 @@ const removeLanguage = (index: number) => {
     <span class="text-gray-600 mb-4">List the languages you are proficient in and your level of proficiency.</span>
 
     <form @submit.prevent="submitForm" class="w-full">
-      <div v-for="(language, index) in formRef.languages" :key="index" class="flex flex-row gap-5 items-center">
+      <div v-for="(language, index) in formRef.languages" :key="index" class="flex flex-row gap-5 items-center justify-center">
         <div class="mt-4 w-full max-w-lg">
           <label for="languageName" class="block text-sm font-medium leading-6 text-gray-900">
             Language <span class="text-red-500">*</span>
@@ -115,7 +115,7 @@ const removeLanguage = (index: number) => {
         </div>
 
         <!-- Remove Button -->
-        <div>
+        <div class="mt-5">
           <button type="button" @click="removeLanguage(index)" class="text-red-500 hover:text-red-700">
             Remove
           </button>
