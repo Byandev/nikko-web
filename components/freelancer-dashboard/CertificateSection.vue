@@ -12,6 +12,7 @@ const isViewModalOpen = ref(false);
 const isDeleteModalOpen = ref(false);
 const isEditing = ref(false);
 const certificateToDelete = ref<Certificate | null>(null);
+const isFileAttanchmentEmpty = ref(false);
 
 interface FormValues {
     title: string;
@@ -49,6 +50,14 @@ const rules = {
 const { formRef, v$ } = useValidation(form, rules);
 
 const selectedFile = ref<File | null>(null);
+
+const watchSelectedFile = () => {
+    if (selectedFile.value || form.value.image) {
+        isFileAttanchmentEmpty.value = false;
+    } else {
+        isFileAttanchmentEmpty.value = true;
+    }
+};
 
 const { account } = storeToRefs(accountStore());
 
@@ -124,12 +133,22 @@ const handleDelete = async () => {
     }
 };
 
+const handleClose = () => {
+    isModalOpen.value = false;
+    isEditing.value = false;
+    form.value = { ...initialValue };
+    isFileAttanchmentEmpty.value = false;
+};
+
 const handleSubmit = async () => {
+    
+    watchEffect(watchSelectedFile);    
     v$.value.$touch();
     if (v$.value.$invalid) return;
+    if (!selectedFile.value) return;
+
 
     try {
-        console.log('Selected File', selectedFile.value);
         if (selectedFile.value) {
             const formData = new FormData();
             formData.append('file', selectedFile.value);
@@ -139,8 +158,6 @@ const handleSubmit = async () => {
             });
             form.value.image = { id: uploadResponse.data.id, file_name: uploadResponse.data.file_name };
         }
-
-        console.log('Form', form.value);
 
         // Submit the certificate
         await submitCertificate(isEditing.value ? `/v1/certificates/${currentCertificate.value?.data.id}` : '/v1/certificates', {
@@ -153,7 +170,7 @@ const handleSubmit = async () => {
                 issued_date: form.value.issued_date,
                 url: form.value.url,
                 reference_id: form.value.reference_id,
-                image: form.value.image?.id,
+                image: form.value.image ? form.value.image.id : undefined,
             }),
         });
 
@@ -281,6 +298,9 @@ const handleSubmit = async () => {
                             class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                             Click to select a file</p>
                     </div>
+                    <span v-if="isFileAttanchmentEmpty" class="text-red-900 text-sm">
+                        File Attachment is required
+                    </span>
                 </div>
             </form>
             <div v-if="selectedFile || form.image" class="mt-4">
@@ -301,10 +321,8 @@ const handleSubmit = async () => {
         </template>
         <template #actions>
             <div class="flex justify-end space-x-2">
-                <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" @click="{
-                    isModalOpen = false;
-                    form = { ...initialValue };
-                }"></Button>
+                <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" 
+                @click="handleClose"></Button>
                 <Button type="button" text="Save" background="primary" foreground="white" :is-wide="false"
                     @click="handleSubmit" :is-loading="isSubmitting || isUploading"></Button>
             </div>

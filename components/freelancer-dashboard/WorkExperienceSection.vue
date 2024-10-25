@@ -56,10 +56,10 @@ const rules = {
     start_year: { required: helpers.withMessage('Start year is required', required) },
     employment: { required: helpers.withMessage('Employment type is required', required) },
     end_month: { 
-        required: helpers.withMessage('End month is required', (value, vm) => vm.is_current) 
+        required: form.value.is_current ? null : helpers.withMessage('End month is required', required)
     },
     end_year: { 
-        required: helpers.withMessage('End year is required', (value, vm) => vm.is_current) 
+        required: form.value.is_current ? null : helpers.withMessage('End year is required', required)
     },
 };
 
@@ -128,29 +128,30 @@ const handleDelete = async () => {
 
 const submitForm = async () => {
     v$.value.$touch();
+    console.log(v$.value.$errors);
     if (v$.value.$invalid) return;
 
-
     try {
+
+        const body = {
+            job_title: form.value.job_title,
+            company: form.value.company,
+            website: form.value.website,
+            country: form.value.country,
+            description: form.value.description,
+            start_month: form.value.start_month,
+            start_year: form.value.start_year,
+            employment: form.value.employment,
+            is_current: form.value.is_current,
+            ...(form.value.is_current ? {} : { end_month: form.value.end_month, end_year: form.value.end_year })
+        };
         // Submit the work experience
         await submitWorkExperience(isEditing.value ? `/v1/work-experiences/${currentWorkExperience.value?.data.id}` : '/v1/work-experiences', {
             method: isEditing.value ? 'PUT' : 'POST',
             headers: account?.value?.id ? {
                 'X-ACCOUNT-ID': account.value.id.toString(),
             } : undefined,
-            body: JSON.stringify({
-                job_title: form.value.job_title,
-                company: form.value.company,
-                website: form.value.website,
-                country: form.value.country,
-                description: form.value.description,
-                start_month: form.value.start_month,
-                start_year: form.value.start_year,
-                employment: form.value.employment,
-                is_current: form.value.is_current,
-                end_month: form.value.is_current ? null : form.value.end_month,
-                end_year: form.value.is_current ? null : form.value.end_year,
-            }),
+            body: JSON.stringify(body),
         });
 
         // Reset the form and state

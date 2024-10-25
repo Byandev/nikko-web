@@ -20,23 +20,44 @@ const { account } = storeToRefs(accountStore())
 
 const monthOptions = computed(() => moment.months());
 
-const initialValue: Partial<WorkExperience> = {
-  job_title: '',
-  company: '',
-  website: '',
-  country: '',
-  description: '',
-  start_month: undefined,
-  start_year: undefined,
-  end_month: undefined,
-  end_year: undefined,
-  is_current: false,
-  employment: EmploymentType.FULL_TIME
+interface FormValues {
+  work_experiences: Partial<WorkExperience>[];
+}
+
+const initialValue: FormValues  = {
+  work_experiences: [{
+    job_title: '',
+    company: '',
+    website: '',
+    country: '',
+    description: '',
+    start_month: undefined,
+    start_year: undefined,
+    end_month: undefined,
+    end_year: undefined,
+    is_current: false,
+    employment: EmploymentType.FULL_TIME
+  }]
 }
 
 const { sendRequest: updateWorkExperience, pending: isSubmitting } = useSubmit<{ data: Account }, ApiErrorResponse>();
 
-const form = ref<Partial<WorkExperience>[]>(account.value?.work_experiences?.length ? account.value?.work_experiences : [initialValue]);
+const form = ref<Partial<WorkExperience>[]>(user.value.work_experiences?.length
+  ? user.value.work_experiences.map((workExperience: Partial<WorkExperience>) => ({
+      job_title: workExperience.job_title,
+      company: workExperience.company,
+      website: workExperience.website,
+      country: workExperience.country,
+      description: workExperience.description,
+      start_month: workExperience.start_month,
+      start_year: workExperience.start_year,
+      end_month: workExperience.end_month,
+      end_year: workExperience.end_year,
+      is_current: workExperience.is_current,
+      employment: workExperience.employment
+    }))
+  : [initialValue]
+);
 
 const rules = {
   work_experiences: {

@@ -12,6 +12,7 @@ const isViewModalOpen = ref(false);
 const isDeleteModalOpen = ref(false);
 const isEditing = ref(false);
 const portfolioToDelete = ref<Portfolio | null>(null);
+const isFileAttachmentEmpty = ref(false);
 
 interface FormValues {
     title: string;
@@ -38,6 +39,14 @@ const rules = {
 const { formRef, v$ } = useValidation(form, rules);
 
 const selectedFiles = ref<File[]>([]);
+
+const watchSelectedFiles = () => {
+  if (selectedFiles.value.length > 0 || form.value.images.length > 0) {
+    isFileAttachmentEmpty.value = false;
+  } else {
+    isFileAttachmentEmpty.value = true;
+  }
+};
 
 const { account } = storeToRefs(accountStore());
 
@@ -89,6 +98,12 @@ const handleView = async (portfolioId: string) => {
     await fetchPortfolioDetails(`/v1/accounts/${account.value?.id}/portfolios/${portfolioId}`);
 };
 
+const handleClose = () => {
+    isModalOpen.value = false;
+    isEditing.value = false;
+    form.value = { ...initialValue };
+};
+
 const confirmDelete = (portfolio: Portfolio) => {
     portfolioToDelete.value = portfolio;
     isDeleteModalOpen.value = true;
@@ -115,8 +130,11 @@ const handleDelete = async () => {
 };
 
 const handleSubmit = async () => {
+
+    watchEffect(watchSelectedFiles);    
     v$.value.$touch();
     if (v$.value.$invalid) return;
+    if (!selectedFiles.value) return;
 
   try {
     // Upload each file and collect the responses
@@ -257,6 +275,9 @@ const handleSubmit = async () => {
                         <p class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">Click to select files</p>
                     </div>
                 </div>
+                <span v-if="isFileAttachmentEmpty" class="text-red-900 text-sm">
+                        File Attachment is required
+                    </span>
             </div>
         </form>
         <div v-if="selectedFiles.length || form.images.length" class="mt-4">
@@ -284,7 +305,7 @@ const handleSubmit = async () => {
     </template>
     <template #actions>
         <div class="flex justify-end space-x-2">
-            <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" @click="{isModalOpen = false; form = { ...initialValue };}"></Button>
+            <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" @click="handleClose"></Button>
             <Button type="button" text="Save" background="primary" foreground="white" :is-wide="false" @click="handleSubmit" :is-loading="isSubmitting || isUploading"></Button>
         </div>
     </template>
