@@ -5,6 +5,7 @@ import type { Portfolio } from '~/types/models/Portfolio';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
+import { required } from '@vuelidate/validators/dist/index.cjs';
 
 const isModalOpen = ref(false);
 const isViewModalOpen = ref(false);
@@ -27,6 +28,14 @@ const initialValue: FormValues = {
 };
 
 const form = ref<FormValues>({ ...initialValue });
+
+const rules = {
+    title: { required: required },
+    description: { required },
+    url: { required },
+};
+
+const { formRef, v$ } = useValidation(form, rules);
 
 const selectedFiles = ref<File[]>([]);
 
@@ -106,6 +115,8 @@ const handleDelete = async () => {
 };
 
 const handleSubmit = async () => {
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
 
   try {
     // Upload each file and collect the responses
@@ -209,30 +220,36 @@ const handleSubmit = async () => {
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                         <Icon icon="mdi:label" :ssr="true" />
-                        <input v-model="form.title" type="text" id="title" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                        <input v-model="formRef.title" type="text" id="title" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                     </div>
                 </div>
+                <span v-if="v$.title.$error" class="text-red-900 text-sm">{{
+                            v$.title.$errors[0].$message }}</span>
             </div>
             <div class="w-full sm:col-span-2">
                 <label for="description" class="text-sm font-medium text-gray-500">Description <span class="text-red-500">*</span></label>
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                         <Icon icon="mdi:note-text" :ssr="true" />
-                        <textarea v-model="form.description" id="description" rows="3" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
+                        <textarea v-model="formRef.description" id="description" rows="3" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
                     </div>
                 </div>
+                <span v-if="v$.description.$error" class="text-red-900 text-sm">{{
+                            v$.description.$errors[0].$message }}</span>
             </div>
             <div class="w-full sm:col-span-2">
                 <label for="url" class="text-sm font-medium text-gray-500">Url <span class="text-red-500">*</span></label>
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                         <Icon icon="mdi:web" :ssr="true" />
-                        <input v-model="form.url" type="url" id="url" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                        <input v-model="formRef.url" type="url" id="url" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                     </div>
                 </div>
+                <span v-if="v$.url.$error" class="text-red-900 text-sm">{{
+                            v$.url.$errors[0].$message }}</span>
             </div>
             <div class="w-full sm:col-span-2">
-                <label for="file" class="text-sm font-medium text-gray-500">File Attachment <span class="text-red-500">*</span></label>
+                <label for="file" class="text-sm font-medium text-gray-500">File Attachment </label>
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500 cursor-pointer" @click="handleClick">
                         <Icon icon="mdi:file" :ssr="true" />

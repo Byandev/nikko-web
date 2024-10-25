@@ -5,6 +5,7 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
 import moment from 'moment';
+import { helpers, required } from '@vuelidate/validators';
 
 const isModalOpen = ref(false);
 const isViewModalOpen = ref(false);
@@ -16,8 +17,8 @@ interface FormValues {
     degree: string;
     country: string;
     description: string;
-    start_month: number;
-    start_year: number;
+    start_month?: number;
+    start_year?: number;
     end_month?: number;
     end_year?: number;
 }
@@ -26,13 +27,39 @@ const initialValue: FormValues = {
     degree: '',
     country: '',
     description: '',
-    start_month: 0,
-    start_year: 0,
+    start_month: undefined,
+    start_year: undefined,
     end_month: undefined,
     end_year: undefined,
 };
 
 const form = ref<FormValues>({ ...initialValue });
+
+const rules = {
+    degree: {
+        required: helpers.withMessage('Degree is required', required),
+    },
+    country: {
+        required: helpers.withMessage('Country is required', required),
+    },
+    description: {
+        required: helpers.withMessage('Description is required', required),
+    },
+    start_month: {
+        required: helpers.withMessage('Start month is required', required),
+    },
+    start_year: {
+        required: helpers.withMessage('Start year is required', required),
+    },
+    end_month: {
+        required: helpers.withMessage('End month is required', required),
+    },
+    end_year: {
+        required: helpers.withMessage('End year is required', required),
+    },
+};
+
+const { formRef, v$ } = useValidation(form, rules);
 
 const monthOptions = computed(() => moment.months());
 
@@ -94,6 +121,9 @@ const handleDelete = async () => {
 };
 
 const handleSubmit = async () => {
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
+
     try {
         // Submit the education
         await submitEducation(isEditing.value ? `/v1/educations/${currentEducation.value?.data.id}` : '/v1/educations', {
@@ -183,9 +213,11 @@ const handleSubmit = async () => {
                         <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                             <Icon icon="mdi:school" :ssr="true" />
-                            <input required type="text" id="degree" v-model="form.degree"
+                            <input type="text" id="degree" v-model="formRef.degree"
                                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
+                        <span v-if="v$.degree.$error" class="text-red-900 text-sm">{{
+                            v$.degree.$errors[0].$message }}</span>
                     </div>
                 </div>
 
@@ -198,9 +230,11 @@ const handleSubmit = async () => {
                         <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                             <Icon icon="mdi:earth" :ssr="true" />
-                            <input type="text" id="country" name="country" v-model="form.country" required
+                            <input type="text" id="country" name="country" v-model="formRef.country"
                                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         </div>
+                        <span v-if="v$.country.$error" class="text-red-900 text-sm">{{
+                            v$.country.$errors[0].$message }}</span>
                     </div>
                 </div>
 
@@ -213,9 +247,11 @@ const handleSubmit = async () => {
                         <div
                             class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                             <Icon icon="mdi:note-text" :ssr="true" />
-                            <textarea required id="description" v-model="form.description" rows="4"
+                            <textarea id="description" v-model="formRef.description" rows="4"
                                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
                         </div>
+                        <span v-if="v$.description.$error" class="text-red-900 text-sm">{{
+                            v$.description.$errors[0].$message }}</span>
                     </div>
                 </div>
 
@@ -227,7 +263,7 @@ const handleSubmit = async () => {
                             Start Month <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-2">
-                            <select required v-model="form.start_month"
+                            <select v-model="formRef.start_month"
                                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                                 <option :value="0">Select Month</option>
                                 <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
@@ -235,6 +271,8 @@ const handleSubmit = async () => {
                                     {{ month }}
                                 </option>
                             </select>
+                            <span v-if="v$.start_month.$error" class="text-red-900 text-sm">{{
+                            v$.start_month.$errors[0].$message }}</span>
                         </div>
                     </div>
 
@@ -244,7 +282,7 @@ const handleSubmit = async () => {
                             Start Year <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-2">
-                            <select required v-model="form.start_year"
+                            <select v-model="formRef.start_year"
                                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                                 <option :value="0">Select Year</option>
                                 <option class="truncate text-sm leading-6"
@@ -253,6 +291,8 @@ const handleSubmit = async () => {
                                     {{ year }}
                                 </option>
                             </select>
+                            <span v-if="v$.start_year.$error" class="text-red-900 text-sm">{{
+                            v$.start_year.$errors[0].$message }}</span>
                         </div>
                     </div>
                 </div>
@@ -265,7 +305,7 @@ const handleSubmit = async () => {
                             End Month <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-2">
-                            <select v-model="form.end_month"
+                            <select v-model="formRef.end_month"
                                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                                 <option :value="0">Select Month</option>
                                 <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
@@ -273,6 +313,8 @@ const handleSubmit = async () => {
                                     {{ month }}
                                 </option>
                             </select>
+                            <span v-if="v$.end_month.$error" class="text-red-900 text-sm">{{
+                            v$.end_month.$errors[0].$message }}</span>
                         </div>
                     </div>
 
@@ -282,7 +324,7 @@ const handleSubmit = async () => {
                             End Year <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-2">
-                            <select v-model="form.end_year"
+                            <select v-model="formRef.end_year"
                                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                                 <option :value="0">Select Year</option>
                                 <option class="truncate text-sm leading-6"
@@ -291,6 +333,8 @@ const handleSubmit = async () => {
                                     {{ year }}
                                 </option>
                             </select>
+                            <span v-if="v$.end_year.$error" class="text-red-900 text-sm">{{
+                                    v$.end_year.$errors[0].$message }}</span>
                         </div>
                     </div>
                 </div>
