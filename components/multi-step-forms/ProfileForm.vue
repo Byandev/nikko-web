@@ -46,7 +46,7 @@ const submitForm = async () => {
 
     if (account.value) {
       account.value.title = form.value.title
-      account.value.bio = form.value.title
+      account.value.bio = form.value.bio
     }
 
     emits('submit');

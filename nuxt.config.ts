@@ -42,7 +42,6 @@ export default defineNuxtConfig({
         signInResponseTokenPointer: "/data/access_token",
         cookieName: process.env.AUTH_COOKIE_NAME || "accessToken",
         maxAgeInSeconds: 604800,
-        sameSite: "lax", // Or 'none' if using cross-origin requests
       },
     },
     globalAppMiddleware: true,
