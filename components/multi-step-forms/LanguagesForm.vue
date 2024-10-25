@@ -80,7 +80,7 @@ const removeLanguage = (index: number) => {
           <label for="languageName" class="block text-sm font-medium leading-6 text-gray-900">
             Language <span class="text-red-500">*</span>
           </label>
-          <div class="mt-2">
+          <div>
             <select
               v-model="language.name"
               class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
@@ -89,8 +89,10 @@ const removeLanguage = (index: number) => {
               </option>
             </select>
           </div>
-            <span v-if="v$.languages.$each.$response.$errors && v$.languages.$each.$response.$errors[index] && v$.languages.$each.$response.$errors[index].name && v$.languages.$each.$response.$errors[index].name[0] && v$.languages.$each.$response.$errors[index].name[0].$message" class="text-red-900 text-sm">{{
+            <div class="h-4">
+              <span v-if="v$.languages.$each.$response.$errors && v$.languages.$each.$response.$errors[index] && v$.languages.$each.$response.$errors[index].name && v$.languages.$each.$response.$errors[index].name[0] && v$.languages.$each.$response.$errors[index].name[0].$message" class="text-red-900 text-sm">{{
               v$.languages.$each.$response.$errors[index].name[0].$message }}</span>
+            </div>
         </div>
 
         <!-- Level -->
@@ -98,7 +100,7 @@ const removeLanguage = (index: number) => {
           <label for="languageProficiency" class="block text-sm font-medium leading-6 text-gray-900">
             Level <span class="text-red-500">*</span>
           </label>
-          <div class="mt-2">
+          <div>
             <select v-model="language.proficiency"
               class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
               <option class="truncate text-sm leading-6" v-for="proficiency in Proficiency" :key="proficiency" :value="proficiency">
@@ -106,8 +108,10 @@ const removeLanguage = (index: number) => {
               </option>
             </select>
           </div>
-          <span v-if="v$.languages.$each.$response.$errors && v$.languages.$each.$response.$errors[index] && v$.languages.$each.$response.$errors[index].proficiency && v$.languages.$each.$response.$errors[index].proficiency[0] && v$.languages.$each.$response.$errors[index].proficiency[0].$message" class="text-red-900 text-sm">{{
+          <div class="h-4">
+            <span v-if="v$.languages.$each.$response.$errors && v$.languages.$each.$response.$errors[index] && v$.languages.$each.$response.$errors[index].proficiency && v$.languages.$each.$response.$errors[index].proficiency[0] && v$.languages.$each.$response.$errors[index].proficiency[0].$message" class="text-red-900 text-sm">{{
               v$.languages.$each.$response.$errors[index].proficiency[0].$message }}</span>
+          </div>
         </div>
 
         <!-- Remove Button -->

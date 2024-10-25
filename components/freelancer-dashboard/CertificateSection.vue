@@ -138,7 +138,6 @@ const handleSubmit = async () => {
                 body: formData,
             });
             form.value.image = { id: uploadResponse.data.id, file_name: uploadResponse.data.file_name };
-
         }
 
         console.log('Form', form.value);
