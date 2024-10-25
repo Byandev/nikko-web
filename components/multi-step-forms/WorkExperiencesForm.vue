@@ -28,6 +28,8 @@ const initialValue: Partial<WorkExperience> = {
   description: '',
   start_month: undefined,
   start_year: undefined,
+  end_month: undefined,
+  end_year: undefined,
   is_current: false,
   employment: EmploymentType.FULL_TIME
 }
@@ -55,17 +57,10 @@ const rules = {
 const { formRef, v$ } = useValidation(form, rules);
 
 const submitForm = async () => {
+  console.log('Form:', formRef.value);
   v$.value.$touch();
-  console.log('Errors:', v$.value.$errors);
+  console.log('Errors:', v$.value.$errors[0]);
   if (v$.value.$invalid) return;
-
-  // Remove end month and end year if is_current is true
-  form.value.forEach(workExperience => {
-    if (workExperience.is_current) {
-      workExperience.end_month = undefined;
-      workExperience.end_year = undefined;
-    }
-  });
 
   try {
     const response = await updateWorkExperience(`/v1/auth/accounts/${user.value.id}`, {
@@ -121,6 +116,8 @@ const removeWorkExperienceForm = (index: number) => {
               <input type="text" id="jobTitle" v-model="workExperience.job_title"
                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
             </div>
+            <span class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors }}</span>
           </div>
         </div>
 

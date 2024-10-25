@@ -148,8 +148,8 @@ const submitForm = async () => {
                 start_year: form.value.start_year,
                 employment: form.value.employment,
                 is_current: form.value.is_current,
-                end_month: form.value.is_current ? undefined : form.value.end_month,
-                end_year: form.value.is_current ? undefined : form.value.end_year,
+                end_month: form.value.is_current ? null : form.value.end_month,
+                end_year: form.value.is_current ? null : form.value.end_year,
             }),
         });
 

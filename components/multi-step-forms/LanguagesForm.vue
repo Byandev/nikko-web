@@ -28,8 +28,8 @@ const form = ref<FormValues>({
 const rules = {
   languages: {
     $each: helpers.forEach({
-      name: { required },
-      proficiency: { required },
+      name: { required: helpers.withMessage('Language is required', required) },
+      proficiency: { required: helpers.withMessage('Proficiency level is required', required) },
     }),
   },
 };
