@@ -5,7 +5,7 @@ import type { Portfolio } from '~/types/models/Portfolio';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
-import { required } from '@vuelidate/validators/dist/index.cjs';
+import { helpers, required } from '@vuelidate/validators/dist/index.cjs';
 
 const isModalOpen = ref(false);
 const isViewModalOpen = ref(false);
@@ -30,9 +30,9 @@ const initialValue: FormValues = {
 const form = ref<FormValues>({ ...initialValue });
 
 const rules = {
-    title: { required: required },
-    description: { required },
-    url: { required },
+  title: { required: helpers.withMessage('Title is required', required) },
+  description: { required: helpers.withMessage('Description is required', required) },
+  url: { required: helpers.withMessage('URL is required', required) },
 };
 
 const { formRef, v$ } = useValidation(form, rules);
