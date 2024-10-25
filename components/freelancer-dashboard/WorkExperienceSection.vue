@@ -138,7 +138,19 @@ const submitForm = async () => {
             headers: account?.value?.id ? {
                 'X-ACCOUNT-ID': account.value.id.toString(),
             } : undefined,
-            body: JSON.stringify(form.value),
+            body: JSON.stringify({
+                job_title: form.value.job_title,
+                company: form.value.company,
+                website: form.value.website,
+                country: form.value.country,
+                description: form.value.description,
+                start_month: form.value.start_month,
+                start_year: form.value.start_year,
+                employment: form.value.employment,
+                is_current: form.value.is_current,
+                end_month: form.value.is_current ? undefined : form.value.end_month,
+                end_year: form.value.is_current ? undefined : form.value.end_year,
+            }),
         });
 
         // Reset the form and state

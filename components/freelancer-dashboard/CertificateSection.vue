@@ -139,24 +139,25 @@ const handleSubmit = async () => {
             });
             form.value.image = { id: uploadResponse.data.id, file_name: uploadResponse.data.file_name };
 
-            console.log('Upload Cerfiticate Image', uploadResponse);
         }
 
-         // Submit the certificate
-         await submitCertificate(isEditing.value ? `/v1/certificates/${currentCertificate.value?.data.id}` : '/v1/certificates', {
-                method: isEditing.value ? 'PUT' : 'POST',
-                headers: account?.value?.id ? {
-                    'X-ACCOUNT-ID': account.value.id.toString(),
-                } : undefined,
-                body: JSON.stringify({
-                    title: form.value.title,
-                    issued_date: form.value.issued_date,
-                    url: form.value.url,
-                    reference_id: form.value.reference_id,
-                    image: form.value.image?.id,
-                }),
-            });
-            
+        console.log('Form', form.value);
+
+        // Submit the certificate
+        await submitCertificate(isEditing.value ? `/v1/certificates/${currentCertificate.value?.data.id}` : '/v1/certificates', {
+            method: isEditing.value ? 'PUT' : 'POST',
+            headers: account?.value?.id ? {
+                'X-ACCOUNT-ID': account.value.id.toString(),
+            } : undefined,
+            body: JSON.stringify({
+                title: form.value.title,
+                issued_date: form.value.issued_date,
+                url: form.value.url,
+                reference_id: form.value.reference_id,
+                image: form.value.image?.id,
+            }),
+        });
+
         // Reset the form and state
         selectedFile.value = null;
         form.value = { ...initialValue };

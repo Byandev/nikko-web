@@ -59,6 +59,14 @@ const submitForm = async () => {
   console.log('Errors:', v$.value.$errors);
   if (v$.value.$invalid) return;
 
+  // Remove end month and end year if is_current is true
+  form.value.forEach(workExperience => {
+    if (workExperience.is_current) {
+      workExperience.end_month = undefined;
+      workExperience.end_year = undefined;
+    }
+  });
+
   try {
     const response = await updateWorkExperience(`/v1/auth/accounts/${user.value.id}`, {
       method: 'PUT',
