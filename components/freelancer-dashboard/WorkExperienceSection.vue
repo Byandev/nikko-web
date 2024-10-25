@@ -326,7 +326,7 @@ const submitForm = async () => {
                         <div class="mt-2">
                             <select v-model="formRef.start_month"
                                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                <option :value="0">Select Month</option>
+                                <option :value=null>Select Month</option>
                                 <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
                                     :key="`start-month-${monthIndex}`" :value="monthIndex + 1">
                                     {{ month }}
@@ -345,7 +345,7 @@ const submitForm = async () => {
                         <div class="mt-2">
                             <select v-model="formRef.start_year"
                                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                <option :value="0">Select Year</option>
+                                <option :value=null>Select Year</option>
                                 <option class="truncate text-sm leading-6"
                                     v-for="(year, yearIndex) in _.range(2000, 2025)"
                                     :key="`start-year-${yearIndex}`" :value="year">
@@ -383,7 +383,7 @@ const submitForm = async () => {
                         <div class="mt-2">
                             <select v-model="formRef.end_month"
                                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                <option :value="0">Select Month</option>
+                                <option :value=null>Select Month</option>
                                 <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
                                     :key="`end-month-${monthIndex}`" :value="monthIndex + 1">
                                     {{ month }}
@@ -402,7 +402,7 @@ const submitForm = async () => {
                         <div class="mt-2">
                             <select v-model="formRef.end_year"
                                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                <option :value="0">Select Year</option>
+                                <option :value=null>Select Year</option>
                                 <option class="truncate text-sm leading-6"
                                     v-for="(year, yearIndex) in _.range(2000, 2025)"
                                     :key="`end-year-${yearIndex}`" :value="year">

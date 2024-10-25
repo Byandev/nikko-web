@@ -13,7 +13,7 @@ import type { Account } from '~/types/models/Account';
 import type { WorkExperience } from '~/types/models/WorkExperience';
 import { EmploymentType } from '~/types/models/WorkExperience';
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import { helpers, required } from '@vuelidate/validators';
+import { helpers, required, requiredIf } from '@vuelidate/validators';
 
 const { user } = storeToRefs(authStore());
 const { account } = storeToRefs(accountStore())
@@ -42,22 +42,25 @@ const initialValue: FormValues  = {
 
 const { sendRequest: updateWorkExperience, pending: isSubmitting } = useSubmit<{ data: Account }, ApiErrorResponse>();
 
-const form = ref<Partial<WorkExperience>[]>(user.value.work_experiences?.length
-  ? user.value.work_experiences.map((workExperience: Partial<WorkExperience>) => ({
-      job_title: workExperience.job_title,
-      company: workExperience.company,
-      website: workExperience.website,
-      country: workExperience.country,
-      description: workExperience.description,
-      start_month: workExperience.start_month,
-      start_year: workExperience.start_year,
-      end_month: workExperience.end_month,
-      end_year: workExperience.end_year,
-      is_current: workExperience.is_current,
-      employment: workExperience.employment
-    }))
-  : [initialValue]
-);
+const form = ref<FormValues>(
+  {
+    work_experiences: account.value?.work_experiences?.length ?
+      account.value.work_experiences.map(workExperience => ({
+        job_title: workExperience.job_title,
+        company: workExperience.company,
+        website: workExperience.website,
+        country: workExperience.country,
+        description: workExperience.description,
+        start_month: workExperience.start_month,
+        start_year: workExperience.start_year,
+        end_month: workExperience.end_month,
+        end_year: workExperience.end_year,
+        is_current: workExperience.is_current,
+        employment: workExperience.employment
+      })) :
+      [initialValue.work_experiences[0]]
+  }
+)
 
 const rules = {
   work_experiences: {
@@ -73,21 +76,35 @@ const rules = {
       employment: { required: helpers.withMessage('Employment type is required', required) },
     })
   }
-}
+};
 
 const { formRef, v$ } = useValidation(form, rules);
 
 const submitForm = async () => {
-  console.log('Form:', formRef.value);
   v$.value.$touch();
-  console.log('Errors:', v$.value.$errors[0]);
+  console.log(v$.value.$errors)
   if (v$.value.$invalid) return;
 
   try {
+
+    const body = {     
+      work_experiences: form.value.work_experiences.map(workExperience => ({
+        job_title: workExperience.job_title,
+        company: workExperience.company,
+        website: workExperience.website,
+        country: workExperience.country,
+        description: workExperience.description,
+        start_month: workExperience.start_month,
+        start_year: workExperience.start_year,
+        is_current: workExperience.is_current,
+        employment: workExperience.employment,
+        ...(workExperience.is_current ? {} : { end_month: workExperience.end_month, end_year: workExperience.end_year })
+    }))};
+
     const response = await updateWorkExperience(`/v1/auth/accounts/${user.value.id}`, {
       method: 'PUT',
       body: {
-        work_experiences: form.value,
+        work_experiences: body.work_experiences,
       }
     });
 
@@ -102,11 +119,11 @@ const submitForm = async () => {
 };
 
 const addWorkExperienceForm = () => {
-  form.value.push(initialValue);
+  form.value.work_experiences.push(initialValue.work_experiences[0]);
 };
 
 const removeWorkExperienceForm = (index: number) => {
-  form.value.splice(index, 1);
+  form.value.work_experiences.splice(index, 1);
 };
 </script>
 
@@ -117,10 +134,10 @@ const removeWorkExperienceForm = (index: number) => {
       expertise.</span>
 
     <form class="max-w-lg w-full" @submit.prevent="submitForm">
-      <div v-for="(workExperience, index) in formRef" :key="index" class="w-full mb-8">
+      <div v-for="(workExperience, index) in formRef.work_experiences" :key="index" class="w-full mb-8">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-semibold">Work Experience {{ index + 1 }}</h2>
-          <button v-if="form.length > 1" @click="removeWorkExperienceForm(index)" class="text-red-500">
+          <button v-if="form.work_experiences.length > 1" @click="removeWorkExperienceForm(index)" class="text-red-500">
             Remove
           </button>
         </div>
@@ -137,8 +154,8 @@ const removeWorkExperienceForm = (index: number) => {
               <input type="text" id="jobTitle" v-model="workExperience.job_title"
                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
             </div>
-            <span class="text-red-900 text-sm">{{
-              v$.work_experiences.$each.$response.$errors }}</span>
+            <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].job_title && v$.work_experiences.$each.$response.$errors[index].job_title[0] && v$.work_experiences.$each.$response.$errors[index].job_title[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].job_title[0].$message }}</span>
           </div>
         </div>
 
@@ -155,6 +172,8 @@ const removeWorkExperienceForm = (index: number) => {
                 <input type="text" id="companyName" v-model="workExperience.company"
                   class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
               </div>
+              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].company && v$.work_experiences.$each.$response.$errors[index].company[0] && v$.work_experiences.$each.$response.$errors[index].company[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].company[0].$message }}</span>
             </div>
           </div>
 
@@ -170,6 +189,8 @@ const removeWorkExperienceForm = (index: number) => {
                 <input type="url" id="website" v-model="workExperience.website"
                   class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
               </div>
+              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].website && v$.work_experiences.$each.$response.$errors[index].website[0] && v$.work_experiences.$each.$response.$errors[index].website[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].website[0].$message }}</span>
             </div>
           </div>
         </div>
@@ -186,6 +207,8 @@ const removeWorkExperienceForm = (index: number) => {
               <input type="text" id="country" name="country" v-model="workExperience.country"
                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
             </div>
+            <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].country && v$.work_experiences.$each.$response.$errors[index].country[0] && v$.work_experiences.$each.$response.$errors[index].country[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].country[0].$message }}</span>
           </div>
         </div>
 
@@ -201,6 +224,8 @@ const removeWorkExperienceForm = (index: number) => {
               <textarea id="description" v-model="workExperience.description" rows="4"
                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
             </div>
+            <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].description && v$.work_experiences.$each.$response.$errors[index].description[0] && v$.work_experiences.$each.$response.$errors[index].description[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].description[0].$message }}</span>
           </div>
         </div>
 
@@ -214,12 +239,14 @@ const removeWorkExperienceForm = (index: number) => {
             <div class="mt-2">
               <select v-model="workExperience.start_month"
                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                <option :value="0">Select Month</option>
+                <option :value=null>Select Month</option>
                 <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
                   :key="`start-month-${index}-${monthIndex}`" :value="monthIndex + 1">
                   {{ month }}
                 </option>
               </select>
+              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].start_month && v$.work_experiences.$each.$response.$errors[index].start_month[0] && v$.work_experiences.$each.$response.$errors[index].start_month[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].start_month[0].$message }}</span>
             </div>
           </div>
 
@@ -231,12 +258,14 @@ const removeWorkExperienceForm = (index: number) => {
             <div class="mt-2">
               <select v-model="workExperience.start_year"
                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                <option :value="0">Select Year</option>
+                <option :value=null>Select Year</option>
                 <option class="truncate text-sm leading-6" v-for="(year, yearIndex) in _.range(2000, 2025)"
                   :key="`start-year-${index}-${yearIndex}`" :value="year">
                   {{ year }}
                 </option>
               </select>
+              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].start_year && v$.work_experiences.$each.$response.$errors[index].start_year[0] && v$.work_experiences.$each.$response.$errors[index].start_year[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].start_year[0].$message }}</span>
             </div>
           </div>
         </div>
@@ -265,12 +294,14 @@ const removeWorkExperienceForm = (index: number) => {
             <div class="mt-2">
               <select v-model="workExperience.end_month"
                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                <option :value="0">Select Month</option>
+                <option :value=null>Select Month</option>
                 <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
                   :key="`start-month-${index}-${monthIndex}`" :value="monthIndex + 1">
                   {{ month }}
                 </option>
               </select>
+              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].end_month && v$.work_experiences.$each.$response.$errors[index].end_month[0] && v$.work_experiences.$each.$response.$errors[index].end_month[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].end_month[0].$message }}</span>
             </div>
           </div>
 
@@ -282,12 +313,14 @@ const removeWorkExperienceForm = (index: number) => {
             <div class="mt-2">
               <select v-model="workExperience.end_year"
                 class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                <option :value="0">Select Year</option>
+                <option :value=null>Select Year</option>
                 <option class="truncate text-sm leading-6" v-for="(year, yearIndex) in _.range(2000, 2025)"
                   :key="`start-year-${index}-${yearIndex}`" :value="year">
                   {{ year }}
                 </option>
               </select>
+              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].end_year && v$.work_experiences.$each.$response.$errors[index].end_year[0] && v$.work_experiences.$each.$response.$errors[index].end_year[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].end_year[0].$message }}</span>
             </div>
           </div>
         </div>
@@ -306,6 +339,8 @@ const removeWorkExperienceForm = (index: number) => {
                 {{ _.capitalize(_.startCase(type)) }}
               </option>
             </select>
+            <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].employment && v$.work_experiences.$each.$response.$errors[index].employment[0] && v$.work_experiences.$each.$response.$errors[index].employment[0].$message" class="text-red-900 text-sm">{{
+              v$.work_experiences.$each.$response.$errors[index].employment[0].$message }}</span>
           </div>
         </div>
       </div>
