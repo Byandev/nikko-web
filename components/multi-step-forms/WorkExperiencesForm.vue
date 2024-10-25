@@ -26,8 +26,8 @@ const initialValue: Partial<WorkExperience> = {
   website: '',
   country: '',
   description: '',
-  start_month: 0,
-  start_year: 0,
+  start_month: undefined,
+  start_year: undefined,
   is_current: false,
   employment: EmploymentType.FULL_TIME
 }
