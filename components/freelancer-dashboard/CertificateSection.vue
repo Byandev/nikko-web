@@ -5,6 +5,7 @@ import type { Certificate } from '~/types/models/Certificate';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
+import { helpers, required } from '@vuelidate/validators';
 
 const isModalOpen = ref(false);
 const isViewModalOpen = ref(false);
@@ -29,6 +30,23 @@ const initialValue: FormValues = {
 };
 
 const form = ref<FormValues>({ ...initialValue });
+
+const rules = {
+    title: {
+        required: helpers.withMessage('Title is required', required),
+    },
+    issued_date: {
+        required: helpers.withMessage('Issue Date is required', required),
+    },
+    url: {
+        required: helpers.withMessage('Url is required', required),
+    },
+    reference_id: {
+        required: helpers.withMessage('Reference ID is required', required),
+    },
+};
+
+const { formRef, v$ } = useValidation(form, rules);
 
 const selectedFile = ref<File | null>(null);
 
@@ -107,6 +125,9 @@ const handleDelete = async () => {
 };
 
 const handleSubmit = async () => {
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
+
     try {
         console.log('Selected File', selectedFile.value);
         if (selectedFile.value) {
@@ -210,33 +231,41 @@ const handleSubmit = async () => {
                     <label for="title" class="text-sm font-medium text-gray-500">Title <span
                             class="text-red-500">*</span></label>
                     <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.title" type="text" id="title"
+                        <input v-model="formRef.title" type="text" id="title"
                             class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                     </div>
+                    <span v-if="v$.title.$error" class="text-red-900 text-sm">{{
+                            v$.title.$errors[0].$message }}</span>
                 </div>
                 <div class="sm:col-span-2">
                     <label for="issued_date" class="text-sm font-medium text-gray-500">Issue Date <span
                             class="text-red-500">*</span></label>
                     <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.issued_date" type="date" id="issued_date"
+                        <input v-model="formRef.issued_date" type="date" id="issued_date"
                             class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                     </div>
+                    <span v-if="v$.issued_date.$error" class="text-red-900 text-sm">{{
+                            v$.issued_date.$errors[0].$message }}</span>
                 </div>
                 <div class="sm:col-span-2">
                     <label for="url" class="text-sm font-medium text-gray-500">Url <span
                             class="text-red-500">*</span></label>
                     <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.url" type="url" id="url"
+                        <input v-model="formRef.url" type="url" id="url"
                             class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                     </div>
+                    <span v-if="v$.url.$error" class="text-red-900 text-sm">{{
+                            v$.url.$errors[0].$message }}</span>
                 </div>
                 <div class="sm:col-span-2">
                     <label for="reference_id" class="text-sm font-medium text-gray-500">Reference ID <span
                             class="text-red-500">*</span></label>
                     <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.reference_id" type="text" id="reference_id"
+                        <input v-model="formRef.reference_id" type="text" id="reference_id"
                             class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                     </div>
+                    <span v-if="v$.reference_id.$error" class="text-red-900 text-sm">{{
+                            v$.reference_id.$errors[0].$message }}</span>
                 </div>
                 <div class="sm:col-span-2">
                     <label for="file" class="text-sm font-medium text-gray-500">File Attachment <span
