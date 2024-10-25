@@ -139,8 +139,11 @@ const handleSubmit = async () => {
             });
             form.value.image = { id: uploadResponse.data.id, file_name: uploadResponse.data.file_name };
 
-             // Submit the certificate
-            await submitCertificate(isEditing.value ? `/v1/certificates/${currentCertificate.value?.data.id}` : '/v1/certificates', {
+            console.log('Upload Cerfiticate Image', uploadResponse);
+        }
+
+         // Submit the certificate
+         await submitCertificate(isEditing.value ? `/v1/certificates/${currentCertificate.value?.data.id}` : '/v1/certificates', {
                 method: isEditing.value ? 'PUT' : 'POST',
                 headers: account?.value?.id ? {
                     'X-ACCOUNT-ID': account.value.id.toString(),
@@ -153,7 +156,7 @@ const handleSubmit = async () => {
                     image: form.value.image?.id,
                 }),
             });
-        }
+            
         // Reset the form and state
         selectedFile.value = null;
         form.value = { ...initialValue };
