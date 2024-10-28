@@ -27,7 +27,7 @@ const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-p
 
 const avatarUrl = ref(user.value?.avatar?.original_url || defaultAvatarUrl);
 
-console.log('Initial avatarUrl:', avatarUrl.value);
+const currentStep = ref(0);
 
 watch(user, (newMedia) => {
     avatarUrl.value = newMedia?.avatar?.original_url || defaultAvatarUrl;
@@ -70,14 +70,14 @@ const uploadImage = async () => {
             body: formData,
         });
 
-         // Update the avatar
-         await sendRequest(`/v1/auth/profile`, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    avatar: UploadImageResponse.data.id,
-                }),
-            });
-            isAvatarModalOpen.value = false;
+        // Update the avatar
+        await sendRequest(`/v1/auth/profile`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                avatar: UploadImageResponse.data.id,
+            }),
+        });
+        isAvatarModalOpen.value = false;
 
     } catch (error) {
         console.error('Error uploading photo:', error);
@@ -97,10 +97,13 @@ const uploadImage = async () => {
                 <div
                     class="flex flex-col items-center justify-center gap-5 border border-gray-300 rounded-lg overflow-hidden bg-white p-4">
                     <div class="relative group">
-                        <img :src="avatarUrl" alt="Avatar" class="w-36 h-36 rounded-full border-4 border-white shadow-lg mx-auto" />
-                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                        <img :src="avatarUrl" alt="Avatar"
+                            class="w-36 h-36 rounded-full border-4 border-white shadow-lg mx-auto" />
+                        <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
                             <label class="cursor-pointer text-white">
-                                <div @click="isAvatarModalOpen = true" class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
+                                <div @click="isAvatarModalOpen = true"
+                                    class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
                                     <Icon icon="ic:outline-edit" width="24" height="24" class="text-primary" />
                                 </div>
                             </label>
@@ -108,7 +111,9 @@ const uploadImage = async () => {
                         <div class="mt-4 text-center">
                             <h2 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h2>
                             <p class="mt-2 text-md text-gray-600">
-                                Joined on {{ new Date(user.created_at).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) }}
+                                Joined on {{ new Date(user.created_at).toLocaleString('en-US', {
+                                    month: 'long', day:
+                                'numeric', year: 'numeric' }) }}
                             </p>
                             <div class="mt-2 flex items-center space-x-2 justify-center">
                                 <Icon icon="mdi:map-marker" width="15" height="15" />
@@ -172,8 +177,8 @@ const uploadImage = async () => {
                                 right candidates.
                             </p>
                             <div class="flex justify-end">
-                                <Button class="mt-4" @click="isPostJobModalOpen = true" text="Post Job" background="primary" foreground="white"
-                                    :is-wide="false" type="button"></Button>
+                                <Button class="mt-4" @click="isPostJobModalOpen = true" text="Post Job"
+                                    background="primary" foreground="white" :is-wide="false" type="button"></Button>
                             </div>
                         </div>
                     </div>
@@ -199,43 +204,46 @@ const uploadImage = async () => {
             </div>
 
             <Modal :modelValue="isAvatarModalOpen" @update:modelValue="isAvatarModalOpen = $event">
-            <template #title>Avatar</template>
-            <template #content>
-                <p class="text-sm text-gray-500 mb-4">Please select an image file to upload as your avatar.</p>
-                <div v-if="avatarImagePreview" class="sm:col-span-2 mb-4 flex items-center justify-center">
-                    <img :src="avatarImagePreview" alt="Image Preview" class="w-32 h-32 object-cover rounded-md" />
-                </div>
-                <div class="sm:col-span-2 mb-4 flex items-center">
-                    <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Image</label>
-                    <input type="file" accept="image/*" required @change="updateAvatarImage"
-                        class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:cursor-pointer" />
-                </div>
-            </template>
-            <template #actions>
-                <div class="flex justify-end space-x-2">
-                    <Button type="button" text="Cancel" background="white" foreground="black" :is-loading="isLoading"
-                        :is-wide="false" @click="isAvatarModalOpen = false"></Button>
-                    <Button type="button" text="Upload" background="primary" foreground="white" :is-loading="isLoading"
-                        :is-wide="false" @click="() => uploadImage()"></Button>
-                </div>
-            </template>
-        </Modal>
+                <template #title>Avatar</template>
+                <template #content>
+                    <p class="text-sm text-gray-500 mb-4">Please select an image file to upload as your avatar.</p>
+                    <div v-if="avatarImagePreview" class="sm:col-span-2 mb-4 flex items-center justify-center">
+                        <img :src="avatarImagePreview" alt="Image Preview" class="w-32 h-32 object-cover rounded-md" />
+                    </div>
+                    <div class="sm:col-span-2 mb-4 flex items-center">
+                        <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Image</label>
+                        <input type="file" accept="image/*" required @change="updateAvatarImage"
+                            class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:cursor-pointer" />
+                    </div>
+                </template>
+                <template #actions>
+                    <div class="flex justify-end space-x-2">
+                        <Button type="button" text="Cancel" background="white" foreground="black"
+                            :is-loading="isLoading" :is-wide="false" @click="isAvatarModalOpen = false"></Button>
+                        <Button type="button" text="Upload" background="primary" foreground="white"
+                            :is-loading="isLoading" :is-wide="false" @click="() => uploadImage()"></Button>
+                    </div>
+                </template>
+            </Modal>
 
             <Modal v-if="isPostJobModalOpen" :modelValue="isPostJobModalOpen"
                 @update:modelValue="isPostJobModalOpen = $event" @close="isPostJobModalOpen = false">
-                <template #title>
-                    <div class="flex items-center space-x-2 justify-center">
-                        <Icon icon="mdi:briefcase" class="text-primary-600" width="24" height="24" />
-                        <span>Post Job</span>
-                    </div>
-                </template>
                 <template #content>
-                   
-                </template>
-                <template #actions>
-                    <Button @click="isPostJobModalOpen = false" text="Cancel" type="button" background="white"
-                        foreground="primary" />
-                    <Button @click="" text="Post Job" type="button" background="primary" foreground="white" />
+                    <div class="rounded-lg">
+                        <div class="flex justify-center mb-5">
+                            <ProgressBar :current-step="currentStep"
+                                :steps="['StepOne', 'StepTwo', 'Review']" />
+                        </div>
+                        <div v-if="currentStep === 0">
+                            <JobPostingStepOne @submit="currentStep++" />
+                        </div>
+                        <div v-if="currentStep === 1">
+                            <JobPostingStepTwo @back="currentStep--" @submit="currentStep++" />
+                        </div>
+                        <div v-if="currentStep === 2">
+                            <JobPostingReview @back="currentStep--" @submit="currentStep++" />
+                        </div>
+                    </div>
                 </template>
             </Modal>
         </div>
