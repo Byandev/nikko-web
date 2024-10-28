@@ -2,8 +2,11 @@
 import { authStore } from '~/store/authStore';
 import { Icon } from '@iconify/vue';
 import { ref, watch } from 'vue';
+import type { ApiErrorResponse } from '~/types/api/response/error';
+import type { Media as MediaResponse } from '~/types/models/Media';
 
 const { user } = storeToRefs(authStore());
+const { updateUser } = authStore();
 
 const tabs = ref([
     { name: 'Post a Job', current: true },
@@ -12,6 +15,11 @@ const tabs = ref([
 ]);
 
 const isAvatarModalOpen = ref(false);
+
+const { sendRequest: sendRequest, pending: isLoading } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
+
+const avatarImage = ref<File | null>(null);
+const avatarImagePreview = ref<string | null>(null);
 
 const isPostJobModalOpen = ref(false);
 
@@ -35,6 +43,49 @@ const setActiveTab = (tabName: string) => {
         tab.current = (tab.name === tabName);
     });
 };
+
+const updateAvatarImage = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target?.files?.[0];
+    if (file) {
+        avatarImage.value = file;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            avatarImagePreview.value = e.target?.result?.toString() || '';
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const uploadImage = async () => {
+    try {
+        const formData = new FormData();
+        if (avatarImage.value) {
+            formData.append('file', avatarImage.value);
+        }
+
+        // Upload image and Get the ID
+        const UploadImageResponse = await sendRequest('/v1/medias', {
+            method: 'POST',
+            body: formData,
+        });
+
+         // Update the avatar
+         await sendRequest(`/v1/auth/profile`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    avatar: UploadImageResponse.data.id,
+                }),
+            });
+            isAvatarModalOpen.value = false;
+
+    } catch (error) {
+        console.error('Error uploading photo:', error);
+    } finally {
+        updateUser();
+        avatarImagePreview.value = null;
+    }
+};
 </script>
 
 <template>
@@ -46,24 +97,19 @@ const setActiveTab = (tabName: string) => {
                 <div
                     class="flex flex-col items-center justify-center gap-5 border border-gray-300 rounded-lg overflow-hidden bg-white p-4">
                     <div class="relative group">
-                        <img :src="avatarUrl" alt="Avatar"
-                            class="w-36 h-36 rounded-full border-4 border-white shadow-lg mx-auto" />
-                        <div
-                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                        <img :src="avatarUrl" alt="Avatar" class="w-36 h-36 rounded-full border-4 border-white shadow-lg mx-auto" />
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
                             <label class="cursor-pointer text-white">
-                                <div @click="isAvatarModalOpen = true"
-                                    class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
+                                <div @click="isAvatarModalOpen = true" class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
                                     <Icon icon="ic:outline-edit" width="24" height="24" class="text-primary" />
                                 </div>
                             </label>
                         </div>
                         <div class="mt-4 text-center">
                             <h2 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h2>
-                            <p class="mt-2 text-md text-gray-600">Joined on {{ new
-                                Date(user.created_at).toLocaleString('en-US', {
-                                    month: 'long', day: 'numeric', year:
-                                        'numeric'
-                                }) }}</p>
+                            <p class="mt-2 text-md text-gray-600">
+                                Joined on {{ new Date(user.created_at).toLocaleString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) }}
+                            </p>
                             <div class="mt-2 flex items-center space-x-2 justify-center">
                                 <Icon icon="mdi:map-marker" width="15" height="15" />
                                 <span class="text-sm text-black font-semibold">{{ user.country_code }}</span>
@@ -151,6 +197,29 @@ const setActiveTab = (tabName: string) => {
                     </div>
                 </div>
             </div>
+
+            <Modal :modelValue="isAvatarModalOpen" @update:modelValue="isAvatarModalOpen = $event">
+            <template #title>Avatar</template>
+            <template #content>
+                <p class="text-sm text-gray-500 mb-4">Please select an image file to upload as your avatar.</p>
+                <div v-if="avatarImagePreview" class="sm:col-span-2 mb-4 flex items-center justify-center">
+                    <img :src="avatarImagePreview" alt="Image Preview" class="w-32 h-32 object-cover rounded-md" />
+                </div>
+                <div class="sm:col-span-2 mb-4 flex items-center">
+                    <label class="text-sm font-medium text-gray-500 w-1/4 text-left">Image</label>
+                    <input type="file" accept="image/*" required @change="updateAvatarImage"
+                        class="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:cursor-pointer" />
+                </div>
+            </template>
+            <template #actions>
+                <div class="flex justify-end space-x-2">
+                    <Button type="button" text="Cancel" background="white" foreground="black" :is-loading="isLoading"
+                        :is-wide="false" @click="isAvatarModalOpen = false"></Button>
+                    <Button type="button" text="Upload" background="primary" foreground="white" :is-loading="isLoading"
+                        :is-wide="false" @click="() => uploadImage()"></Button>
+                </div>
+            </template>
+        </Modal>
 
             <Modal v-if="isPostJobModalOpen" :modelValue="isPostJobModalOpen"
                 @update:modelValue="isPostJobModalOpen = $event" @close="isPostJobModalOpen = false">
