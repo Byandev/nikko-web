@@ -233,7 +233,7 @@ const uploadImage = async () => {
                    
                 </template>
                 <template #actions>
-                    <Button @click="" text="Cancel" type="button" background="white"
+                    <Button @click="isPostJobModalOpen = false" text="Cancel" type="button" background="white"
                         foreground="primary" />
                     <Button @click="" text="Post Job" type="button" background="primary" foreground="white" />
                 </template>
