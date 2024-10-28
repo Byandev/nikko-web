@@ -1,3 +1,174 @@
+<script setup lang="ts">
+import { authStore } from '~/store/authStore';
+import { Icon } from '@iconify/vue';
+import { ref, watch } from 'vue';
+
+const { user } = storeToRefs(authStore());
+
+const tabs = ref([
+    { name: 'Post a Job', current: true },
+    { name: 'All Jobs Post', current: false },
+    { name: 'Saved Drafts', current: false },
+]);
+
+const isAvatarModalOpen = ref(false);
+
+const isPostJobModalOpen = ref(false);
+
+const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
+
+const avatarUrl = ref(user.value?.avatar?.original_url || defaultAvatarUrl);
+
+console.log('Initial avatarUrl:', avatarUrl.value);
+
+watch(user, (newMedia) => {
+    avatarUrl.value = newMedia?.avatar?.original_url || defaultAvatarUrl;
+    console.log('Updated avatarUrl:', avatarUrl.value);
+});
+
+definePageMeta({
+    middleware: ['verify']
+});
+
+const setActiveTab = (tabName: string) => {
+    tabs.value.forEach(tab => {
+        tab.current = (tab.name === tabName);
+    });
+};
+</script>
+
 <template>
-    Client Dashboard
+    <div class="my-8 lg:mx-auto mx-5">
+        <div class="max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-4 mt-5 mx-auto ">
+
+            <!-- Left Column -->
+            <div class="col-span-1">
+                <div
+                    class="flex flex-col items-center justify-center gap-5 border border-gray-300 rounded-lg overflow-hidden bg-white p-4">
+                    <div class="relative group">
+                        <img :src="avatarUrl" alt="Avatar"
+                            class="w-36 h-36 rounded-full border-4 border-white shadow-lg mx-auto" />
+                        <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                            <label class="cursor-pointer text-white">
+                                <div @click="isAvatarModalOpen = true"
+                                    class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
+                                    <Icon icon="ic:outline-edit" width="24" height="24" class="text-primary" />
+                                </div>
+                            </label>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <h2 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h2>
+                            <p class="mt-2 text-md text-gray-600">Joined on {{ new
+                                Date(user.created_at).toLocaleString('en-US', {
+                                    month: 'long', day: 'numeric', year:
+                                        'numeric'
+                                }) }}</p>
+                            <div class="mt-2 flex items-center space-x-2 justify-center">
+                                <Icon icon="mdi:map-marker" width="15" height="15" />
+                                <span class="text-sm text-black font-semibold">{{ user.country_code }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- About the client Section -->
+                <Section class="mt-4">
+                    <template #header>
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-2xl font-bold">About the Client</h2>
+                        </div>
+                    </template>
+                    <template #content>
+                        <div>
+                            <p class="text-gray-500">About the client Section</p>
+                        </div>
+                    </template>
+                </Section>
+
+                <!-- My all Contracts -->
+                <Section class="mt-4">
+                    <template #header>
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-2xl font-bold">My All Contracts</h2>
+                        </div>
+                    </template>
+                    <template #content>
+                        <div>
+                            <p class="text-gray-500">My all Contracts Section</p>
+                        </div>
+                    </template>
+                </Section>
+
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-span-1 lg:col-span-2">
+                <div class="grid grid-cols-1 gap-5">
+                    <div>
+                        <nav class="flex space-x-4" aria-label="Tabs">
+                            <template v-for="tab in tabs" :key="tab.name">
+                                <a href="#" @click.prevent="setActiveTab(tab.name)"
+                                    :class="tab.current ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
+                                    class="px-3 py-2 font-medium text-sm rounded-md">
+                                    {{ tab.name }}
+                                </a>
+                            </template>
+                        </nav>
+                    </div>
+
+                    <div v-if="tabs[0].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900">Post a Job</h3>
+                            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                                Fill out the details below to post a new job. Ensure all information is accurate to
+                                attract the
+                                right candidates.
+                            </p>
+                            <div class="flex justify-end">
+                                <Button class="mt-4" @click="isPostJobModalOpen = true" text="Post Job" background="primary" foreground="white"
+                                    :is-wide="false" type="button"></Button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="tabs[1].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900">All Jobs Post</h3>
+                            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                                Here you can see all the jobs you have posted.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div v-if="tabs[2].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h3 class="text-lg font-medium leading-6 text-gray-900">Saved Drafts</h3>
+                            <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                                Here you can see all your saved drafts.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <Modal v-if="isPostJobModalOpen" :modelValue="isPostJobModalOpen"
+                @update:modelValue="isPostJobModalOpen = $event" @close="isPostJobModalOpen = false">
+                <template #title>
+                    <div class="flex items-center space-x-2 justify-center">
+                        <Icon icon="mdi:briefcase" class="text-primary-600" width="24" height="24" />
+                        <span>Post Job</span>
+                    </div>
+                </template>
+                <template #content>
+                   
+                </template>
+                <template #actions>
+                    <Button @click="" text="Cancel" type="button" background="white"
+                        foreground="primary" />
+                    <Button @click="" text="Post Job" type="button" background="primary" foreground="white" />
+                </template>
+            </Modal>
+        </div>
+    </div>
 </template>
