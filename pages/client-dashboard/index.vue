@@ -4,9 +4,11 @@ import { Icon } from '@iconify/vue';
 import { ref, watch } from 'vue';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media as MediaResponse } from '~/types/models/Media';
+import { jobPostingStore } from '~/store/jobPostingStore';
 
 const { user } = storeToRefs(authStore());
 const { updateUser } = authStore();
+const { resetJobPosting } = jobPostingStore();
 
 const tabs = ref([
     { name: 'Post a Job', current: true },
@@ -241,7 +243,11 @@ const uploadImage = async () => {
                             <JobPostingStepTwo @back="currentStep--" @submit="currentStep++" />
                         </div>
                         <div v-if="currentStep === 2">
-                            <JobPostingReview @back="currentStep--" @submit="isPostJobModalOpen = false" />
+                            <JobPostingReview @back="currentStep--" @submit="{
+                                isPostJobModalOpen = false;
+                                resetJobPosting();
+                                currentStep = 0;
+                            }" />
                         </div>
                     </div>
                 </template>

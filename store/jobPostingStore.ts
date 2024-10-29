@@ -26,5 +26,16 @@ export const jobPostingStore = defineStore('jobPosting', () => {
         estimatedBudget: ''
     });
 
-    return { jobPosting };
+    const resetJobPosting = () => {
+        jobPosting.value = {
+            title: '',
+            description: '',
+            images: [],
+            skills: [],
+            projectLength: '',
+            experienceLevel: Level.ENTRY,
+        }
+    }
+
+    return { jobPosting, resetJobPosting };
 });
