@@ -235,7 +235,7 @@ const uploadImage = async () => {
                                 :steps="['StepOne', 'StepTwo', 'Review']" />
                         </div>
                         <div v-if="currentStep === 0">
-                            <JobPostingStepOne @submit="currentStep++" />
+                            <JobPostingStepOne @back="isPostJobModalOpen = false" @submit="currentStep++" />
                         </div>
                         <div v-if="currentStep === 1">
                             <JobPostingStepTwo @back="currentStep--" @submit="currentStep++" />
