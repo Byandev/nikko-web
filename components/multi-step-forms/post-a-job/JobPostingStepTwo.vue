@@ -1,26 +1,34 @@
 <script setup lang="ts">
 import { helpers, required } from '@vuelidate/validators';
-import type { ApiErrorResponse } from '~/types/api/response/error';
 import { Icon } from '@iconify/vue';
 import codes from 'iso-language-codes';
+import { jobPostingStore } from '~/store/jobPostingStore';
+import { Level } from '~/types/models/Job';
+import _ from 'lodash';
 
 const emits = defineEmits<{ (e: 'submit'): void; (e: 'back'): void; }>();
 
 interface FormData {
     projectLength: string;
-    experienceLevel: string;
+    experienceLevel: Level;
     language: string;
     estimatedBudget: string;
 }
 
 const initialValue: FormData = {
     projectLength: '',
-    experienceLevel: '',
+    experienceLevel: Level.ENTRY,
     language: '',
     estimatedBudget: '',
 }
 
-const form = ref(initialValue);
+const { jobPosting } = storeToRefs(jobPostingStore());
+const form = ref(jobPosting.value? {
+    projectLength: jobPosting.value.projectLength,
+    experienceLevel: jobPosting.value.experienceLevel,
+    language: jobPosting.value.language,
+    estimatedBudget: jobPosting.value.estimatedBudget,
+}:initialValue);
 
 const rules = {
     projectLength: { required: helpers.withMessage('Project Length is required', required) },
@@ -34,6 +42,14 @@ const { formRef, v$ } = useValidation(form, rules);
 const submitForm = () => {
     v$.value.$touch();
     if (v$.value.$invalid) return;
+
+    jobPosting.value = {
+        ...jobPosting.value,
+        projectLength: formRef.value.projectLength,
+        experienceLevel: formRef.value.experienceLevel,
+        language: formRef.value.language,
+        estimatedBudget: formRef.value.estimatedBudget,
+     };
 
     emits('submit');
 };
@@ -72,8 +88,10 @@ const submitForm = () => {
                     <div
                         class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                         <Icon icon="mdi:account" :ssr="true" />
-                        <input type="text" id="experienceLevel" v-model="formRef.experienceLevel"
+                        <select id="experienceLevel" v-model="formRef.experienceLevel"
                             class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                            <option v-for="level in Object.values(Level)" :key="level" :value="level">{{ _.capitalize(level) }}</option>
+                        </select>
                     </div>
                     <span v-if="v$.experienceLevel.$error" class="text-red-900 text-sm">{{
                         v$.experienceLevel.$errors[0].$message }}</span>
@@ -119,7 +137,7 @@ const submitForm = () => {
 
             <div class="flex mt-5 justify-end w-full">
                 <Button text="Back" type="button" background="white" foreground="primary" @click="emits('back')" />
-                <Button text="Submit" type="submit" background="primary" foreground="white" />
+                <Button text="Next" type="submit" background="primary" foreground="white" />
             </div>
         </form>
     </div>

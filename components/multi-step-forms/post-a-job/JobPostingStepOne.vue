@@ -3,6 +3,7 @@ import { helpers, required } from '@vuelidate/validators';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Skill } from '~/types/models/Skill';
 import { Icon } from '@iconify/vue';
+import { jobPostingStore } from '~/store/jobPostingStore';
 
 const emits = defineEmits<{ (e: 'submit'): void; (e: 'back'): void; }>();
 
@@ -10,7 +11,7 @@ interface FormData {
     title: string;
     description: string;
     skills: Skill[];
-    images: { file_name?: string; id: number }[];
+    images: File[];
 }
 
 const initialValue: FormData = {
@@ -19,6 +20,8 @@ const initialValue: FormData = {
     images: [],
     skills: [],
 }
+
+const { jobPosting } = storeToRefs(jobPostingStore());
 
 const selectedSkillId = ref<number>(0)
 const isFileAttachmentEmpty = ref(false);
@@ -33,19 +36,23 @@ const watchSelectedFiles = () => {
     }
 };
 
-
 const { data: skills, fetchData: fetchSkills } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
 
 fetchSkills('/v1/skills');
 
-const skillOptions = computed<Skill[]>(() => (skills.value?.data ?? []).filter(skill => !form.value.skills.find(i => i.id === skill.id)))
+const skillOptions = computed<Skill[]>(() => (skills.value?.data ?? []).filter(skill => !form.value.skills?.find(i => i.id === skill.id)))
 
-const form = ref(initialValue);
+const form = ref<FormData>(jobPosting.value ? {
+    title: jobPosting.value.title || '',
+    description: jobPosting.value.description || '',
+    skills: jobPosting.value.skills || [],
+    images: jobPosting.value.images || [],
+} : initialValue);
 
 const rules = {
     title: { required: helpers.withMessage('Title is required', required) },
     description: { required: helpers.withMessage('Description is required', required) },
-    skills: { required: helpers.withMessage('Skills is required', required) },
+    skills: { required: helpers.withMessage('Skills are required', required) },
 };
 
 const { formRef, v$ } = useValidation(form, rules);
@@ -54,8 +61,8 @@ const onSelect = () => {
     if (selectedSkillId.value) {
         const selectedSkill = skillOptions.value.find(skill => skill.id === selectedSkillId.value)
 
-        if (selectedSkill && !form.value.skills.find(skill => skill.id === selectedSkillId.value)) {
-            form.value.skills.push(selectedSkill)
+        if (selectedSkill && !form.value.skills?.find(skill => skill.id === selectedSkillId.value)) {
+            form.value.skills?.push(selectedSkill)
         }
 
         selectedSkillId.value = 0
@@ -63,7 +70,7 @@ const onSelect = () => {
 }
 
 const onRemoveSkill = (index: number) => {
-    form.value.skills.splice(index, 1);
+    form.value.skills?.splice(index, 1);
 }
 
 const handleClick = () => {
@@ -73,22 +80,32 @@ const handleClick = () => {
 
 const handleRemoveFile = (fileNameToRemove: string) => {
     selectedFiles.value = selectedFiles.value.filter(file => file.name !== fileNameToRemove);
+    form.value.images = form.value.images.filter(image => image.name !== fileNameToRemove);
 };
-
 
 const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files) {
-        selectedFiles.value = selectedFiles.value.concat(Array.from(target.files));
+        const newFiles = Array.from(target.files);
+        console.log(newFiles);
+        selectedFiles.value = selectedFiles.value.concat(newFiles);
+        form.value.images = form.value.images.concat(newFiles);
     }
 };
 
 const submitForm = () => {
-
     watchEffect(watchSelectedFiles);
     v$.value.$touch();
     if (v$.value.$invalid) return;
     if (!selectedFiles.value) return;
+
+    jobPosting.value = {
+        ...jobPosting.value,
+        title: formRef.value.title,
+        description: formRef.value.description,
+        skills: formRef.value.skills,
+        images: formRef.value.images,
+    };
 
     emits('submit');
 };
@@ -152,27 +169,16 @@ const submitForm = () => {
                 </span>
             </div>
 
-            <div v-if="selectedFiles.length || form.images.length" class="mt-4">
+            <div v-if="selectedFiles.length || formRef.images.length" class="mt-4">
                 <ul class="mt-2 space-y-4">
-                    <li v-for="file in selectedFiles" :key="file.name"
-                        class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
-                        <div class="flex items-center space-x-2 w-full">
-                            <Icon icon="mdi:file" class="text-gray-500" width="24" height="24" />
-                            <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96" :title="file.name">{{
-                                file.name }}</span>
-                        </div>
-                        <button @click="handleRemoveFile(file.name)" class="text-red-500 hover:text-red-700">
-                            <Icon icon="mdi:close" width="16" height="16" />
-                        </button>
-                    </li>
-                    <li v-for="image in form.images" :key="image.id"
+                    <li v-for="(image, index) in formRef.images" :key="index"
                         class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
                         <div class="flex items-center space-x-2 w-full">
                             <Icon icon="mdi:file" class="text-gray-500" width="24" height="24" />
                             <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96"
-                                :title="image.file_name">{{ image.file_name }}</span>
+                                :title="image.name">{{ image.name }}</span>
                         </div>
-                        <button @click="handleRemoveFile(String(image.file_name))"
+                        <button @click="handleRemoveFile(String(image.name))"
                             class="text-red-500 hover:text-red-700">
                             <Icon icon="mdi:close" width="16" height="16" />
                         </button>
@@ -217,10 +223,9 @@ const submitForm = () => {
                 </div>
             </div>
 
-
             <div class="flex mt-5 justify-end w-full">
                 <Button text="Back" type="button" background="white" foreground="primary" @click="emits('back')" />
-                <Button text="Submit" type="submit" background="primary" foreground="white" />
+                <Button text="Next" type="submit" background="primary" foreground="white" />
             </div>
         </form>
     </div>

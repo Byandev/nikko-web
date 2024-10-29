@@ -241,7 +241,7 @@ const uploadImage = async () => {
                             <JobPostingStepTwo @back="currentStep--" @submit="currentStep++" />
                         </div>
                         <div v-if="currentStep === 2">
-                            <JobPostingReview @back="currentStep--" @submit="currentStep++" />
+                            <JobPostingReview @back="currentStep--" @submit="isPostJobModalOpen = false" />
                         </div>
                     </div>
                 </template>
