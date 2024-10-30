@@ -115,7 +115,8 @@ const uploadImage = async () => {
                             <p class="mt-2 text-md text-gray-600">
                                 Joined on {{ new Date(user.created_at).toLocaleString('en-US', {
                                     month: 'long', day:
-                                'numeric', year: 'numeric' }) }}
+                                        'numeric', year: 'numeric'
+                                }) }}
                             </p>
                             <div class="mt-2 flex items-center space-x-2 justify-center">
                                 <Icon icon="mdi:map-marker" width="15" height="15" />
@@ -233,8 +234,7 @@ const uploadImage = async () => {
                 <template #content>
                     <div class="rounded-lg">
                         <div class="flex justify-center mb-5">
-                            <ProgressBar :current-step="currentStep"
-                                :steps="['StepOne', 'StepTwo', 'Review']" />
+                            <ProgressBar :current-step="currentStep" :steps="['StepOne', 'StepTwo', 'Review']" />
                         </div>
                         <div v-if="currentStep === 0">
                             <JobPostingStepOne @back="isPostJobModalOpen = false" @submit="currentStep++" />

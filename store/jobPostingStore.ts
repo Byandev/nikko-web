@@ -1,39 +1,40 @@
 import { defineStore } from 'pinia';
-import { Level } from '~/types/models/Job';
+import type { Language } from '~/types/models/Language';
+import { Level, Term } from '~/types/models/Project';
 import type { Skill } from '~/types/models/Skill';
 
 export const jobPostingStore = defineStore('jobPosting', () => {
 
-    interface Job {
+    //The reason for this is the recreate the interface because I want to image to Array of File type becuase the submission is the end of form. 
+    interface Project {
         title: string;
         description: string;
         images: File[];
         skills: Skill[];
-        projectLength: string;
-        experienceLevel: Level;
-        language: string;
-        estimatedBudget: string;
+        project_length: Term;
+        experience_level: Level;
+        languages: {name: string}[];
+        estimated_budget: number;
     }
-   
-    const jobPosting = ref<Partial<Job>>({
+
+    const initialJobPosting: Partial<Project> = {
         title: '',
         description: '',
         images: [],
         skills: [],
-        projectLength: '',
-        experienceLevel: Level.ENTRY,
-        language: '',
-        estimatedBudget: ''
+        project_length: Term.SHORT_TERM,
+        experience_level: Level.ENTRY,
+        languages: [],
+        estimated_budget: 0
+    }
+   
+    const jobPosting = ref<Partial<Project>>({
+        ...initialJobPosting
     });
 
     const resetJobPosting = () => {
         jobPosting.value = {
-            title: '',
-            description: '',
-            images: [],
-            skills: [],
-            projectLength: '',
-            experienceLevel: Level.ENTRY,
+            ...initialJobPosting
         }
     }
 
