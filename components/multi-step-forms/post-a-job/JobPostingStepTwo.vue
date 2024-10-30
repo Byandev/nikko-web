@@ -9,14 +9,14 @@ import _ from 'lodash';
 const emits = defineEmits<{ (e: 'submit'): void; (e: 'back'): void; }>();
 
 interface FormData {
-    project_length: Term;
+    length: Term;
     experience_level: Level;
     languages: { name: string }[];
     estimated_budget: number;
 }
 
 const initialValue: FormData = {
-    project_length: Term.LONG_TERM,
+    length: Term.LONG_TERM,
     experience_level: Level.ENTRY,
     languages: [],
     estimated_budget: 0,
@@ -49,14 +49,14 @@ const onSelect = () => {
 }
 const { jobPosting } = storeToRefs(jobPostingStore());
 const form = ref(jobPosting.value ? {
-    project_length: jobPosting.value.project_length,
+    length: jobPosting.value.length,
     experience_level: jobPosting.value.experience_level,
     languages: jobPosting.value.languages,
     estimated_budget: jobPosting.value.estimated_budget,
 } : initialValue);
 
 const rules = {
-    project_length: { required: helpers.withMessage('Project Length is required', required) },
+    length: { required: helpers.withMessage('Project Length is required', required) },
     experience_level: { required: helpers.withMessage('Experience Level is required', required) },
     languages: { required: helpers.withMessage('Language is required', required) },
     estimated_budget: { required: helpers.withMessage('Estimated Budget is required', required) },
@@ -70,7 +70,7 @@ const submitForm = () => {
 
     jobPosting.value = {
         ...jobPosting.value,
-        project_length: formRef.value.project_length,
+        length: formRef.value.length,
         experience_level: formRef.value.experience_level,
         languages: formRef.value.languages,
         estimated_budget: formRef.value.estimated_budget,
@@ -93,21 +93,21 @@ const onRemoveLanguage = (index: number) => {
         <form @submit.prevent="submitForm" class="w-full max-w-lg text-left">
             <!-- Project Length -->
             <div class="mt-4 w-full">
-                <label for="project_length" class="block text-sm font-medium leading-6 text-gray-900">
+                <label for="length" class="block text-sm font-medium leading-6 text-gray-900">
                     Project Length <span class="text-red-500">*</span>
                 </label>
                 <div class="mt-2">
                     <div
                         class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                         <Icon icon="mdi:calendar" :ssr="true" />
-                        <select id="project_length" v-model="formRef.project_length"
+                        <select id="length" v-model="formRef.length"
                             class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                             <option v-for="term in Term" :key="term" :value="term">{{ _.startCase(term.toLowerCase()) }}
                             </option>
                         </select>
                     </div>
-                    <span v-if="v$.project_length.$error" class="text-red-900 text-sm">{{
-                        v$.project_length.$errors[0].$message }}</span>
+                    <span v-if="v$.length.$error" class="text-red-900 text-sm">{{
+                        v$.length.$errors[0].$message }}</span>
                 </div>
             </div>
 

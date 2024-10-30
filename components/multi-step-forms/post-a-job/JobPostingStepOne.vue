@@ -24,17 +24,8 @@ const initialValue: FormData = {
 const { jobPosting } = storeToRefs(jobPostingStore());
 
 const selectedSkillId = ref<number>(0)
-const isFileAttachmentEmpty = ref(false);
 
 const selectedFiles = ref<File[]>([]);
-
-const watchSelectedFiles = () => {
-    if (selectedFiles.value.length > 0 || form.value.images.length > 0) {
-        isFileAttachmentEmpty.value = false;
-    } else {
-        isFileAttachmentEmpty.value = true;
-    }
-};
 
 const { data: skills, fetchData: fetchSkills } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
 
@@ -53,6 +44,7 @@ const rules = {
     title: { required: helpers.withMessage('Title is required', required) },
     description: { required: helpers.withMessage('Description is required', required) },
     skills: { required: helpers.withMessage('Skills are required', required) },
+    images: { required: helpers.withMessage('File Attachment is required', required) },
 };
 
 const { formRef, v$ } = useValidation(form, rules);
@@ -94,10 +86,8 @@ const handleFileChange = (event: Event) => {
 };
 
 const submitForm = () => {
-    watchEffect(watchSelectedFiles);
     v$.value.$touch();
     if (v$.value.$invalid) return;
-    if (!selectedFiles.value) return;
 
     jobPosting.value = {
         ...jobPosting.value,
@@ -164,9 +154,8 @@ const submitForm = () => {
                     <p class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                         Click to select a file</p>
                 </div>
-                <span v-if="isFileAttachmentEmpty" class="text-red-900 text-sm">
-                    File Attachment is required
-                </span>
+                <span v-if="v$.images.$error" class="text-red-900 text-sm">{{
+                        v$.images.$errors[0].$message }}</span>
             </div>
 
             <div v-if="selectedFiles.length || formRef.images.length" class="mt-4">

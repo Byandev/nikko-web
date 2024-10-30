@@ -6,15 +6,17 @@ import { jobPostingStore } from '~/store/jobPostingStore';
 import { ref, computed } from 'vue';
 import type { Skill } from '~/types/models/Skill';
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import { Level, Term } from '~/types/models/Project';  
+import { Level, Term, type Project } from '~/types/models/Project';  
 import _ from 'lodash';
+import type { Media } from '~/types/models/Media';
+import { accountStore } from '~/store/accountStore';
 
 const emits = defineEmits<{ (e: 'submit'): void; (e: 'back'): void; }>();
 
 interface FormData {
     title: string;
     description: string;
-    project_length: Term;
+    length: Term;
     experience_level: string;
     languages: { name: string }[];
     estimated_budget: number;
@@ -25,7 +27,7 @@ interface FormData {
 const initialValue: FormData = {
     title: '',
     description: '',
-    project_length: Term.LONG_TERM,
+    length: Term.LONG_TERM,
     experience_level: '',
     languages: [],
     estimated_budget: 0,
@@ -34,11 +36,12 @@ const initialValue: FormData = {
 }
 
 const { jobPosting } = storeToRefs(jobPostingStore());
+const { account } = storeToRefs(accountStore());
 
 const form = ref<FormData>(jobPosting.value ? {
     title: jobPosting.value.title || '',
     description: jobPosting.value.description || '',
-    project_length: jobPosting.value.project_length || Term.LONG_TERM,
+    length: jobPosting.value.length || Term.LONG_TERM,
     experience_level: jobPosting.value.experience_level || '',
     languages: jobPosting.value.languages ? jobPosting.value.languages.map((lang: { name: string }) => ({ name: lang.name })) : [],
     estimated_budget: jobPosting.value.estimated_budget || 0,
@@ -49,7 +52,7 @@ const form = ref<FormData>(jobPosting.value ? {
 const rules = {
     title: { required: helpers.withMessage('Title is required', required) },
     description: { required: helpers.withMessage('Description is required', required) },
-    project_length: { required: helpers.withMessage('Project Length is required', required) },
+    length: { required: helpers.withMessage('Project Length is required', required) },
     experience_level: { required: helpers.withMessage('Experience Level is required', required) },
     languages: { required: helpers.withMessage('Language is required', required) },
     estimated_budget: { required: helpers.withMessage('Estimated Budget is required', required) },
@@ -72,20 +75,6 @@ const languageOptions = computed<string[]>(() =>
     )
 );
 
-const onSelectLanguage = () => {
-    if (selectedLanguageName.value) {
-        const selectedLanguage = languageOptions.value.find(language => language === selectedLanguageName.value);
-
-        if (selectedLanguage && form.value.languages && !form.value.languages.find((lang: { name: string }) => lang.name === selectedLanguageName.value)) {
-            form.value.languages.push({
-                name: selectedLanguage,
-            });
-        }
-
-        selectedLanguageName.value = null;
-    }
-}
-
 const selectedSkillId = ref<number>(0)
 const skillOptions = computed<Skill[]>(() => (skills.value?.data ?? []).filter(skill => !form.value.skills?.find(i => i.id === skill.id)))
 
@@ -96,7 +85,7 @@ fetchSkills('/v1/skills');
 const isEditing = ref({
     title: false,
     description: false,
-    project_length: false,
+    length: false,
     experience_level: false,
     languages: false,
     estimated_budget: false,
@@ -169,9 +158,51 @@ const onSelectedLanguage = () => {
     }
 }
 
-const submitForm = () => {
+const {sendRequest: createJob, pending: isSubmitting} = useSubmit<{ data: Project }, ApiErrorResponse>();
+const {sendRequest: uploadMedia, pending: isUploading} = useSubmit<{ data: Media }, ApiErrorResponse>();
+
+const submitForm = async () => {
     v$.value.$touch();
+    console.log('Errors', v$.value.$errors);
     if (v$.value.$invalid) return;
+
+    try {
+        
+        // Upload each file and collect the responses
+        const uploadPromises = form.value.images.map(file => {
+            const formData = new FormData();
+            formData.append('file', file);
+            return uploadMedia('/v1/medias', {
+                method: 'POST',
+                body: formData,
+            });
+        });
+
+        const uploadResponses = await Promise.all(uploadPromises);
+        const uploadedImages = uploadResponses.map(response => response.data.id);
+
+        const body = ref({
+            title: form.value.title,
+            description: form.value.description,
+            estimated_budget: form.value.estimated_budget,
+            length: form.value.length,
+            experience_level: form.value.experience_level,
+            languages: form.value.languages,
+            skills: form.value.skills.map(skill => skill.id),
+            images: uploadedImages,
+        });
+
+        await createJob("/v1/client/projects", {
+            method: 'POST',
+            headers: account?.value?.id ? {
+                'X-ACCOUNT-ID': account.value.id.toString(),
+            } : undefined,
+            body: body.value,
+        });
+
+    } catch (error) {
+        console.error(error);
+    }
 
     emits('submit');
 };
@@ -248,32 +279,32 @@ const submitForm = () => {
             <!-- Project Length -->
             <div class="mt-4 w-full">
                 <div class="flex flex-row justify-between">
-                    <label for="project_length" class="block text-sm font-medium leading-6 text-gray-900">
+                    <label for="length" class="block text-sm font-medium leading-6 text-gray-900">
                         Project Length <span class="text-red-500">*</span>
                     </label>
-                    <div v-if="!isEditing.project_length">
-                        <button type="button" @click="toggleEdit('project_length')" class="text-blue-500">Edit</button>
+                    <div v-if="!isEditing.length">
+                        <button type="button" @click="toggleEdit('length')" class="text-blue-500">Edit</button>
                     </div>
                     <div v-else>
-                        <button type="button" @click="toggleEdit('project_length')" class="text-blue-500">Save</button>
+                        <button type="button" @click="toggleEdit('length')" class="text-blue-500">Save</button>
                     </div>
                 </div>
                 <div class="mt-2">
-                    <div v-if="!isEditing.project_length" class="flex flex-row justify-between px-2 py-1 rounded bg-gray-100">
-                        <p>{{ _.startCase(formRef.project_length.toLowerCase()) }}</p>
+                    <div v-if="!isEditing.length" class="flex flex-row justify-between px-2 py-1 rounded bg-gray-100">
+                        <p>{{ _.startCase(formRef.length.toLowerCase()) }}</p>
                     </div>
                     <div v-else>
                         <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                             <Icon icon="mdi:calendar" :ssr="true" />
-                            <select id="project_length" v-model="formRef.project_length"
+                            <select id="length" v-model="formRef.length"
                                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                                 <option v-for="term in Term" :key="term" :value="term">{{ _.startCase(term.toLowerCase()) }}
                                 </option>
                             </select>
                         </div>
-                        <span v-if="v$.project_length.$error" class="text-red-900 text-sm">{{
-                            v$.project_length.$errors[0].$message }}</span>
+                        <span v-if="v$.length.$error" class="text-red-900 text-sm">{{
+                            v$.length.$errors[0].$message }}</span>
                     </div>
                 </div>
             </div>
@@ -402,7 +433,7 @@ const submitForm = () => {
             <div class="mt-4 w-full">
                 <div class="flex flex-row justify-between">
                     <label for="images" class="block text-sm font-medium leading-6 text-gray-900">
-                        Images
+                        Images <span class="text-red-500">*</span>
                     </label>
                     <div v-if="!isEditing.images">
                         <button type="button" @click="toggleEdit('images')" class="text-blue-500">Edit</button>
@@ -460,7 +491,7 @@ const submitForm = () => {
             <div class="mt-4 w-full">
                 <div class="flex flex-row justify-between">
                     <label for="skills" class="block text-sm font-medium leading-6 text-gray-900">
-                        Skills
+                        Skills <span class="text-red-500">*</span>
                     </label>
                     <div v-if="!isEditing.skills">
                         <button type="button" @click="toggleEdit('skills')" class="text-blue-500">Edit</button>

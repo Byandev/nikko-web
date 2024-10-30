@@ -4,11 +4,9 @@ import { Icon } from '@iconify/vue';
 import { ref, watch } from 'vue';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media as MediaResponse } from '~/types/models/Media';
-import { jobPostingStore } from '~/store/jobPostingStore';
 
 const { user } = storeToRefs(authStore());
 const { updateUser } = authStore();
-const { resetJobPosting } = jobPostingStore();
 
 const tabs = ref([
     { name: 'Post a Job', current: true },
@@ -23,13 +21,9 @@ const { sendRequest: sendRequest, pending: isLoading } = useSubmit<{ data: Media
 const avatarImage = ref<File | null>(null);
 const avatarImagePreview = ref<string | null>(null);
 
-const isPostJobModalOpen = ref(false);
-
 const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
 
 const avatarUrl = ref(user.value?.avatar?.original_url || defaultAvatarUrl);
-
-const currentStep = ref(0);
 
 watch(user, (newMedia) => {
     avatarUrl.value = newMedia?.avatar?.original_url || defaultAvatarUrl;
@@ -44,6 +38,12 @@ const setActiveTab = (tabName: string) => {
     tabs.value.forEach(tab => {
         tab.current = (tab.name === tabName);
     });
+};
+
+const router = useRouter();
+
+const postAJob = async () => {
+    await router.push(`/post-a-job/${user.value.accounts[0].id}`);
 };
 
 const updateAvatarImage = (event: Event) => {
@@ -180,7 +180,7 @@ const uploadImage = async () => {
                                 right candidates.
                             </p>
                             <div class="flex justify-end">
-                                <Button class="mt-4" @click="isPostJobModalOpen = true" text="Post Job"
+                                <Button class="mt-4" @click="postAJob" text="Post Job"
                                     background="primary" foreground="white" :is-wide="false" type="button"></Button>
                             </div>
                         </div>
@@ -225,30 +225,6 @@ const uploadImage = async () => {
                             :is-loading="isLoading" :is-wide="false" @click="isAvatarModalOpen = false"></Button>
                         <Button type="button" text="Upload" background="primary" foreground="white"
                             :is-loading="isLoading" :is-wide="false" @click="() => uploadImage()"></Button>
-                    </div>
-                </template>
-            </Modal>
-
-            <Modal v-if="isPostJobModalOpen" :modelValue="isPostJobModalOpen"
-                @update:modelValue="isPostJobModalOpen = $event" @close="isPostJobModalOpen = false">
-                <template #content>
-                    <div class="rounded-lg">
-                        <div class="flex justify-center mb-5">
-                            <ProgressBar :current-step="currentStep" :steps="['StepOne', 'StepTwo', 'Review']" />
-                        </div>
-                        <div v-if="currentStep === 0">
-                            <JobPostingStepOne @back="isPostJobModalOpen = false" @submit="currentStep++" />
-                        </div>
-                        <div v-if="currentStep === 1">
-                            <JobPostingStepTwo @back="currentStep--" @submit="currentStep++" />
-                        </div>
-                        <div v-if="currentStep === 2">
-                            <JobPostingReview @back="currentStep--" @submit="{
-                                isPostJobModalOpen = false;
-                                resetJobPosting();
-                                currentStep = 0;
-                            }" />
-                        </div>
                     </div>
                 </template>
             </Modal>

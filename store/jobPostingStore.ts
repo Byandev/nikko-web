@@ -11,7 +11,7 @@ export const jobPostingStore = defineStore('jobPosting', () => {
         description: string;
         images: File[];
         skills: Skill[];
-        project_length: Term;
+        length: Term;
         experience_level: Level;
         languages: {name: string}[];
         estimated_budget: number;
@@ -22,7 +22,7 @@ export const jobPostingStore = defineStore('jobPosting', () => {
         description: '',
         images: [],
         skills: [],
-        project_length: Term.SHORT_TERM,
+        length: Term.SHORT_TERM,
         experience_level: Level.ENTRY,
         languages: [],
         estimated_budget: 0
