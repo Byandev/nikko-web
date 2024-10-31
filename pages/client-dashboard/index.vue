@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { authStore } from '~/store/authStore';
 import { Icon } from '@iconify/vue';
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media as MediaResponse } from '~/types/models/Media';
 import type { Project } from '~/types/models/Project';
@@ -15,7 +15,7 @@ const { account } = storeToRefs(accountStore());
 const tabs = ref([
     { name: 'Post a Job', current: true },
     { name: 'All Jobs Post', current: false },
-    { name: 'Saved Drafts', current: false}
+    { name: 'Saved Drafts', current: false }
 ]);
 
 const isAvatarModalOpen = ref(false);
@@ -143,6 +143,13 @@ const confirmDeleteJob = async () => {
     }
 };
 
+const searchQuery = ref('');
+
+const filteredJobs = computed(() => {
+    if (!jobs.value?.data) return [];
+    return jobs.value.data.filter(job => job.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
+});
+
 </script>
 
 <template>
@@ -235,21 +242,29 @@ const confirmDeleteJob = async () => {
                                 right candidates.
                             </p>
                             <div class="flex justify-end">
-                                <Button class="mt-4" @click="postAJob" text="Post Job"
-                                    background="primary" foreground="white" :is-wide="false" type="button"></Button>
+                                <Button class="mt-4" @click="postAJob" text="Post Job" background="primary"
+                                    foreground="white" :is-wide="false" type="button"></Button>
                             </div>
                         </div>
                     </div>
 
                     <div v-if="tabs[1].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">All Jobs Post</h3>
-                            <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                                Here you can see all the jobs you have posted.
-                            </p>
+                        <div class="px-4 py-5 sm:px-6 flex flex-row justify-between items-center">
+                            <div>
+                                <h3 class="text-lg font-medium leading-6 text-gray-900">All Jobs Post</h3>
+                                <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                                    Here you can see all the jobs you have posted.
+                                </p>
+                            </div>
+
+                            <div class="flex justify-end mb-4">
+                                <input type="text" v-model="searchQuery" placeholder="Search jobs..."
+                                    class="p-2 border rounded-md" />
+                            </div>
                         </div>
                         <div v-if="!isJobsLoading">
-                            <div v-for="(job, idx) in jobs?.data.filter(job => job.status === 'ACTIVE')" :key="job.id">
+                            <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'ACTIVE')"
+                                :key="job.id">
                                 <JobCard @submit="refreshJobs" @delete="openDeleteModal" :job="job" />
                             </div>
                         </div>
@@ -262,14 +277,21 @@ const confirmDeleteJob = async () => {
                     </div>
 
                     <div v-if="tabs[2].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">All Saved Draft</h3>
-                            <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                                Here you can see all the jobs you have saved as drafts.
-                            </p>
+                        <div class="px-4 py-5 sm:px-6 flex flex-row justify-between items-center">
+                            <div>
+                                <h3 class="text-lg font-medium leading-6 text-gray-900">All Saved Draft</h3>
+                                <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                                    Here you can see all the jobs you have saved as drafts.
+                                </p>
+                            </div>
+
+                            <div class="flex justify-end mb-4">
+                                <input type="text" v-model="searchQuery" placeholder="Search jobs..."
+                                    class="p-2 border rounded-md" />
+                            </div>
                         </div>
                         <div v-if="!isJobsLoading">
-                            <div v-for="(job, idx) in jobs?.data.filter(job => job.status === 'DRAFT')" :key="job.id">
+                            <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'DRAFT')" :key="job.id">
                                 <JobCard @submit="refreshJobs" @delete="deleteAJob" :job="job" />
                             </div>
                         </div>
@@ -309,7 +331,8 @@ const confirmDeleteJob = async () => {
             <Modal :modelValue="isDeleteModalOpen" @update:modelValue="isDeleteModalOpen = $event">
                 <template #title>Confirm Deletion</template>
                 <template #content>
-                    <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete this job? This action cannot be undone.</p>
+                    <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete this job? This action cannot
+                        be undone.</p>
                 </template>
                 <template #actions>
                     <div class="flex justify-end space-x-2">
