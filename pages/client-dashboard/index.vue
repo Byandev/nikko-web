@@ -249,7 +249,7 @@ const filteredJobs = computed(() => {
                     </div>
 
                     <div v-if="tabs[1].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6 flex flex-row justify-between items-center">
+                        <div class="px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center">
                             <div>
                                 <h3 class="text-lg font-medium leading-6 text-gray-900">All Jobs Post</h3>
                                 <p class="mt-1 max-w-2xl text-sm text-gray-500">
@@ -277,7 +277,7 @@ const filteredJobs = computed(() => {
                     </div>
 
                     <div v-if="tabs[2].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6 flex flex-row justify-between items-center">
+                        <div class="px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center">
                             <div>
                                 <h3 class="text-lg font-medium leading-6 text-gray-900">All Saved Draft</h3>
                                 <p class="mt-1 max-w-2xl text-sm text-gray-500">
