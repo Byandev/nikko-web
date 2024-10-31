@@ -127,6 +127,22 @@ const deleteAJob = async (jobId: number) => {
     }
 };
 
+const isDeleteModalOpen = ref(false);
+const jobToDelete = ref<number | null>(null);
+
+const openDeleteModal = (jobId: number) => {
+    jobToDelete.value = jobId;
+    isDeleteModalOpen.value = true;
+};
+
+const confirmDeleteJob = async () => {
+    if (jobToDelete.value !== null) {
+        await deleteAJob(jobToDelete.value);
+        isDeleteModalOpen.value = false;
+        jobToDelete.value = null;
+    }
+};
+
 </script>
 
 <template>
@@ -234,7 +250,7 @@ const deleteAJob = async (jobId: number) => {
                         </div>
                         <div v-if="!isJobsLoading">
                             <div v-for="(job, idx) in jobs?.data.filter(job => job.status === 'ACTIVE')" :key="job.id">
-                                <JobCard @submit="refreshJobs" @delete="deleteAJob" :job="job" />
+                                <JobCard @submit="refreshJobs" @delete="openDeleteModal" :job="job" />
                             </div>
                         </div>
                         <div v-else>
@@ -286,6 +302,21 @@ const deleteAJob = async (jobId: number) => {
                             :is-loading="isLoading" :is-wide="false" @click="isAvatarModalOpen = false"></Button>
                         <Button type="button" text="Upload" background="primary" foreground="white"
                             :is-loading="isLoading" :is-wide="false" @click="() => uploadImage()"></Button>
+                    </div>
+                </template>
+            </Modal>
+
+            <Modal :modelValue="isDeleteModalOpen" @update:modelValue="isDeleteModalOpen = $event">
+                <template #title>Confirm Deletion</template>
+                <template #content>
+                    <p class="text-sm text-gray-500 mb-4">Are you sure you want to delete this job? This action cannot be undone.</p>
+                </template>
+                <template #actions>
+                    <div class="flex justify-end space-x-2">
+                        <Button type="button" text="Cancel" background="white" foreground="black"
+                            :is-loading="isLoading" :is-wide="false" @click="isDeleteModalOpen = false"></Button>
+                        <Button type="button" text="Delete" background="primary" foreground="white"
+                            :is-loading="isLoading" :is-wide="false" @click="confirmDeleteJob"></Button>
                     </div>
                 </template>
             </Modal>
