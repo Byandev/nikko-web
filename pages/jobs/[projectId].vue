@@ -41,7 +41,7 @@ const goBack = () => {
             <p class="mb-4 text-gray-600"><strong>Posted On:</strong> {{ new Date(job.data.created_at).toLocaleDateString() }}</p>
             <p class="mb-4 text-gray-600"><strong>Description:</strong> {{ job.data.description }}</p>
             <p class="mb-4 text-gray-600"><strong>Estimated Budget:</strong> {{ job.data.estimated_budget }}</p>
-            <p class="mb-4 text-gray-600"><strong>Experience Level:</strong> {{ job.data.experience_level }}</p>
+            <p class="mb-4 text-gray-600"><strong>Experience Level:</strong> {{ _.capitalize(job.data.experience_level) }}</p>
             <p class="mb-4 text-gray-600"><strong>Project Length:</strong> {{ _.startCase(_.lowerCase(job.data.length)) }}</p>
             <p class="mb-4 text-gray-600"><strong>Languages:</strong></p>
             <div class="flex flex-wrap mb-4">

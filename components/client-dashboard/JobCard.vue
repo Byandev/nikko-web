@@ -17,6 +17,7 @@ const props = defineProps<{
 const {jobPosting} = storeToRefs(jobPostingStore());
 const { resetJobPosting } = jobPostingStore();
 const { account } = storeToRefs(accountStore());
+const status = ref<string | null>(null);
 
 interface FormData {
     title: string;
@@ -207,6 +208,7 @@ const submitForm = async () => {
 
         const body = ref({
             ...form.value,
+            ...(status.value ? { status: status.value } : {}),
             skills: form.value.skills.map(skill => skill.id),
             images: [...uploadedImages, ...mediaData],
         });
@@ -256,7 +258,7 @@ const viewJobDetails = async () => {
         <div class="mt-5 flex  items-center justify-start lg:justify-between gap-3">
             <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">Experience Level:</span>
-                <span class="text-sm font-medium text-gray-700">{{ props.job.experience_level }}</span>
+                <span class="text-sm font-medium text-gray-700">{{ _.capitalize(props.job.experience_level) }}</span>
             </div>
             <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">Project Length:</span>
@@ -620,7 +622,9 @@ const viewJobDetails = async () => {
             <div class="flex mt-5  w-full" :class="job.status == 'DRAFT' ? 'justify-between' : 'justify-end'  ">
                 <Button text="Cancel" type="button" background="white" foreground="primary" @click="isEditModalOpen = false" />
                 <div class="flex flex-row">
-                    <Button v-if="job.status == 'DRAFT'" text="Save Publish" type="button" background="white" foreground="primary" @click="isEditModalOpen = false" />
+                    <Button v-if="job.status == 'DRAFT'" text="Save Publish" type="submit" background="white" foreground="primary" @click="{isEditModalOpen = false;
+                        status = 'ACTIVE'
+                    }" />
                     <Button :is-loading="isSubmitting || isUploading" text="Save" type="submit" background="primary" foreground="white" />
                 </div>
             </div>
