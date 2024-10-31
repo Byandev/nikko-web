@@ -15,6 +15,7 @@ const props = defineProps<{
 }>();
 
 const {jobPosting} = storeToRefs(jobPostingStore());
+const { resetJobPosting } = jobPostingStore();
 const { account } = storeToRefs(accountStore());
 
 interface FormData {
@@ -222,6 +223,8 @@ const submitForm = async () => {
         emits('submit');
     } catch (error) {
         
+    }finally {
+        resetJobPosting();
     }
 };
 
