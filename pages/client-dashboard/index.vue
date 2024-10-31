@@ -4,8 +4,11 @@ import { Icon } from '@iconify/vue';
 import { ref, watch, computed } from 'vue';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media as MediaResponse } from '~/types/models/Media';
-import type { Project } from '~/types/models/Project';
 import { accountStore } from '~/store/accountStore';
+import { data } from 'autoprefixer';
+
+const { fetchJobs, fetchJob, jobs, isJobsLoading } = useJobs();
+const { sendRequest: sendRequest, pending: isLoading } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
 
 const { user } = storeToRefs(authStore());
 const { updateUser } = authStore();
@@ -19,18 +22,6 @@ const tabs = ref([
 ]);
 
 const isAvatarModalOpen = ref(false);
-
-const { sendRequest: sendRequest, pending: isLoading } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
-const { data: jobs, fetchData: fetchJobs, pending: isJobsLoading } = useFetchData<{ data: Project[] }, ApiErrorResponse>();
-
-onMounted(async () => {
-    await fetchJobs('/v1/client/projects', {
-        method: 'GET',
-        headers: account?.value?.id ? {
-            'X-ACCOUNT-ID': account.value.id.toString(),
-        } : undefined,
-    });
-});
 
 const avatarImage = ref<File | null>(null);
 const avatarImagePreview = ref<string | null>(null);
@@ -104,12 +95,7 @@ const uploadImage = async () => {
 };
 
 const refreshJobs = async () => {
-    await fetchJobs('/v1/client/projects', {
-        method: 'GET',
-        headers: account?.value?.id ? {
-            'X-ACCOUNT-ID': account.value.id.toString(),
-        } : undefined,
-    });
+    fetchJobs();
 };
 
 const deleteAJob = async (jobId: number) => {
@@ -150,6 +136,7 @@ const filteredJobs = computed(() => {
     return jobs.value.data.filter(job => job.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
 });
 
+fetchJobs();
 </script>
 
 <template>
@@ -263,8 +250,7 @@ const filteredJobs = computed(() => {
                             </div>
                         </div>
                         <div v-if="!isJobsLoading">
-                            <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'ACTIVE')"
-                                :key="job.id">
+                            <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'ACTIVE')" :key="job.id">
                                 <JobCard @submit="refreshJobs" @delete="openDeleteModal" :job="job" />
                             </div>
                         </div>
@@ -302,6 +288,13 @@ const filteredJobs = computed(() => {
                             </div>
                         </div>
                     </div>
+
+                    <Pagination
+                        v-if="!isLoading && (jobs.data ?? []).length > 0 && !tabs[0].current"
+                        :pagination="jobs.meta"
+                        @prev-page="fetchJobs(jobs.meta.current_page - 1)"
+                        @next-page="fetchJobs(jobs.meta.current_page + 1)"
+                    />
                 </div>
             </div>
 
