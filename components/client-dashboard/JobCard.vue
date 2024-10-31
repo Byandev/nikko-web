@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { helpers, required } from '@vuelidate/validators';
+import { Term, type Project, Level } from '~/types/models/Project';
 import { Icon } from '@iconify/vue';
-import codes from 'iso-language-codes';
-import { jobPostingStore } from '~/store/jobPostingStore';
-import { ref, computed } from 'vue';
 import type { Skill } from '~/types/models/Skill';
-import type { ApiErrorResponse } from '~/types/api/response/error';
-import { Level, Term, type Project } from '~/types/models/Project';  
+import { helpers, required } from '@vuelidate/validators';
+import { jobPostingStore } from '~/store/jobPostingStore';
 import _ from 'lodash';
-import type { Media } from '~/types/models/Media';
+import codes from 'iso-language-codes';
+import type { ApiErrorResponse } from '~/types/api/response/error';
+import  { type Media } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
 
-const emits = defineEmits<{ (e: 'submit'): void; (e: 'back'): void; }>();
+const props = defineProps<{
+    job: Project;
+}>();
+
+const {jobPosting} = storeToRefs(jobPostingStore());
+const { account } = storeToRefs(accountStore());
 
 interface FormData {
     title: string;
@@ -20,107 +24,23 @@ interface FormData {
     experience_level: string;
     languages: { name: string }[];
     estimated_budget: number;
-    images: File[];
+    images: Media[] | File[];
     skills: Skill[];
 }
 
-const initialValue: FormData = {
-    title: '',
-    description: '',
-    length: Term.LONG_TERM,
-    experience_level: '',
-    languages: [],
-    estimated_budget: 0,
-    images: [],
-    skills: [],
-}
+const emits = defineEmits<{
+    (e: 'submit'): void;
+    (e: 'delete', jobId: number): void;
+}>();
 
-const { jobPosting } = storeToRefs(jobPostingStore());
-const { account } = storeToRefs(accountStore());
-const status = ref('');
+const dropdownOpen = ref(false);
 
-const form = ref<FormData>(jobPosting.value ? {
-    title: jobPosting.value.title || '',
-    description: jobPosting.value.description || '',
-    length: jobPosting.value.length || Term.LONG_TERM,
-    experience_level: jobPosting.value.experience_level || '',
-    languages: jobPosting.value.languages ? jobPosting.value.languages.map((lang: { name: string }) => ({ name: lang.name })) : [],
-    estimated_budget: jobPosting.value.estimated_budget || 0,
-    images: jobPosting.value.images || [],
-    skills: jobPosting.value.skills || [],
-} : initialValue);
-
-const rules = {
-    title: { required: helpers.withMessage('Title is required', required) },
-    description: { required: helpers.withMessage('Description is required', required) },
-    length: { required: helpers.withMessage('Project Length is required', required) },
-    experience_level: { required: helpers.withMessage('Experience Level is required', required) },
-    languages: { required: helpers.withMessage('Language is required', required) },
-    estimated_budget: { required: helpers.withMessage('Estimated Budget is required', required) },
-    images: {
-       required: helpers.withMessage('Please attach at least one image', required),
-    },
-    skills: {
-       required: helpers.withMessage('Please select at least one skill', required),
-    },
+const handleEdit = () => {
+    isEditModalOpen.value = true;
 };
 
-const { formRef, v$ } = useValidation(form, rules);
-
-const languagesName = ref<string[]>(codes.map(code => code.name));
-const selectedLanguageName = ref<string | null>(null);
-
-const languageOptions = computed<string[]>(() => 
-    (languagesName.value ?? []).filter(language => 
-        !form.value.languages?.find((i: { name: string }) => i.name === language)
-    )
-);
-
-const selectedSkillId = ref<number>(0)
-const skillOptions = computed<Skill[]>(() => (skills.value?.data ?? []).filter(skill => !form.value.skills?.find(i => i.id === skill.id)))
-
-const { data: skills, fetchData: fetchSkills } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
-
-fetchSkills('/v1/skills');
-
-const isEditing = ref({
-    title: false,
-    description: false,
-    length: false,
-    experience_level: false,
-    languages: false,
-    estimated_budget: false,
-    images: false,
-    skills: false,
-});
-
-const toggleEdit = (field: keyof FormData) => {
-    if (isEditing.value[field]) {
-        v$.value[field].$touch();
-        if (v$.value[field].$invalid) return;
-
-        jobPosting.value[field] = formRef.value[field];
-        isEditing.value[field] = !isEditing.value[field];
-    } else {
-        isEditing.value[field] = !isEditing.value[field];
-    }
-};
-
-const handleFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (target.files) {
-        const newFiles = Array.from(target.files);
-        form.value.images = form.value.images.concat(newFiles);
-    }
-};
-
-const handleRemoveFile = (fileNameToRemove: string) => {
-    form.value.images = form.value.images.filter(file => file.name !== fileNameToRemove);
-};
-
-const handleClick = () => {
-    const fileInput = document.getElementById('file') as HTMLInputElement;
-    fileInput.click();
+const handleDelete = () => {
+    emits('delete', props.job.id);
 };
 
 const onSelectSkill = () => {
@@ -159,64 +79,213 @@ const onSelectedLanguage = () => {
     }
 }
 
-const {sendRequest: createJob, pending: isSubmitting} = useSubmit<{ data: Project }, ApiErrorResponse>();
+const isEditModalOpen = ref(false);
+
+const isEditing = ref({
+    title: false,
+    description: false,
+    length: false,
+    experience_level: false,
+    languages: false,
+    estimated_budget: false,
+    images: false,
+    skills: false,
+});
+
+const initialValue: FormData = {
+    title: '',
+    description: '',
+    length: Term.LONG_TERM,
+    experience_level: '',
+    languages: [],
+    estimated_budget: 0,
+    images: [],
+    skills: [],
+}
+
+
+const form = ref<FormData>(props.job ? {
+    title: props.job.title || '',
+    description: props.job.description || '',
+    length: props.job.length || Term.LONG_TERM,
+    experience_level: props.job.experience_level || '',
+    languages: props.job.languages ? props.job.languages.map((lang: { name: string }) => ({ name: lang.name })) : [],
+    estimated_budget: Number(props.job.estimated_budget) || 0,
+    images: props.job.images || [],
+    skills: props.job.skills || [],
+} : initialValue);
+
+const rules = {
+    title: { required: helpers.withMessage('Title is required', required) },
+    description: { required: helpers.withMessage('Description is required', required) },
+    length: { required: helpers.withMessage('Project Length is required', required) },
+    experience_level: { required: helpers.withMessage('Experience Level is required', required) },
+    languages: { required: helpers.withMessage('Language is required', required) },
+    estimated_budget: { required: helpers.withMessage('Estimated Budget is required', required) },
+    images: {
+       required: helpers.withMessage('Please attach at least one image', required),
+    },
+    skills: {
+       required: helpers.withMessage('Please select at least one skill', required),
+    },
+};
+
+const { formRef, v$ } = useValidation(form, rules);
+
+const languagesName = ref<string[]>(codes.map(code => code.name));
+const selectedLanguageName = ref<string | null>(null);
+
+const languageOptions = computed<string[]>(() => 
+    (languagesName.value ?? []).filter(language => 
+        !form.value.languages?.find((i: { name: string }) => i.name === language)
+    )
+);
+
+const selectedSkillId = ref<number>(0)
+const skillOptions = computed<Skill[]>(() => (skills.value?.data ?? []).filter(skill => !form.value.skills?.find(i => i.id === skill.id)))
+
+const { data: skills, fetchData: fetchSkills } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
+
+fetchSkills('/v1/skills');
+
+const toggleEdit = (field: keyof FormData) => {
+    if (isEditing.value[field]) {
+        v$.value[field].$touch();
+        if (v$.value[field].$invalid) return;
+
+        jobPosting.value[field] = formRef.value[field];
+        isEditing.value[field] = !isEditing.value[field];
+    } else {
+        isEditing.value[field] = !isEditing.value[field];
+    }
+};
+
+const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    if (target.files) {
+        const newFiles = Array.from(target.files);
+        form.value.images = form.value.images.concat(newFiles) as File[];
+    }
+};
+
+const handleRemoveFile = (fileNameToRemove: string) => {
+    form.value.images = form.value.images.filter(file => file.name !== fileNameToRemove) as File[];
+};
+
+const handleClick = () => {
+    const fileInput = document.getElementById('file') as HTMLInputElement;
+    fileInput.click();
+};
+
+const {sendRequest: updateJob, pending: isSubmitting} = useSubmit<{ data: Project }, ApiErrorResponse>();
 const {sendRequest: uploadMedia, pending: isUploading} = useSubmit<{ data: Media }, ApiErrorResponse>();
 
 const submitForm = async () => {
     v$.value.$touch();
-    console.log('Errors', v$.value.$errors);
     if (v$.value.$invalid) return;
 
     try {
-        
-        // Upload each file and collect the responses
-        const uploadPromises = form.value.images.map(file => {
-            const formData = new FormData();
-            formData.append('file', file);
-            return uploadMedia('/v1/medias', {
-                method: 'POST',
-                body: formData,
+        const uploadPromises = form.value.images
+            .filter(file => file instanceof File)
+            .map(file => {
+                const formData = new FormData();
+                formData.append('file', file);
+                return uploadMedia('/v1/medias', {
+                    method: 'POST',
+                    body: formData,
+                });
             });
-        });
-
+        
         const uploadResponses = await Promise.all(uploadPromises);
         const uploadedImages = uploadResponses.map(response => response.data.id);
+        
+        // Extract only the id from Media objects
+        const mediaData = form.value.images
+            .filter(file => !(file instanceof File))
+            .map(media => (media as Media).id);
 
         const body = ref({
-            title: form.value.title,
-            description: form.value.description,
-            estimated_budget: form.value.estimated_budget,
-            length: form.value.length,
-            status: status.value,
-            experience_level: form.value.experience_level,
-            languages: form.value.languages,
+            ...form.value,
             skills: form.value.skills.map(skill => skill.id),
-            images: uploadedImages,
+            images: [...uploadedImages, ...mediaData],
         });
 
-        await createJob("/v1/client/projects", {
-            method: 'POST',
+        await updateJob(`/v1/client/projects/${props.job.id}`, {
+            method: 'PUT',
             headers: account?.value?.id ? {
                 'X-ACCOUNT-ID': account.value.id.toString(),
             } : undefined,
             body: body.value,
         });
 
+        isEditModalOpen.value = false;
+        emits('submit');
     } catch (error) {
-        console.error(error);
+        
     }
-
-    emits('submit');
 };
+
+const router = useRouter();
+
+const viewJobDetails = async () => {
+    await router.push(`/jobs/${props.job.id}`);
+};
+
 </script>
 
 <template>
-    <div class="flex flex-col items-center justify-center">
-        <h1 class="text-2xl font-bold mb-4">Review Your Job Posting</h1>
-        <span class="text-gray-600 mb-4">Please review the details of your job posting below. Ensure all information is
-            accurate to attract the best candidates.</span>
-
-        <form @submit.prevent="submitForm" class="w-full max-w-lg text-left">
+    <div class="job-card bg-white border-b-2 border-t-2 border-black p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-gray-800">{{ props.job.title }}</h2>
+            <div class="relative">
+                <Icon @click="dropdownOpen = !dropdownOpen" icon="mi:options-vertical" class=" text-2xl hover:cursor-pointer" />
+                <div v-if="dropdownOpen" class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                    <button @click="handleEdit" class="flex flex-row px-4 py-2 items-center text-gray-700 hover:bg-gray-100 w-full" >
+                        <Icon icon="mdi:pencil" class="mr-2" />
+                        Edit</button>
+                    <button @click="handleDelete" class="flex flex-row px-4 py-2 items-center text-gray-700 hover:bg-gray-100 w-full">
+                        <Icon icon="mdi:trash-can" class="mr-2" />
+                        Delete</button>
+                </div>
+            </div>
+        </div>
+        <p class="text-gray-600 mb-4">{{ props.job.description }}</p>
+        <div class="mt-5 flex  items-center justify-start lg:justify-between gap-3">
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">Experience Level:</span>
+                <span class="text-sm font-medium text-gray-700">{{ props.job.experience_level }}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-500">Project Length:</span>
+                <span class="text-sm font-medium text-gray-700">{{ _.startCase(props.job.length.toLowerCase()) }}</span>
+            </div>
+        </div>
+        <div class="mt-4 flex items-center space-x-2">
+            <span class="text-sm text-gray-500">Languages:</span>
+            <div class="flex flex-wrap">
+                <span v-for="(language, index) in props.job.languages" :key="index" class="bg-primary/15 text-primary  text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
+                    {{ language.name }}
+                </span>
+            </div>
+        </div>
+        <div class="mt-4 flex items-center space-x-2">
+            <span class="text-sm text-gray-500">Skills:</span>
+            <div class="flex flex-wrap">
+                <span v-for="(skill, index) in props.job.skills" :key="index" class="bg-primary/15 text-primary text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
+                    {{ skill.name }}
+                </span>
+            </div>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+            <span class="text-lg font-semibold text-gray-800">${{ props.job.estimated_budget }}</span>
+            <Button @click="viewJobDetails" text="View Details" type="button" background="primary" foreground="white" />
+        </div>
+    </div>
+    
+    <Modal :modelValue="isEditModalOpen" @update:modelValue="isEditModalOpen = $event">
+        <template #title>Job Details</template>
+        <template #content>
+            <form @submit.prevent="submitForm" class="w-full max-w-lg text-left">
             <!-- Title -->
             <div class="mt-4 w-full">
                 <div class="flex flex-row justify-between">
@@ -545,13 +614,17 @@ const submitForm = async () => {
                 </div>
             </div>
 
-            <div class="flex mt-5 justify-between w-full">
-                <Button text="Back" type="button" background="white" foreground="primary" @click="emits('back')" />
+            <div class="flex mt-5  w-full" :class="job.status == 'DRAFT' ? 'justify-between' : 'justify-end'  ">
+                <Button text="Cancel" type="button" background="white" foreground="primary" @click="isEditModalOpen = false" />
                 <div class="flex flex-row">
-                    <Button :isLoading="isUploading || isSubmitting" text="Save Draft" type="submit" background="white" @click="status = 'DRAFT'" foreground="primary" />
-                    <Button :isLoading="isUploading || isSubmitting" text="Publish" type="submit" background="primary" @click="status = 'ACTIVE'" foreground="white" />
+                    <Button v-if="job.status == 'DRAFT'" text="Save Publish" type="button" background="white" foreground="primary" @click="isEditModalOpen = false" />
+                    <Button :is-loading="isSubmitting || isUploading" text="Save" type="submit" background="primary" foreground="white" />
                 </div>
             </div>
         </form>
-    </div>
+        </template>
+        <template #actions>
+            
+        </template>
+    </Modal>
 </template>

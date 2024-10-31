@@ -4,19 +4,33 @@ import { Icon } from '@iconify/vue';
 import { ref, watch } from 'vue';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media as MediaResponse } from '~/types/models/Media';
+import type { Project } from '~/types/models/Project';
+import { accountStore } from '~/store/accountStore';
 
 const { user } = storeToRefs(authStore());
 const { updateUser } = authStore();
 
+const { account } = storeToRefs(accountStore());
+
 const tabs = ref([
     { name: 'Post a Job', current: true },
     { name: 'All Jobs Post', current: false },
-    { name: 'Saved Drafts', current: false },
+    { name: 'Saved Drafts', current: false}
 ]);
 
 const isAvatarModalOpen = ref(false);
 
 const { sendRequest: sendRequest, pending: isLoading } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
+const { data: jobs, fetchData: fetchJobs, pending: isJobsLoading } = useFetchData<{ data: Project[] }, ApiErrorResponse>();
+
+onMounted(async () => {
+    await fetchJobs('/v1/client/projects', {
+        method: 'GET',
+        headers: account?.value?.id ? {
+            'X-ACCOUNT-ID': account.value.id.toString(),
+        } : undefined,
+    });
+});
 
 const avatarImage = ref<File | null>(null);
 const avatarImagePreview = ref<string | null>(null);
@@ -88,6 +102,31 @@ const uploadImage = async () => {
         avatarImagePreview.value = null;
     }
 };
+
+const refreshJobs = async () => {
+    await fetchJobs('/v1/client/projects', {
+        method: 'GET',
+        headers: account?.value?.id ? {
+            'X-ACCOUNT-ID': account.value.id.toString(),
+        } : undefined,
+    });
+};
+
+const deleteAJob = async (jobId: number) => {
+    try {
+        await sendRequest(`/v1/client/projects/${jobId}`, {
+            method: 'DELETE',
+            headers: account?.value?.id ? {
+                'X-ACCOUNT-ID': account.value.id.toString(),
+            } : undefined,
+        });
+    } catch (error) {
+        console.error('Error deleting job:', error);
+    } finally {
+        refreshJobs();
+    }
+};
+
 </script>
 
 <template>
@@ -193,14 +232,36 @@ const uploadImage = async () => {
                                 Here you can see all the jobs you have posted.
                             </p>
                         </div>
+                        <div v-if="!isJobsLoading">
+                            <div v-for="(job, idx) in jobs?.data.filter(job => job.status === 'ACTIVE')" :key="job.id">
+                                <JobCard @submit="refreshJobs" @delete="deleteAJob" :job="job" />
+                            </div>
+                        </div>
+                        <div v-else>
+                            <div class="animate-pulse space-y-4">
+                                <div class=" h-72 bg-gray-100 rounded-lg"></div>
+                                <div class=" h-72 bg-gray-100 rounded-lg"></div>
+                            </div>
+                        </div>
                     </div>
 
                     <div v-if="tabs[2].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
                         <div class="px-4 py-5 sm:px-6">
-                            <h3 class="text-lg font-medium leading-6 text-gray-900">Saved Drafts</h3>
+                            <h3 class="text-lg font-medium leading-6 text-gray-900">All Saved Draft</h3>
                             <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                                Here you can see all your saved drafts.
+                                Here you can see all the jobs you have saved as drafts.
                             </p>
+                        </div>
+                        <div v-if="!isJobsLoading">
+                            <div v-for="(job, idx) in jobs?.data.filter(job => job.status === 'DRAFT')" :key="job.id">
+                                <JobCard @submit="refreshJobs" @delete="deleteAJob" :job="job" />
+                            </div>
+                        </div>
+                        <div v-else>
+                            <div class="animate-pulse space-y-4">
+                                <div class=" h-72 bg-gray-100 rounded-lg"></div>
+                                <div class=" h-72 bg-gray-100 rounded-lg"></div>
+                            </div>
                         </div>
                     </div>
                 </div>

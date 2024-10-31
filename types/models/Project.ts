@@ -16,14 +16,23 @@ export enum Term {
     EXTENDED = 'EXTENDED',
 }
 
+export enum Status {
+    DRAFT = 'DRAFT',
+    ACTIVE = 'ACTIVE',
+}
+
 export interface Project {
+    id: number;
     title: string;
     description: string;
     estimated_budget: string;
     length: Term;
     experience_level: Level;
+    status: Status, 
     languages: Language[];
     images: Media[];
     skills: Skill[];
+    created_at: string,
+    updated_at: string,
 }
     
