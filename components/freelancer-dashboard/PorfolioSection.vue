@@ -5,12 +5,14 @@ import type { Portfolio } from '~/types/models/Portfolio';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
+import { helpers, required } from '@vuelidate/validators/dist/index.cjs';
 
 const isModalOpen = ref(false);
 const isViewModalOpen = ref(false);
 const isDeleteModalOpen = ref(false);
 const isEditing = ref(false);
 const portfolioToDelete = ref<Portfolio | null>(null);
+const isFileAttachmentEmpty = ref(false);
 
 interface FormValues {
     title: string;
@@ -28,7 +30,23 @@ const initialValue: FormValues = {
 
 const form = ref<FormValues>({ ...initialValue });
 
+const rules = {
+  title: { required: helpers.withMessage('Title is required', required) },
+  description: { required: helpers.withMessage('Description is required', required) },
+  url: { required: helpers.withMessage('URL is required', required) },
+};
+
+const { formRef, v$ } = useValidation(form, rules);
+
 const selectedFiles = ref<File[]>([]);
+
+const watchSelectedFiles = () => {
+  if (selectedFiles.value.length > 0 || form.value.images.length > 0) {
+    isFileAttachmentEmpty.value = false;
+  } else {
+    isFileAttachmentEmpty.value = true;
+  }
+};
 
 const { account } = storeToRefs(accountStore());
 
@@ -80,6 +98,12 @@ const handleView = async (portfolioId: string) => {
     await fetchPortfolioDetails(`/v1/accounts/${account.value?.id}/portfolios/${portfolioId}`);
 };
 
+const handleClose = () => {
+    isModalOpen.value = false;
+    isEditing.value = false;
+    form.value = { ...initialValue };
+};
+
 const confirmDelete = (portfolio: Portfolio) => {
     portfolioToDelete.value = portfolio;
     isDeleteModalOpen.value = true;
@@ -106,47 +130,55 @@ const handleDelete = async () => {
 };
 
 const handleSubmit = async () => {
-    try {
-        // Upload each file and collect the responses
-        const uploadPromises = selectedFiles.value.map(file => {
-            const formData = new FormData();
-            formData.append('file', file);
-            return uploadMedia('/v1/medias', {
-                method: 'POST',
-                body: formData,
-            });
-        });
 
-        const uploadResponses = await Promise.all(uploadPromises);
-        const uploadedImages = uploadResponses.map(response => response.data.id);
+    watchEffect(watchSelectedFiles);    
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
+    if (!selectedFiles.value) return;
 
-               // Update the form images with the uploaded image URLs
-        form.value.images = form.value.images.concat(uploadedImages.map(id => ({ id })));
+  try {
+    // Upload each file and collect the responses
+    const uploadPromises = selectedFiles.value.map(file => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return uploadMedia('/v1/medias', {
+        method: 'POST',
+        body: formData,
+      });
+    });
 
-        // Submit the portfolio
-        await submitPortfolio(isEditing.value ? `/v1/portfolios/${currentPortfolio.value?.data.id}` : '/v1/portfolios', {
-            method: isEditing.value ? 'PUT' : 'POST',
-            headers: account?.value?.id ? {
-                'X-ACCOUNT-ID': account.value.id.toString(),
-            } : undefined,
-            body: JSON.stringify({
-                ...form.value,
-                images: form.value.images.map(image => image.id),
-            }),
-        });
+    const uploadResponses = await Promise.all(uploadPromises);
+    const uploadedImages = uploadResponses.map(response => response.data.id);
 
-        // Reset the form and state
-        selectedFiles.value = [];
-        form.value = { ...initialValue };
-        isModalOpen.value = false;
-        isEditing.value = false;
-        currentPortfolio.value = null;
+    const imageToUpload = ref<{ id: number; file_name?: string }[]>([]);
 
-        // Refetch portfolios
-        fetchPortfolio(`v1/accounts/${account.value?.id}/portfolios`);
-    } catch (error) {
-        console.error(error);
-    }
+    // Update the form images with the uploaded image URLs
+    imageToUpload.value = form.value.images.concat(uploadedImages.map(id => ({ id, file_name: '' })));
+
+    // Submit the portfolio
+    await submitPortfolio(isEditing.value ? `/v1/portfolios/${currentPortfolio.value?.data.id}` : '/v1/portfolios', {
+      method: isEditing.value ? 'PUT' : 'POST',
+      headers: account?.value?.id ? {
+        'X-ACCOUNT-ID': account.value.id.toString(),
+      } : undefined,
+      body: JSON.stringify({
+        ...form.value,
+        images: imageToUpload.value.map(image => image.id),
+      }),
+    });
+
+    // Reset the form and state
+    selectedFiles.value = [];
+    form.value = { ...initialValue };
+    isModalOpen.value = false;
+    isEditing.value = false;
+    currentPortfolio.value = null;
+
+    // Refetch portfolios
+    fetchPortfolio(`v1/accounts/${account.value?.id}/portfolios`);
+  } catch (error) {
+    console.error(error);
+  }
 };
 </script>
 
@@ -206,30 +238,36 @@ const handleSubmit = async () => {
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                         <Icon icon="mdi:label" :ssr="true" />
-                        <input v-model="form.title" type="text" id="title" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                        <input v-model="formRef.title" type="text" id="title" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                     </div>
                 </div>
+                <span v-if="v$.title.$error" class="text-red-900 text-sm">{{
+                            v$.title.$errors[0].$message }}</span>
             </div>
             <div class="w-full sm:col-span-2">
                 <label for="description" class="text-sm font-medium text-gray-500">Description <span class="text-red-500">*</span></label>
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="flex flex-row items-start px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                         <Icon icon="mdi:note-text" :ssr="true" />
-                        <textarea v-model="form.description" id="description" rows="3" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
+                        <textarea v-model="formRef.description" id="description" rows="3" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
                     </div>
                 </div>
+                <span v-if="v$.description.$error" class="text-red-900 text-sm">{{
+                            v$.description.$errors[0].$message }}</span>
             </div>
             <div class="w-full sm:col-span-2">
                 <label for="url" class="text-sm font-medium text-gray-500">Url <span class="text-red-500">*</span></label>
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
                         <Icon icon="mdi:web" :ssr="true" />
-                        <input v-model="form.url" type="url" id="url" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
+                        <input v-model="formRef.url" type="url" id="url" class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                     </div>
                 </div>
+                <span v-if="v$.url.$error" class="text-red-900 text-sm">{{
+                            v$.url.$errors[0].$message }}</span>
             </div>
             <div class="w-full sm:col-span-2">
-                <label for="file" class="text-sm font-medium text-gray-500">File Attachment <span class="text-red-500">*</span></label>
+                <label for="file" class="text-sm font-medium text-gray-500">File Attachment </label>
                 <div class="mt-1 text-sm text-gray-900">
                     <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500 cursor-pointer" @click="handleClick">
                         <Icon icon="mdi:file" :ssr="true" />
@@ -237,6 +275,9 @@ const handleSubmit = async () => {
                         <p class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">Click to select files</p>
                     </div>
                 </div>
+                <span v-if="isFileAttachmentEmpty" class="text-red-900 text-sm">
+                        File Attachment is required
+                    </span>
             </div>
         </form>
         <div v-if="selectedFiles.length || form.images.length" class="mt-4">
@@ -264,7 +305,7 @@ const handleSubmit = async () => {
     </template>
     <template #actions>
         <div class="flex justify-end space-x-2">
-            <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" @click="{isModalOpen = false; form = { ...initialValue };}"></Button>
+            <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" @click="handleClose"></Button>
             <Button type="button" text="Save" background="primary" foreground="white" :is-wide="false" @click="handleSubmit" :is-loading="isSubmitting || isUploading"></Button>
         </div>
     </template>

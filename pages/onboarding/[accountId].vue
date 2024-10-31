@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import {ref} from "vue";
 
-import WorkExperiencesForm from "~/components/multi-step-forms/WorkExperiencesForm.vue";
-import LanguagesForm from "~/components/multi-step-forms/LanguagesForm.vue";
-import EducationHistoryForm from "~/components/multi-step-forms/EducationHistoryForm.vue";
-import SkillsForm from "~/components/multi-step-forms/SkillsForm.vue";
-import ProfileForm from "~/components/multi-step-forms/ProfileForm.vue";
+import WorkExperiencesForm from "~/components/multi-step-forms/onboarding/WorkExperiencesForm.vue";
+import LanguagesForm from "~/components/multi-step-forms/onboarding/LanguagesForm.vue";
+import EducationHistoryForm from "~/components/multi-step-forms/onboarding/EducationHistoryForm.vue";
+import SkillsForm from "~/components/multi-step-forms/onboarding/SkillsForm.vue";
+import ProfileForm from "~/components/multi-step-forms/onboarding/ProfileForm.vue";
 
 const currentStep = ref(0);
 </script>

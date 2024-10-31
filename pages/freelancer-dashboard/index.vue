@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import EducationSection from '~/components/freelancer-dashboard/EducationSection.vue';
 
 definePageMeta({
   middleware: ['verify']

@@ -5,19 +5,21 @@ import type { Certificate } from '~/types/models/Certificate';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
+import { helpers, required } from '@vuelidate/validators';
 
 const isModalOpen = ref(false);
 const isViewModalOpen = ref(false);
 const isDeleteModalOpen = ref(false);
 const isEditing = ref(false);
 const certificateToDelete = ref<Certificate | null>(null);
+const isFileAttanchmentEmpty = ref(false);
 
 interface FormValues {
     title: string;
     issued_date: string;
     url: string;
     reference_id: string;
-    image?: { file_name?: string; id: number };
+    image?: { file_name?: string; id?: number };
 }
 
 const initialValue: FormValues = {
@@ -30,7 +32,32 @@ const initialValue: FormValues = {
 
 const form = ref<FormValues>({ ...initialValue });
 
+const rules = {
+    title: {
+        required: helpers.withMessage('Title is required', required),
+    },
+    issued_date: {
+        required: helpers.withMessage('Issue Date is required', required),
+    },
+    url: {
+        required: helpers.withMessage('Url is required', required),
+    },
+    reference_id: {
+        required: helpers.withMessage('Reference ID is required', required),
+    },
+};
+
+const { formRef, v$ } = useValidation(form, rules);
+
 const selectedFile = ref<File | null>(null);
+
+const watchSelectedFile = () => {
+    if (selectedFile.value || form.value.image) {
+        isFileAttanchmentEmpty.value = false;
+    } else {
+        isFileAttanchmentEmpty.value = true;
+    }
+};
 
 const { account } = storeToRefs(accountStore());
 
@@ -46,6 +73,7 @@ const handleFileChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
         selectedFile.value = target.files[0];
+        form.value.image = { file_name: target.files[0].name };
     }
 };
 
@@ -55,11 +83,8 @@ const handleClick = () => {
 };
 
 const handleRemoveFile = () => {
-    if (isEditing.value) {
-        form.value.image = undefined;
-    } else {
-        selectedFile.value = null;
-    }
+    selectedFile.value = null;
+    form.value.image = undefined;
 };
 
 const handleEdit = async (certificateId: string) => {
@@ -108,9 +133,22 @@ const handleDelete = async () => {
     }
 };
 
+const handleClose = () => {
+    isModalOpen.value = false;
+    isEditing.value = false;
+    form.value = { ...initialValue };
+    isFileAttanchmentEmpty.value = false;
+};
+
 const handleSubmit = async () => {
+    
+    watchEffect(watchSelectedFile);    
+    v$.value.$touch();
+    if (v$.value.$invalid) return;
+    if (!selectedFile.value) return;
+
+
     try {
-        let uploadedImageId;
         if (selectedFile.value) {
             const formData = new FormData();
             formData.append('file', selectedFile.value);
@@ -118,11 +156,7 @@ const handleSubmit = async () => {
                 method: 'POST',
                 body: formData,
             });
-            uploadedImageId = uploadResponse.data.id;
-        }
-
-        if (uploadedImageId) {
-            form.value.image = { id: uploadedImageId };
+            form.value.image = { id: uploadResponse.data.id, file_name: uploadResponse.data.file_name };
         }
 
         // Submit the certificate
@@ -132,8 +166,11 @@ const handleSubmit = async () => {
                 'X-ACCOUNT-ID': account.value.id.toString(),
             } : undefined,
             body: JSON.stringify({
-                ...form.value,
-                image: form.value.image?.id,
+                title: form.value.title,
+                issued_date: form.value.issued_date,
+                url: form.value.url,
+                reference_id: form.value.reference_id,
+                image: form.value.image ? form.value.image.id : undefined,
             }),
         });
 
@@ -187,7 +224,7 @@ const handleSubmit = async () => {
             </div>
         </div>
         <div class="flex justify-center rounded-lg border border-primary border-dashed">
-            <button @click="isModalOpen = true"
+            <button @click="{isModalOpen = true; isEditing = false}"
                 class="bg-primary-600 text-primary px-4 py-2 rounded-md hover:bg-primary-700 flex items-center">
                 <Icon icon="mdi:plus" class="mr-2" width="20" height="20" />
                 Add Certificate
@@ -214,33 +251,41 @@ const handleSubmit = async () => {
                     <label for="title" class="text-sm font-medium text-gray-500">Title <span
                             class="text-red-500">*</span></label>
                     <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.title" type="text" id="title"
+                        <input v-model="formRef.title" type="text" id="title"
                             class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                     </div>
+                    <span v-if="v$.title.$error" class="text-red-900 text-sm">{{
+                            v$.title.$errors[0].$message }}</span>
                 </div>
                 <div class="sm:col-span-2">
                     <label for="issued_date" class="text-sm font-medium text-gray-500">Issue Date <span
                             class="text-red-500">*</span></label>
                     <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.issued_date" type="date" id="issued_date"
+                        <input v-model="formRef.issued_date" type="date" id="issued_date"
                             class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                     </div>
+                    <span v-if="v$.issued_date.$error" class="text-red-900 text-sm">{{
+                            v$.issued_date.$errors[0].$message }}</span>
                 </div>
                 <div class="sm:col-span-2">
                     <label for="url" class="text-sm font-medium text-gray-500">Url <span
                             class="text-red-500">*</span></label>
                     <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.url" type="url" id="url"
+                        <input v-model="formRef.url" type="url" id="url"
                             class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                     </div>
+                    <span v-if="v$.url.$error" class="text-red-900 text-sm">{{
+                            v$.url.$errors[0].$message }}</span>
                 </div>
                 <div class="sm:col-span-2">
                     <label for="reference_id" class="text-sm font-medium text-gray-500">Reference ID <span
                             class="text-red-500">*</span></label>
                     <div class="mt-1 text-sm text-gray-900">
-                        <input v-model="form.reference_id" type="text" id="reference_id"
+                        <input v-model="formRef.reference_id" type="text" id="reference_id"
                             class="block w-full rounded-md ring-2 ring-gray-300 shadow-sm focus:ring-indigo-500 sm:text-sm p-2">
                     </div>
+                    <span v-if="v$.reference_id.$error" class="text-red-900 text-sm">{{
+                            v$.reference_id.$errors[0].$message }}</span>
                 </div>
                 <div class="sm:col-span-2">
                     <label for="file" class="text-sm font-medium text-gray-500">File Attachment <span
@@ -253,21 +298,13 @@ const handleSubmit = async () => {
                             class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                             Click to select a file</p>
                     </div>
+                    <span v-if="isFileAttanchmentEmpty" class="text-red-900 text-sm">
+                        File Attachment is required
+                    </span>
                 </div>
             </form>
             <div v-if="selectedFile || form.image" class="mt-4">
                 <ul class="mt-2 space-y-4">
-                    <li v-if="selectedFile"
-                        class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
-                        <div class="flex items-center space-x-2 w-full">
-                            <Icon icon="mdi:file" class="text-gray-500" width="24" height="24" />
-                            <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96"
-                                :title="selectedFile.name">{{ selectedFile.name }}</span>
-                        </div>
-                        <button @click="handleRemoveFile" class="text-red-500 hover:text-red-700">
-                            <Icon icon="mdi:close" width="16" height="16" />
-                        </button>
-                    </li>
                     <li v-if="form.image"
                         class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
                         <div class="flex items-center space-x-2 w-full">
@@ -284,10 +321,8 @@ const handleSubmit = async () => {
         </template>
         <template #actions>
             <div class="flex justify-end space-x-2">
-                <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" @click="{
-                    isModalOpen = false;
-                    form = { ...initialValue };
-                }"></Button>
+                <Button type="button" text="Cancel" background="white" foreground="black" :is-wide="false" 
+                @click="handleClose"></Button>
                 <Button type="button" text="Save" background="primary" foreground="white" :is-wide="false"
                     @click="handleSubmit" :is-loading="isSubmitting || isUploading"></Button>
             </div>

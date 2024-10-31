@@ -25,7 +25,7 @@ const handleLogout = async () => {
 <template>
     <header class="flex flex-row justify-between items-center border-b-2 border-gray-200 text-white py-2 px-4 sm:px-16 bg-white">
         <NuxtLink to="/" @click="closeDropdown">
-            <img src="@/assets/icons/artsycrowd.jpg" alt="Dummy Logo" class="h-10 object-cover rounded-full">
+            <img src="@/assets/icons/artsycrowd.png" alt="Dummy Logo" class="h-10 object-cover rounded-full">
         </NuxtLink>
         <div class="relative flex justify-end space-x-4 group">
             <template v-if="isAuthenticated">
