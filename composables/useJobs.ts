@@ -18,7 +18,7 @@ export function useJobs() {
                 } : undefined,
             });
             jobs.value = response as PaginatedList<Project>;
-            console.log("Fetched jobs:", jobs.value);
+            console.log("Fetched jobs:", jobs.value.data.filter(job => job.status === 'DRAFT').length);
         } catch (error) {
             console.error("Error fetching cards data:", error);
         } finally {
