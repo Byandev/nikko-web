@@ -258,7 +258,7 @@ const viewJobDetails = async () => {
         <div class="mt-5 flex  items-center justify-start lg:justify-between gap-3">
             <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">Experience Level:</span>
-                <span class="text-sm font-medium text-gray-700">{{ props.job.experience_level }}</span>
+                <span class="text-sm font-medium text-gray-700">{{ _.capitalize(props.job.experience_level) }}</span>
             </div>
             <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">Project Length:</span>
