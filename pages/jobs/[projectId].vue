@@ -76,33 +76,3 @@ const goBack = () => {
         </div>
     </div>
 </template>
-
-<style scoped>
-@media (max-width: 640px) {
-    .my-10 {
-        margin-top: 2.5rem;
-        margin-bottom: 2.5rem;
-    }
-    .max-w-5xl {
-        max-width: 100%;
-    }
-    .px-4 {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    .sm\:px-16 {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-    .text-3xl {
-        font-size: 1.875rem;
-        line-height: 2.25rem;
-    }
-    .mb-6 {
-        margin-bottom: 1.5rem;
-    }
-    .mb-4 {
-        margin-bottom: 1rem;
-    }
-}
-</style>

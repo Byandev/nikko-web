@@ -267,7 +267,7 @@ const viewJobDetails = async () => {
         </div>
         <div class="mt-4 flex items-center space-x-2">
             <span class="text-sm text-gray-500">Languages:</span>
-            <div class="flex flex-wrap">
+            <div class="flex flex-wrap gap-2">
                 <span v-for="(language, index) in props.job.languages" :key="index" class="bg-primary/15 text-primary  text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
                     {{ language.name }}
                 </span>
@@ -275,7 +275,7 @@ const viewJobDetails = async () => {
         </div>
         <div class="mt-4 flex items-center space-x-2">
             <span class="text-sm text-gray-500">Skills:</span>
-            <div class="flex flex-wrap">
+            <div class="flex flex-wrap gap-2">
                 <span v-for="(skill, index) in props.job.skills" :key="index" class="bg-primary/15 text-primary text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
                     {{ skill.name }}
                 </span>
@@ -431,7 +431,7 @@ const viewJobDetails = async () => {
                     </div>
                 </div>
                 <div class="mt-2">
-                    <div v-if="!isEditing.languages" class="flex flex-row ">
+                    <div v-if="!isEditing.languages" class="flex flex-row flex-wrap">
                         <div v-for="(language, idx) in formRef.languages" :key="`selected-language-${language.id}`"
                             class="mr-2 my-1">
                             <span
@@ -577,11 +577,10 @@ const viewJobDetails = async () => {
                     </div>
                 </div>
                 <div class="mt-2">
-                    <div v-if="!isEditing.skills" class="flex flex-row ">
-                        <div v-for="(skill, idx) in formRef.skills" :key="`selected-skill-${skill.id}`"
-                            class="mr-2 my-1">
+                    <div v-if="!isEditing.skills" class="flex flex-row flex-wrap gap-2">
+                        <div v-for="(skill, idx) in formRef.skills" :key="`selected-skill-${skill.id}`">
                             <span
-                                class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20 whitespace-nowrap">
+                                class="rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20 whitespace-nowrap">
                                 {{ skill.name }}
                             </span>
                         </div>
@@ -597,7 +596,7 @@ const viewJobDetails = async () => {
                         </select>
                         <span v-if="v$.skills.$error" class="text-red-900 text-sm">{{ v$.skills.$errors[0].$message
                             }}</span>
-                        <div v-if="formRef.skills.length" class="mt-4 flex flex-row">
+                        <div v-if="formRef.skills.length" class="mt-4 flex flex-row flex-wrap">
                             <div v-for="(skill, idx) in formRef.skills" :key="`selected-skill-${skill.id}`"
                                 class="mr-2 my-1">
                                 <span
@@ -619,13 +618,15 @@ const viewJobDetails = async () => {
                 </div>
             </div>
 
-            <div class="flex mt-5  w-full" :class="job.status == 'DRAFT' ? 'justify-between' : 'justify-end'  ">
-                <Button text="Cancel" type="button" background="white" foreground="primary" @click="isEditModalOpen = false" />
-                <div class="flex flex-row">
-                    <Button v-if="job.status == 'DRAFT'" text="Save Publish" type="submit" background="white" foreground="primary" @click="{isEditModalOpen = false;
+            <div class="flex mt-5 w-full flex-wrap" :class="job.status == 'DRAFT' ? 'justify-between' : 'justify-end'">
+                <Button text="Cancel" type="button" background="white" foreground="primary" @click="{isEditModalOpen = false;
+                    resetJobPosting();
+                }" />
+                <div class="flex flex-row flex-wrap">
+                    <Button v-if="job.status == 'DRAFT'" text="Save as Publish" type="submit" background="white" foreground="primary" @click="{isEditModalOpen = false;
                         status = 'ACTIVE'
                     }" />
-                    <Button :is-loading="isSubmitting || isUploading" text="Save" type="submit" background="primary" foreground="white" />
+                    <Button :is-loading="isSubmitting || isUploading" text="Publish" type="submit" background="primary" foreground="white" />
                 </div>
             </div>
         </form>
