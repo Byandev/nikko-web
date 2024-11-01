@@ -8,7 +8,7 @@
         <Section>
           <template #header>
             <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Your Bids</h2>
+              <h2 class="text-xl font-bold">Your Bids</h2>
             </div>
           </template>
           <template #content>
@@ -22,7 +22,7 @@
         <Section class="mt-5">
           <template #header>
             <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">All Contracts</h2>
+              <h2 class="text-xl font-bold">All Contracts</h2>
             </div>
           </template>
           <template #content>
@@ -36,7 +36,7 @@
         <Section class="mt-5">
           <template #header>
             <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Tools</h2>
+              <h2 class="text-xl font-bold">Tools</h2>
               <div>
                 <button class="text-blue-500">Request Tools</button>
                 <button class="text-gray-500 ml-5">Edit</button>
@@ -54,7 +54,7 @@
         <Section class="mt-5">
           <template #header>
             <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Verification</h2>
+              <h2 class="text-xl font-bold">Verification</h2>
             </div>
           </template>
           <template #content>
@@ -72,7 +72,7 @@
           <Section>
             <template #header>
               <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">About</h2>
+                <h2 class="text-xl font-bold">About</h2>
                 <div>
                   <button class="text-gray-500 ml-5">Edit</button>
                 </div>
@@ -88,7 +88,7 @@
           <Section>
             <template #header>
               <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Feedback & History</h2>
+                <h2 class="text-xl font-bold">Feedback & History</h2>
               </div>
             </template>
             <template #content>
@@ -101,7 +101,7 @@
           <Section>
             <template #header>
               <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Show Your Talent</h2>
+                <h2 class="text-xl font-bold">Show Your Talent</h2>
               </div>
             </template>
             <template #content>
@@ -114,7 +114,7 @@
           <Section>
             <template #header>
               <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Certifications</h2>
+                <h2 class="text-xl font-bold">Certifications</h2>
               </div>
             </template>
             <template #content>
@@ -127,7 +127,7 @@
           <Section>
             <template #header>
               <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Share Your Education</h2>
+                <h2 class="text-xl font-bold">Share Your Education</h2>
                 <div>
                   <button class="text-blue-500">Add Education</button>
                 </div>
@@ -144,7 +144,7 @@
           <Section>
             <template #header>
               <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Share Your Professional Journey</h2>
+                <h2 class="text-xl font-bold">Share Your Professional Journey</h2>
               </div>
             </template>
             <template #content>
