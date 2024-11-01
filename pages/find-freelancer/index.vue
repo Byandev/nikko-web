@@ -41,6 +41,51 @@ interface Account {
   bio: string;
 }
 
+const savedFreelancers = ref<Account[]> ([
+  {
+    id: 3,
+    user: {
+      avatar: {
+        original_url: 'https://example.com/avatar3.jpg',
+      },
+      banner: {
+        original_url: 'https://example.com/banner3.jpg',
+      },
+      first_name: 'Alice',
+      last_name: 'Brown',
+      created_at: '2021-09-10',
+      country_code: 'US',
+    },
+    title: 'Data Scientist',
+    skills: [
+      { id: 6, name: 'Python' },
+      { id: 7, name: 'Machine Learning' },
+    ],
+    bio: 'Data scientist with a strong background in machine learning and AI.',
+  },
+  {
+    id: 4,
+    user: {
+      avatar: {
+        original_url: 'https://example.com/avatar4.jpg',
+      },
+      banner: {
+        original_url: 'https://example.com/banner4.jpg',
+      },
+      first_name: 'Bob',
+      last_name: 'Johnson',
+      created_at: '2020-02-20',
+      country_code: 'UK',
+    },
+    title: 'Backend Developer',
+    skills: [
+      { id: 8, name: 'Node.js' },
+      { id: 9, name: 'Express.js' },
+    ],
+    bio: 'Experienced backend developer specialized in building scalable server applications.',
+  },
+]);
+
 const freelancers = ref<Account[]>([
   {
     id: 1,
@@ -189,6 +234,12 @@ const freelancerProfile = (user: Account) => {
 
           <div v-if="tabs[0].current" class="flex flex-col gap-4">
             <div v-for="(freelancer, idx) in freelancers" :key="idx">
+              <FreelancerCard @profile="freelancerProfile" :freelancer="freelancer" />
+            </div>
+          </div>
+
+          <div v-if="tabs[1].current" class="flex flex-col gap-4">
+            <div v-for="(freelancer, idx) in savedFreelancers" :key="idx">
               <FreelancerCard @profile="freelancerProfile" :freelancer="freelancer" />
             </div>
           </div>
