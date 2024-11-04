@@ -18,8 +18,6 @@ interface SearchParams {
   search: string;
 }
 
-const freelancerLength = ref<number | undefined>(0);
-
 const filters = ref([
   { name: 'Avatar', value: 'user.avatar' },
   { name: 'Skills', value: 'skills' },
@@ -42,10 +40,6 @@ onMounted(async () => {
 
 watch(() => searchParams.value.search, async () => {
   await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`);
-});
-
-watch(() => freelancers.value?.data ?? [], () => {
-  freelancerLength.value = freelancers.value?.data.length;
 });
 
 const fetchFreelancers = async (page: number) => {
@@ -78,8 +72,8 @@ const updateSaveStatus = async (id: number, isSaved: boolean) => {
   console.log('Freelancer updated', freelancers.value?.data);
 };
 
-const tabs = computed(() => [
-  { name: `All freelancer(${freelancerLength.value ?? 0})`, current: true },
+const tabs = ref([
+  { name: `All freelancer`, current: true },
   { name: `Saved freelancer`, current: false },
 ]);
 
@@ -101,9 +95,19 @@ const updateInclude = (event: Event) => {
   } else {
     searchParams.value.include = searchParams.value.include.replace(`,${target.value}`, '');
   }
-  console.log('Include:', searchParams.value.include);
   fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`);
 };
+
+const tabCount = computed(() => {
+  return (tabName: string) => {
+    if (tabName === 'All freelancer') {
+      return freelancers.value?.data.length || 0;
+    } else if (tabName === 'Saved freelancer') {
+      return freelancers.value?.data.filter(freelancer => freelancer.is_saved).length || 0;
+    }
+    return 0;
+  };
+});
 
 </script>
 
@@ -146,8 +150,8 @@ const updateInclude = (event: Event) => {
                 <a href="#" @click.prevent="setActiveTab(tab.name)"
                   :class="tab.current ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
                   class="px-3 py-2 font-medium text-sm rounded-md">
-                  {{ tab.name }}
-                </a>
+                    {{ tab.name }} <span class="text-green-900"> ({{ tabCount(tab.name) }})</span>
+                  </a>
               </template>
             </nav>
           </div>
