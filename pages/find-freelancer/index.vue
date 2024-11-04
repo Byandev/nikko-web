@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
 import { accountStore } from '~/store/accountStore';
 import { profileDisplayStore } from '~/store/profileDisplayStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Freelancer } from '~/types/models/Freelancer';
+import type { PaginatedList } from '~/types/models/Pagination';
 
 const router = useRouter();
 const { account } = storeToRefs(accountStore());
@@ -15,28 +18,23 @@ interface SearchParams {
   search: string;
 }
 
+const freelancerLength = ref<number | undefined>(0);
+
+const filters = ref([
+  { name: 'Avatar', value: 'user.avatar' },
+  { name: 'Skills', value: 'skills' },
+]);
+
 const searchParams = ref<SearchParams>({
-  include: 'user.avatar,skills',
+  include: filters.value.map(filter => filter.value).join(','),
   type: 'FREELANCER',
   search: '',
 });
 
 const { profileDisplay } = storeToRefs(profileDisplayStore());
 
-const tabs = ref([
-  { name: 'All freelancer', current: true },
-  { name: 'Saved freelancer', current: false },
-]);
-
-const setActiveTab = (tabName: string) => {
-  tabs.value.forEach(tab => {
-    tab.current = (tab.name === tabName);
-  });
-};
-
-const { data: freelancers, fetchData: fetchFreelancer, pending: isLoading } = useFetchData<{ data: Freelancer[] }, ApiErrorResponse>();
-const { sendRequest: updateFreelancer, pending: isSubmitting } = useSubmit<{ data: Freelancer }, ApiErrorResponse>();
-
+const { data: freelancers, fetchData: fetchFreelancer, pending: isLoading } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
+const { sendRequest: updateFreelancer } = useSubmit<{ data: Freelancer }, ApiErrorResponse>();
 
 onMounted(async () => {
   await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`);
@@ -45,6 +43,14 @@ onMounted(async () => {
 watch(() => searchParams.value.search, async () => {
   await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`);
 });
+
+watch(() => freelancers.value?.data ?? [], () => {
+  freelancerLength.value = freelancers.value?.data.length;
+});
+
+const fetchFreelancers = async (page: number) => {
+  await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&page=${page}`);
+};
 
 const updateSaveStatus = async (id: number, isSaved: boolean) => {
   if (!isSaved) {
@@ -72,10 +78,32 @@ const updateSaveStatus = async (id: number, isSaved: boolean) => {
   console.log('Freelancer updated', freelancers.value?.data);
 };
 
+const tabs = computed(() => [
+  { name: `All freelancer(${freelancerLength.value ?? 0})`, current: true },
+  { name: `Saved freelancer`, current: false },
+]);
+
+const setActiveTab = (tabName: string) => {
+  tabs.value.forEach(tab => {
+    tab.current = (tab.name === tabName);
+  });
+};
+
 const freelancerProfile = (user: Freelancer) => {
   profileDisplay.value = user;
   router.push({ path: `/freelancer/${user.id}` });
 }
+
+const updateInclude = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.checked) {
+    searchParams.value.include = `${searchParams.value.include},${target.value}`;
+  } else {
+    searchParams.value.include = searchParams.value.include.replace(`,${target.value}`, '');
+  }
+  console.log('Include:', searchParams.value.include);
+  fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`);
+};
 
 </script>
 
@@ -86,67 +114,19 @@ const freelancerProfile = (user: Freelancer) => {
 
       <!-- Left Column -->
       <div class="col-span-1 flex flex-col gap-4">
-        <!-- Skill search -->
+      
+        <!-- Filter search -->
         <Section>
           <template #header>
             <div class="flex justify-between items-center">
-              <h2 class="text-xl font-bold">Skill</h2>
+              <h2 class="text-xl font-bold">Filter</h2>
             </div>
           </template>
           <template #content>
-            <!-- Skill search input -->
-          </template>
-        </Section>
-
-        <!-- Hourly Range -->
-        <Section>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-xl font-bold">Hourly Range</h2>
-              <button>Clear</button>
+            <div v-for="filter in filters" :key="filter.value" class="flex items-center">
+              <input type="checkbox" :value="filter.value" @change="updateInclude" class="mr-2" checked />
+              <label>{{ filter.name }}</label>
             </div>
-          </template>
-          <template #content>
-            <!-- content -->
-          </template>
-        </Section>
-
-
-        <!-- Ratings search -->
-        <Section>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-xl font-bold">Ratings</h2>
-              <button>Clear</button>
-            </div>
-          </template>
-          <template #content>
-            <!-- content -->
-          </template>
-        </Section>
-
-        <!-- Freelancer Earnings search -->
-        <Section>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-xl font-bold">Freelancer Earnings</h2>
-              <button>Clear</button>
-            </div>
-          </template>
-          <template #content>
-            <!-- content -->
-          </template>
-        </Section>
-
-        <!-- Countries search -->
-        <Section>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-xl font-bold">Countries</h2>
-            </div>
-          </template>
-          <template #content>
-            <!-- content -->
           </template>
         </Section>
 
@@ -160,7 +140,7 @@ const freelancerProfile = (user: Freelancer) => {
             <input v-model="searchParams.search" type="text" placeholder="Search for freelancers..." class="w-full outline-none border-none"
              />
           </div>
-          <div>
+          <div v-if="!isLoading && freelancers">
             <nav class="flex space-x-4" aria-label="Tabs">
               <template v-for="tab in tabs" :key="tab.name">
                 <a href="#" @click.prevent="setActiveTab(tab.name)"
@@ -176,8 +156,13 @@ const freelancerProfile = (user: Freelancer) => {
             <div v-for="(freelancer, idx) in freelancers.data" :key="idx">
               <FreelancerCard @save="updateSaveStatus($event,false)" @unsave="updateSaveStatus($event, true)" :freelancer="freelancer" @profile="freelancerProfile" />
             </div>
+            <Pagination
+                v-if="!isLoading && (freelancers.data ?? []).length > 0 && tabs[0].current && freelancers.data.filter(freelancer => freelancer.is_saved === false).length > 0"
+                :pagination="freelancers.meta"
+                @prev-page="fetchFreelancers(freelancers.meta.current_page - 1)"
+                @next-page="fetchFreelancers(freelancers.meta.current_page + 1)"
+            />
           </div>
-
 
           <div v-if="isLoading" class="flex flex-col gap-4">
             <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl">
@@ -191,7 +176,6 @@ const freelancerProfile = (user: Freelancer) => {
               </div>
             </div>
           </div>
-
 
         </div>
       </div>
