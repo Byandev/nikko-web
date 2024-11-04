@@ -39,7 +39,7 @@ const props = defineProps<{
                 </div>
             </div>
         </div>
-        <div class="mt-4 w-full">
+        <div v-if="props.freelancer.skills.length > 0" class="mt-4 w-full">
             <label for="profileTitle" class="block text-sm font-medium leading-6 text-gray-900">
                 Skills
             </label>
