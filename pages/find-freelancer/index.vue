@@ -1,9 +1,25 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { ref } from 'vue';
+import { accountStore } from '~/store/accountStore';
 import { profileDisplayStore } from '~/store/profileDisplayStore';
+import type { ApiErrorResponse } from '~/types/api/response/error';
+import type { Freelancer } from '~/types/models/Freelancer';
 
 const router = useRouter();
+const { account } = storeToRefs(accountStore());
+
+interface SearchParams {
+  include: string;
+  type: string;
+  search: string;
+}
+
+const searchParams = ref<SearchParams>({
+  include: 'user.avatar,skills',
+  type: 'FREELANCER',
+  search: '',
+});
 
 const { profileDisplay } = storeToRefs(profileDisplayStore());
 
@@ -18,121 +34,45 @@ const setActiveTab = (tabName: string) => {
   });
 };
 
-const handleInputFocus = () => {
-  console.log('Input is selected');
+const { data: freelancers, fetchData: fetchFreelancer, pending: isLoading } = useFetchData<{ data: Freelancer[] }, ApiErrorResponse>();
+const { sendRequest: updateFreelancer, pending: isSubmitting } = useSubmit<{ data: Freelancer }, ApiErrorResponse>();
+
+
+onMounted(async () => {
+  await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`);
+});
+
+watch(() => searchParams.value.search, async () => {
+  await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`);
+});
+
+const updateSaveStatus = async (id: number, isSaved: boolean) => {
+  if (!isSaved) {
+    const response = await updateFreelancer(`v1/accounts/${id}/save`,
+      {
+        method: 'POST',
+        headers: account?.value?.id ? {
+                'X-ACCOUNT-ID': account.value.id.toString(),
+            } : undefined,
+      }
+    );
+    console.log('Freelancer saved', response.data);
+  } else {
+    const response = await updateFreelancer(`v1/accounts/${id}/un-save`,
+      {
+        method: 'DELETE',
+        headers: account?.value?.id ? {
+                'X-ACCOUNT-ID': account.value.id.toString(),
+            } : undefined,
+      }
+    );
+    console.log('Freelancer unsaved', response.data);
+  }
+  await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`);
+  console.log('Freelancer updated', freelancers.value?.data);
 };
 
-interface Account {
-  id: number;
-  user: {
-    avatar: {
-      original_url: string;
-    };
-    banner: {
-      original_url: string;
-    };
-    first_name: string;
-    last_name: string;
-    created_at: string;
-    country_code: string;
-  };
-  title: string;
-  skills: { id: number; name: string }[];
-  bio: string;
-}
-
-const savedFreelancers = ref<Account[]> ([
-  {
-    id: 3,
-    user: {
-      avatar: {
-        original_url: 'https://example.com/avatar3.jpg',
-      },
-      banner: {
-        original_url: 'https://example.com/banner3.jpg',
-      },
-      first_name: 'Alice',
-      last_name: 'Brown',
-      created_at: '2021-09-10',
-      country_code: 'US',
-    },
-    title: 'Data Scientist',
-    skills: [
-      { id: 6, name: 'Python' },
-      { id: 7, name: 'Machine Learning' },
-    ],
-    bio: 'Data scientist with a strong background in machine learning and AI.',
-  },
-  {
-    id: 4,
-    user: {
-      avatar: {
-        original_url: 'https://example.com/avatar4.jpg',
-      },
-      banner: {
-        original_url: 'https://example.com/banner4.jpg',
-      },
-      first_name: 'Bob',
-      last_name: 'Johnson',
-      created_at: '2020-02-20',
-      country_code: 'UK',
-    },
-    title: 'Backend Developer',
-    skills: [
-      { id: 8, name: 'Node.js' },
-      { id: 9, name: 'Express.js' },
-    ],
-    bio: 'Experienced backend developer specialized in building scalable server applications.',
-  },
-]);
-
-const freelancers = ref<Account[]>([
-  {
-    id: 1,
-    user: {
-      avatar: {
-        original_url: 'https://example.com/avatar1.jpg',
-      },
-      banner: {
-        original_url: 'https://example.com/banner1.jpg',
-      },
-      first_name: 'John',
-      last_name: 'Doe',
-      created_at: '2023-01-01',
-      country_code: 'Philippines',
-    },
-    title: 'Web Developer',
-    skills: [
-      { id: 1, name: 'JavaScript' },
-      { id: 2, name: 'Vue.js' },
-    ],
-    bio: 'Experienced web developer with a focus on front-end technologies.',
-  },
-  {
-    id: 2,
-    user: {
-      avatar: {
-        original_url: 'https://example.com/avatar2.jpg',
-      },
-      banner: {
-        original_url: 'https://example.com/banner2.jpg',
-      },
-      first_name: 'Jane',
-      last_name: 'Smith',
-      created_at: '2022-05-15',
-      country_code: 'CA',
-    },
-    title: 'Graphic Designer',
-    skills: [
-      { id: 3, name: 'Photoshop' },
-      { id: 4, name: 'Illustrator' },
-    ],
-    bio: 'Creative graphic designer with over 5 years of experience.',
-  },
-
-]);
-
-const freelancerProfile = (user: Account) => {
+const freelancerProfile = (user: Freelancer) => {
   profileDisplay.value = user;
   router.push({ path: `/freelancer/${user.id}` });
 }
@@ -217,8 +157,8 @@ const freelancerProfile = (user: Account) => {
         <div class="grid grid-cols-1 gap-5">
           <div class="border border-gray-300 rounded-lg p-4 flex flex-row items-center gap-2">
             <Icon icon="material-symbols:search" class=" text-xl text-gray-400" />
-            <input type="text" placeholder="Search for freelancers..." class="w-full outline-none border-none"
-              @focus="handleInputFocus" />
+            <input v-model="searchParams.search" type="text" placeholder="Search for freelancers..." class="w-full outline-none border-none"
+             />
           </div>
           <div>
             <nav class="flex space-x-4" aria-label="Tabs">
@@ -232,17 +172,27 @@ const freelancerProfile = (user: Account) => {
             </nav>
           </div>
 
-          <div v-if="tabs[0].current" class="flex flex-col gap-4">
-            <div v-for="(freelancer, idx) in freelancers" :key="idx">
-              <FreelancerCard @profile="freelancerProfile" :freelancer="freelancer" />
+          <div v-if="tabs[0].current && !isLoading && freelancers" class="flex flex-col gap-4">
+            <div v-for="(freelancer, idx) in freelancers.data" :key="idx">
+              <FreelancerCard @save="updateSaveStatus($event,false)" @unsave="updateSaveStatus($event, true)" :freelancer="freelancer" @profile="freelancerProfile" />
             </div>
           </div>
 
-          <div v-if="tabs[1].current" class="flex flex-col gap-4">
-            <div v-for="(freelancer, idx) in savedFreelancers" :key="idx">
-              <FreelancerCard @profile="freelancerProfile" :freelancer="freelancer" />
+
+          <div v-if="isLoading" class="flex flex-col gap-4">
+            <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl">
+              <div class="rounded-full bg-gray-300 h-12 w-12"></div>
+              <div class="flex-1 space-y-4 py-1">
+                <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+                <div class="space-y-2">
+                  <div class="h-4 bg-gray-300 rounded"></div>
+                  <div class="h-4 bg-gray-300 rounded w-5/6"></div>
+                </div>
+              </div>
             </div>
           </div>
+
+
         </div>
       </div>
     </div>

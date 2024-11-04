@@ -8,11 +8,11 @@ export interface User {
     first_name: string
     last_name: string
     phone_number: string | null
-    "street_address": string | null
-    "city": string | null
-    "state_code": string | null
-    "country_code": string | null
-    "postal": string | null
+    street_address: string | null
+    city: string | null
+    state_code: string | null
+    country_code: string | null
+    postal: string | null
     email_verified_at?: Date
     created_at: Date
     updated_at: Date

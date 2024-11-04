@@ -32,7 +32,7 @@ const initialValue: Partial<Education> = {
   end_year: 0,
 };
 
-const form = ref<Partial<Education>[]>(
+const forms = ref<Partial<Education>[]>(
     account.value?.educations?.length ? account.value?.educations : [initialValue]
 );
 
@@ -44,7 +44,7 @@ const submitForm = async () => {
     const response = await updateEducationHistory(`/v1/auth/accounts/${user.value.id}`, {
       method: 'PUT',
       body: {
-        educations: form.value,
+        educations: forms.value,
       }
     });
 
@@ -60,11 +60,11 @@ const submitForm = async () => {
 };
 
 const addEducation = () => {
-  form.value.push(initialValue);
+  forms.value.push(initialValue);
 };
 
 const removeEducation = (index: number) => {
-  form.value.splice(index, 1);
+  forms.value.splice(index, 1);
 };
 </script>
 
@@ -74,10 +74,10 @@ const removeEducation = (index: number) => {
     <span class="text-gray-600 mb-4">Share your educational background to highlight your qualifications.</span>
 
     <form class="w-full max-w-lg" @submit.prevent="submitForm">
-      <div v-for="(form, index) in form" :key="index" class="w-full mb-8">
+      <div v-for="(form, index) in forms" :key="index" class="w-full mb-8">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-semibold">Education History {{ index + 1 }}</h2>
-          <button v-if="form.length > 1" @click="removeEducation(index as number)" class="text-red-500">Remove</button>
+          <button v-if="forms.length > 1" @click="removeEducation(index as number)" class="text-red-500">Remove</button>
         </div>
 
         <!-- Degree -->

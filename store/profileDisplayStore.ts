@@ -1,46 +1,21 @@
 import { defineStore } from 'pinia';
+import { AccountType } from '~/types/models/Account';
+import type { Freelancer } from '~/types/models/Freelancer';
 
 export const profileDisplayStore = defineStore('profileDisplay', () => {
 
-    interface Account {
-        id: number;
-        user: {
-            avatar: {
-                original_url: string;
-            };
-            banner: {
-                original_url: string;
-            };
-            first_name: string;
-            last_name: string;
-            created_at: string;
-            country_code: string;
-        };
-        title: string;
-        skills: { id: number; name: string }[];
-        bio: string;
-    }
-
-    const initialProfileDisplay: Partial<Account> = {
+    const initialProfileDisplay: Partial<Freelancer> = {
         id: 0,
-        user: {
-            avatar: {
-                original_url: ''
-            },
-            banner: {
-                original_url: ''
-            },
-            first_name: '',
-            last_name: '',
-            created_at: '',
-            country_code: ''
-        },
+        bio: '',
+        type: AccountType.FREELANCER,
         title: '',
-        skills: [],
-        bio: ''
+        created_at: '',
+        updated_at: '',
+        is_saved: false,
+        skills: []
     }
     
-    const profileDisplay = ref<Partial<Account>>({
+    const profileDisplay = ref<Partial<Freelancer>>({
         ...initialProfileDisplay
     });
 

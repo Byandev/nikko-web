@@ -1,3 +1,9 @@
+<script setup lang="ts">
+import { profileDisplayStore } from '~/store/profileDisplayStore';
+
+const { profileDisplay } = storeToRefs(profileDisplayStore());
+</script>
+
 <template>
     <div class="my-8 lg:mx-auto mx-5">
         <ProfileDisplay class="max-w-6xl mx-auto " />
@@ -28,6 +34,26 @@
                         </div>
                     </template>
                 </Section>
+
+                <Section class="mt-5">
+                <template #header>
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Skills</h2>
+                </div>
+                </template>
+                <template #content>
+                <div class="flex flex-wrap">
+                    <div v-if="profileDisplay.skills?.length === 0" class="text-gray-500">
+                    No skills yet.
+                    </div>
+                    <div v-else v-for="(skill, idx) in profileDisplay?.skills" :key="`selected-skill-${skill.id}`" class="mr-2 my-1">
+                    <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                        {{skill.name}}
+                    </span>
+                    </div>
+                </div>
+                </template>
+            </Section>
 
             </div>
 
