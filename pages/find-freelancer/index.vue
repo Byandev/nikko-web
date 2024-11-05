@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { accountStore } from '~/store/accountStore';
@@ -32,37 +32,44 @@ const searchParams = ref<SearchParams>({
 
 const { profileDisplay } = storeToRefs(profileDisplayStore());
 
-const { data: freelancers, fetchData: fetchFreelancer, pending: isLoading } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
+const { data: Savedfreelancers, fetchData: fetchSavedFreelancer, pending: isLoadingSavedFreelancer } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
+const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: isLoadingUnsavedFreelancer } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
+
 const { sendRequest: updateFreelancer } = useSubmit<{ data: Freelancer }, ApiErrorResponse>();
 
 onMounted(async () => {
-  await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`,
-    {
-      headers: account?.value?.id ? {
-        'X-ACCOUNT-ID': account.value.id.toString(),
-      } : undefined,
-    }
-  );
+  await fetchFreelancers(1);
 });
 
 watch(
   () => searchParams.value.search,
   debounce(async () => {
-    await fetchFreelancer(
-      `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`,
-      {
-        headers: account?.value?.id
-          ? {
-              'X-ACCOUNT-ID': account.value.id.toString(),
-            }
-          : undefined,
-      }
-    );
+    await fetchFreelancers(1);
   }, 300)
 );
 
 const fetchFreelancers = async (page: number) => {
-  await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&page=${page}`);
+  await fetchUnsavedFreelancer(
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&page=${page}`,
+    {
+      headers: account?.value?.id
+        ? {
+          'X-ACCOUNT-ID': account.value.id.toString(),
+        }
+        : undefined,
+    }
+  );
+
+  await fetchSavedFreelancer(
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[is_saved]=true$page=${page}`,
+    {
+      headers: account?.value?.id
+        ? {
+          'X-ACCOUNT-ID': account.value.id.toString(),
+        }
+        : undefined,
+    }
+  );
 };
 
 const updateSaveStatus = async (id: number, isSaved: boolean) => {
@@ -87,14 +94,8 @@ const updateSaveStatus = async (id: number, isSaved: boolean) => {
     );
     console.log('Freelancer unsaved', response.data);
   }
-  await fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`,
-    {
-      headers: account?.value?.id ? {
-                'X-ACCOUNT-ID': account.value.id.toString(),
-            } : undefined,
-    }
-  );
-  console.log('Freelancer updated', freelancers.value?.data);
+  await fetchFreelancers(1);
+  console.log('Freelancer updated', Savedfreelancers.value?.data, Unsavedfreelancers.value?.data);
 };
 
 const tabs = ref([
@@ -120,21 +121,16 @@ const updateInclude = (event: Event) => {
   } else {
     searchParams.value.include = searchParams.value.include.replace(`,${target.value}`, '');
   }
-  fetchFreelancer(`v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}`,
-    {
-      headers: account?.value?.id ? {
-          'X-ACCOUNT-ID': account.value.id.toString(),
-      } : undefined,
-    }
-  );
+  console.log('Include', searchParams.value.include);
+  fetchFreelancers(1);
 };
 
 const tabCount = computed(() => {
   return (tabName: string) => {
     if (tabName === 'All freelancer') {
-      return freelancers.value?.data.length || 0;
+      return Unsavedfreelancers.value?.data.length || 0;
     } else if (tabName === 'Saved freelancer') {
-      return freelancers.value?.data.filter(freelancer => freelancer.is_saved).length || 0;
+      return Savedfreelancers.value?.data.length || 0;
     }
     return 0;
   };
@@ -175,7 +171,7 @@ const tabCount = computed(() => {
             <input v-model="searchParams.search" type="text" placeholder="Search for freelancers..."
               class="w-full outline-none border-none" />
           </div>
-          <div v-if="!isLoading && freelancers">
+          <div v-if="!isLoadingSavedFreelancer && !isLoadingUnsavedFreelancer && (Savedfreelancers || Unsavedfreelancers)">
             <nav class="flex space-x-4" aria-label="Tabs">
               <template v-for="tab in tabs" :key="tab.name">
                 <a href="#" @click.prevent="setActiveTab(tab.name)"
@@ -187,18 +183,40 @@ const tabCount = computed(() => {
             </nav>
           </div>
 
-          <div v-if="tabs[0].current && !isLoading && freelancers" class="flex flex-col gap-4">
-            <div v-for="(freelancer, idx) in freelancers.data" :key="idx">
+          <div v-if="tabs[0].current && !isLoadingUnsavedFreelancer && Unsavedfreelancers" class="flex flex-col gap-4">
+            <div v-for="(freelancer, idx) in Unsavedfreelancers.data" :key="idx">
               <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
                 :freelancer="freelancer" @profile="freelancerProfile" />
             </div>
             <Pagination
-              v-if="!isLoading && (freelancers.data ?? []).length > 0 && tabs[0].current && freelancers.data.filter(freelancer => freelancer.is_saved === false).length > 0"
-              :pagination="freelancers.meta" @prev-page="fetchFreelancers(freelancers.meta.current_page - 1)"
-              @next-page="fetchFreelancers(freelancers.meta.current_page + 1)" />
+              v-if="!isLoadingUnsavedFreelancer && Unsavedfreelancers.data.length > 0"
+              :pagination="Unsavedfreelancers.meta" @prev-page="fetchFreelancers(Unsavedfreelancers.meta.current_page - 1)"
+              @next-page="fetchFreelancers(Unsavedfreelancers.meta.current_page + 1)" />
+          </div>
+          <div v-if="tabs[0].current && isLoadingUnsavedFreelancer && !Unsavedfreelancers" class="flex flex-col gap-4">
+            <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl">
+              <div class="rounded-full bg-gray-300 h-12 w-12"></div>
+              <div class="flex-1 space-y-4 py-1">
+                <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+                <div class="space-y-2">
+                  <div class="h-4 bg-gray-300 rounded"></div>
+                  <div class="h-4 bg-gray-300 rounded w-5/6"></div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div v-if="isLoading" class="flex flex-col gap-4">
+          <div v-if="tabs[1].current && !isLoadingSavedFreelancer && Savedfreelancers" class="flex flex-col gap-4">
+            <div v-for="(freelancer, idx) in Savedfreelancers.data" :key="idx">
+              <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
+                :freelancer="freelancer" @profile="freelancerProfile" />
+            </div>
+            <Pagination
+              v-if="!isLoadingSavedFreelancer && Savedfreelancers.data.length > 0"
+              :pagination="Savedfreelancers.meta" @prev-page="fetchFreelancers(Savedfreelancers.meta.current_page - 1)"
+              @next-page="fetchFreelancers(Savedfreelancers.meta.current_page + 1)" />
+          </div>
+          <div v-if="tabs[1].current && isLoadingSavedFreelancer && !Savedfreelancers" class="flex flex-col gap-4">
             <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl">
               <div class="rounded-full bg-gray-300 h-12 w-12"></div>
               <div class="flex-1 space-y-4 py-1">
