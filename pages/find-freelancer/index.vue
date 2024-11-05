@@ -50,14 +50,7 @@ watch(
 
 const fetchFreelancers = async (page: number) => {
   await fetchUnsavedFreelancer(
-    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&page=${page}`,
-    {
-      headers: account?.value?.id
-        ? {
-          'X-ACCOUNT-ID': account.value.id.toString(),
-        }
-        : undefined,
-    }
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&page=${page}`
   );
 
   await fetchSavedFreelancer(
@@ -136,9 +129,9 @@ const updateInclude = (event: Event) => {
 const tabCount = computed(() => {
   return (tabName: string) => {
     if (tabName === 'All freelancer') {
-      return Unsavedfreelancers.value?.data.length || 0;
+      return Unsavedfreelancers.value?.meta.total || 0;
     } else if (tabName === 'Saved freelancer') {
-      return Savedfreelancers.value?.data.length || 0;
+      return Savedfreelancers.value?.meta.total || 0;
     }
     return 0;
   };
