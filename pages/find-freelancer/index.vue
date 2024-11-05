@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { ref, onMounted, watch, computed } from 'vue';
-import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { accountStore } from '~/store/accountStore';
 import { profileDisplayStore } from '~/store/profileDisplayStore';
