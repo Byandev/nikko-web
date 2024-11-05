@@ -48,7 +48,14 @@ watch(
 
 const fetchFreelancers = async (page: number) => {
   await fetchUnsavedFreelancer(
-    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&page=${page}`
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&page=${page}`,
+    {
+      headers: account?.value?.id
+        ? {
+          'X-ACCOUNT-ID': account.value.id.toString(),
+        }
+        : undefined,
+    }
   );
 
   await fetchSavedFreelancer(
