@@ -7,6 +7,10 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Freelancer } from '~/types/models/Freelancer';
 import type { PaginatedList } from '~/types/models/Pagination';
 import { debounce } from '~/utils/debounce';
+import { ref } from 'vue'
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid'
+import type { Skill } from '~/types/models/Skill';
+
 
 const router = useRouter();
 const { account } = storeToRefs(accountStore());
@@ -15,6 +19,7 @@ interface SearchParams {
   include: string;
   type: string;
   search: string;
+  skills: number[];
 }
 
 const filters = ref([
@@ -26,6 +31,7 @@ const searchParams = ref<SearchParams>({
   include: filters.value.map(filter => filter.value).join(','),
   type: 'FREELANCER',
   search: '',
+  skills: [],
 });
 
 const { profileDisplay } = storeToRefs(profileDisplayStore());
@@ -33,10 +39,16 @@ const { profileDisplay } = storeToRefs(profileDisplayStore());
 const { data: Savedfreelancers, fetchData: fetchSavedFreelancer, pending: isLoadingSavedFreelancer } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
 const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: isLoadingUnsavedFreelancer } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
 
+const { data: skills, fetchData: fetchSkills, pending: isSkillsLoading } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
+
+const selectedSkills = ref<Skill | null>(null);
+
 const { sendRequest: updateFreelancer } = useSubmit<{ data: Freelancer }, ApiErrorResponse>();
 
 onMounted(async () => {
   await fetchFreelancers(1);
+  await fetchSkills('/v1/skills');
+  selectedSkills.value = skills.value?.data[0] || null;
 });
 
 watch(
@@ -167,6 +179,50 @@ const tabCount = computed(() => {
           </template>
         </Section>
 
+        <!-- Skill Section -->
+        <Section>
+          <template #header>
+            <div class="flex justify-between items-center">
+              <h2 class="text-xl font-bold">Skills</h2>
+            </div>
+          </template>
+          <template #content>
+            <HeadlessListbox v-model="selectedSkills">
+              <div class="relative mt-1">
+                <HeadlessListboxButton
+                  class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                  <span class="block truncate">{{ selectedSkills?.name }}</span>
+                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                  </span>
+                </HeadlessListboxButton>
+
+                <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100"
+                  leave-to-class="opacity-0">
+                  <HeadlessListboxOptions
+                    class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm">
+                    <HeadlessListboxOption v-for="skill in skills?.data" v-slot="{ active, selected }" :key="skill.name"
+                      :value="skill" as="template">
+                      <li :class="[
+                        active ? 'bg-primary/10 text-primary' : 'text-gray-900',
+                        'relative cursor-default select-none py-2 pl-10 pr-4',
+                      ]">
+                        <span :class="[
+                          selected ? 'font-medium' : 'font-normal',
+                          'block truncate',
+                        ]">{{ skill.name }}</span>
+                        <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                          <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                        </span>
+                      </li>
+                    </HeadlessListboxOption>
+                  </HeadlessListboxOptions>
+                </transition>
+              </div>
+            </HeadlessListbox>
+          </template>
+        </Section>
+
       </div>
 
       <!-- Right Column -->
@@ -177,7 +233,8 @@ const tabCount = computed(() => {
             <input v-model="searchParams.search" type="text" placeholder="Search for freelancers..."
               class="w-full outline-none border-none" />
           </div>
-          <div v-if="!isLoadingSavedFreelancer && !isLoadingUnsavedFreelancer && (Savedfreelancers || Unsavedfreelancers)">
+          <div
+            v-if="!isLoadingSavedFreelancer && !isLoadingUnsavedFreelancer && (Savedfreelancers || Unsavedfreelancers)">
             <nav class="flex space-x-4" aria-label="Tabs">
               <template v-for="tab in tabs" :key="tab.name">
                 <a href="#" @click.prevent="setActiveTab(tab.name)"
@@ -194,9 +251,9 @@ const tabCount = computed(() => {
               <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
                 :freelancer="freelancer" @profile="freelancerProfile" />
             </div>
-            <Pagination
-              v-if="!isLoadingUnsavedFreelancer && Unsavedfreelancers.data.length > 0"
-              :pagination="Unsavedfreelancers.meta" @prev-page="fetchFreelancers(Unsavedfreelancers.meta.current_page - 1)"
+            <Pagination v-if="!isLoadingUnsavedFreelancer && Unsavedfreelancers.data.length > 0"
+              :pagination="Unsavedfreelancers.meta"
+              @prev-page="fetchFreelancers(Unsavedfreelancers.meta.current_page - 1)"
               @next-page="fetchFreelancers(Unsavedfreelancers.meta.current_page + 1)" />
           </div>
           <div v-if="tabs[0].current && isLoadingUnsavedFreelancer && !Unsavedfreelancers" class="flex flex-col gap-4">
@@ -217,8 +274,7 @@ const tabCount = computed(() => {
               <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
                 :freelancer="freelancer" @profile="freelancerProfile" />
             </div>
-            <Pagination
-              v-if="!isLoadingSavedFreelancer && Savedfreelancers.data.length > 0"
+            <Pagination v-if="!isLoadingSavedFreelancer && Savedfreelancers.data.length > 0"
               :pagination="Savedfreelancers.meta" @prev-page="fetchFreelancers(Savedfreelancers.meta.current_page - 1)"
               @next-page="fetchFreelancers(Savedfreelancers.meta.current_page + 1)" />
           </div>
