@@ -21,7 +21,7 @@ const props = defineProps<{
     <div class="border rounded-lg p-4">
         <div class="flex flex-row justify-between gap-4">
             <div class="flex flex-row gap-3 items-center">
-                <img :src="props.freelancer.user.avatar?.original_url || defaultAvatarUrl" alt="profile" class="w-16 h-16 rounded-full">
+                <img :src="props.freelancer.user?.avatar?.original_url || defaultAvatarUrl" alt="profile" class="w-16 h-16 rounded-full">
                 <div class="flex flex-col justify-center">
                     <span class="text-lg font-bold" v-if="props.freelancer.user">{{ props.freelancer.user.first_name }} {{ props.freelancer.user.last_name }}</span>
                     <span class="text-sm text-gray-500" v-if="props.freelancer.user">{{ props.freelancer.title }}</span>
@@ -39,7 +39,7 @@ const props = defineProps<{
                 </div>
             </div>
         </div>
-        <div v-if="props.freelancer.skills.length > 0" class="mt-4 w-full">
+        <div v-if="props.freelancer.skills && props.freelancer.skills.length > 0" class="mt-4 w-full">
             <label for="profileTitle" class="block text-sm font-medium leading-6 text-gray-900">
                 Skills
             </label>

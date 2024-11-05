@@ -116,12 +116,20 @@ const freelancerProfile = (user: Freelancer) => {
 
 const updateInclude = (event: Event) => {
   const target = event.target as HTMLInputElement;
+  const includes = searchParams.value.include.split(',');
+
   if (target.checked) {
-    searchParams.value.include = `${searchParams.value.include},${target.value}`;
+    if (!includes.includes(target.value)) {
+      includes.push(target.value);
+    }
   } else {
-    searchParams.value.include = searchParams.value.include.replace(`,${target.value}`, '');
+    const index = includes.indexOf(target.value);
+    if (index > -1) {
+      includes.splice(index, 1);
+    }
   }
-  console.log('Include', searchParams.value.include);
+
+  searchParams.value.include = includes.join(',');
   fetchFreelancers(1);
 };
 
