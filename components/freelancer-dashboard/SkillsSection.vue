@@ -6,6 +6,13 @@ import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import { useSubmit } from '~/composables/useSubmit';
 import { useFetchData } from '~/composables/useFetchData';
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOptions,
+  ListboxOption,
+} from '@headlessui/vue';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 
 interface Skill {
   id: number;
@@ -21,7 +28,6 @@ fetchSkills('/v1/skills');
 
 const isEditModalOpen = ref(false);
 const isRequestModalOpen = ref(false);
-const selectedSkillId = ref<number | null>(null);
 const selectedSkills = ref<Skill[]>([]);
 
 function onRemoveSkill(idx: number) {
@@ -52,7 +58,7 @@ const submitSkills = async () => {
 };
 
 const requestSkill = async () => {
-  if (!selectedSkillId.value || !account?.value?.id) return;
+  if (!account?.value?.id) return;
 
   try {
     const response = await updateSkills(`/v1/auth/accounts/${account.value.id}`, {
@@ -70,21 +76,11 @@ const requestSkill = async () => {
     }
 
     selectedSkills.value = [];
-    selectedSkillId.value = null;
     isRequestModalOpen.value = false;
   } catch (error) {
     console.error('Error requesting skill:', error);
   }
 };
-
-const onSelect = (event: Event) => {
-  const target = event.target as HTMLSelectElement;
-  const skillId = Number(target.value);
-  const skill = skillOptions.value?.data.find(skill => skill.id === skillId);
-  if (skill && !selectedSkills.value.some(s => s.id === skill.id)) {
-    selectedSkills.value.push(skill);
-  }
-}
 
 const onRemoveSelectedSkill = (idx: number) => {
   selectedSkills.value.splice(idx, 1);
@@ -113,7 +109,8 @@ const onCancelEdit = async () => {
           No skills yet.
         </div>
         <div v-else v-for="(skill, idx) in account?.skills" :key="`selected-skill-${skill.id}`" class="mr-2 my-1">
-          <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+          <span
+            class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
             {{skill.name}}
           </span>
         </div>
@@ -128,9 +125,11 @@ const onCancelEdit = async () => {
     <template #content>
       <div class="mt-5 flex flex-wrap">
         <div v-for="(skill, idx) in account?.skills" :key="`selected-skill-${skill.id}`" class="mr-2 my-1">
-          <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+          <span
+            class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
             {{skill.name}}
-            <button @click="onRemoveSkill(idx)" type="button" class="group relative -mr-1 h-3.5 w-3.5 rounded-sm hover:bg-green-600/20">
+            <button @click="onRemoveSkill(idx)" type="button"
+              class="group relative -mr-1 h-3.5 w-3.5 rounded-sm hover:bg-green-600/20">
               <span class="sr-only">Remove</span>
               <svg viewBox="0 0 14 14" class="h-3.5 w-3.5 stroke-green-700/50 group-hover:stroke-green-700/75">
                 <path d="M4 4l6 6m0-6l-6 6" />
@@ -153,30 +152,60 @@ const onCancelEdit = async () => {
     </template>
     <template #content>
       <div class="mt-4 w-full">
-        
+
         <div class="mt-2">
-          <select required @change="onSelect" v-model="selectedSkillId"
-                  class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-            <option :value="null">Select Skill</option>
-            <option class="truncate text-sm leading-6" v-for="skill in skillOptions?.data" :key="skill.id"
-                    :value="skill.id">
-              {{ skill.name }}
-            </option>
-          </select>
+          <Listbox v-model="selectedSkills" multiple>
+            <div class="relative mt-1">
+              <ListboxButton
+                class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                <span class="block truncate">
+                  <span v-if="selectedSkills.length === 0">Select Skill</span>
+                  <span v-else>
+                    <span v-for="(skill, index) in selectedSkills" :key="index">
+                      {{ skill.name }}<span v-if="index < selectedSkills.length - 1">, </span>
+                    </span>
+                  </span>
+                </span>
+                <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                  <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </span>
+              </ListboxButton>
+
+              <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+                <ListboxOptions
+                  class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                  <ListboxOption v-for="(skill, index) in skillOptions?.data" v-slot="{ active, selected }"
+                    :key="index" :value="skill" as="template">
+                    <li
+                      :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                      <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ skill.name
+                        }}</span>
+                      <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                        <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                      </span>
+                    </li>
+                  </ListboxOption>
+                </ListboxOptions>
+              </transition>
+            </div>
+          </Listbox>
         </div>
         <div class="mt-4">
           <div class="flex flex-wrap mt-2">
             <div v-for="(skill, idx) in selectedSkills" :key="`selected-skill-${skill.id}`" class="mr-2 my-1">
-                <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                    {{skill.name}}
-                    <button @click="onRemoveSelectedSkill(idx)" type="button" class="group relative -mr-1 h-3.5 w-3.5 rounded-sm hover:bg-green-600/20">
-                    <span class="sr-only">Remove</span>
-                    <svg viewBox="0 0 14 14" class="h-3.5 w-3.5 stroke-green-700/50 group-hover:stroke-green-700/75">
-                        <path d="M4 4l6 6m0-6l-6 6" />
-                    </svg>
-                    <span class="absolute -inset-1" />
-                    </button>
-                </span>
+              <span
+                class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                {{skill.name}}
+                <button @click="onRemoveSelectedSkill(idx)" type="button"
+                  class="group relative -mr-1 h-3.5 w-3.5 rounded-sm hover:bg-green-600/20">
+                  <span class="sr-only">Remove</span>
+                  <svg viewBox="0 0 14 14" class="h-3.5 w-3.5 stroke-green-700/50 group-hover:stroke-green-700/75">
+                    <path d="M4 4l6 6m0-6l-6 6" />
+                  </svg>
+                  <span class="absolute -inset-1" />
+                </button>
+              </span>
             </div>
           </div>
         </div>

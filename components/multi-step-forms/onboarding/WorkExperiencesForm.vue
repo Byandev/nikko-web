@@ -15,6 +15,14 @@ import { EmploymentType } from '~/types/models/WorkExperience';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import { helpers, required, requiredIf } from '@vuelidate/validators';
 
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOptions,
+  ListboxOption,
+} from '@headlessui/vue';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
+
 const { user } = storeToRefs(authStore());
 const { account } = storeToRefs(accountStore())
 
@@ -85,6 +93,10 @@ const submitForm = async () => {
   console.log(v$.value.$errors)
   if (v$.value.$invalid) return;
 
+  console.log(formRef.value.work_experiences)
+
+  return
+
   try {
 
     const body = {     
@@ -154,7 +166,9 @@ const removeWorkExperienceForm = (index: number) => {
               <input type="text" id="jobTitle" v-model="workExperience.job_title"
                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
             </div>
-            <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].job_title && v$.work_experiences.$each.$response.$errors[index].job_title[0] && v$.work_experiences.$each.$response.$errors[index].job_title[0].$message" class="text-red-900 text-sm">{{
+            <span
+              v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].job_title && v$.work_experiences.$each.$response.$errors[index].job_title[0] && v$.work_experiences.$each.$response.$errors[index].job_title[0].$message"
+              class="text-red-900 text-sm">{{
               v$.work_experiences.$each.$response.$errors[index].job_title[0].$message }}</span>
           </div>
         </div>
@@ -172,8 +186,10 @@ const removeWorkExperienceForm = (index: number) => {
                 <input type="text" id="companyName" v-model="workExperience.company"
                   class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
               </div>
-              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].company && v$.work_experiences.$each.$response.$errors[index].company[0] && v$.work_experiences.$each.$response.$errors[index].company[0].$message" class="text-red-900 text-sm">{{
-              v$.work_experiences.$each.$response.$errors[index].company[0].$message }}</span>
+              <span
+                v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].company && v$.work_experiences.$each.$response.$errors[index].company[0] && v$.work_experiences.$each.$response.$errors[index].company[0].$message"
+                class="text-red-900 text-sm">{{
+                v$.work_experiences.$each.$response.$errors[index].company[0].$message }}</span>
             </div>
           </div>
 
@@ -189,8 +205,10 @@ const removeWorkExperienceForm = (index: number) => {
                 <input type="url" id="website" v-model="workExperience.website"
                   class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
               </div>
-              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].website && v$.work_experiences.$each.$response.$errors[index].website[0] && v$.work_experiences.$each.$response.$errors[index].website[0].$message" class="text-red-900 text-sm">{{
-              v$.work_experiences.$each.$response.$errors[index].website[0].$message }}</span>
+              <span
+                v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].website && v$.work_experiences.$each.$response.$errors[index].website[0] && v$.work_experiences.$each.$response.$errors[index].website[0].$message"
+                class="text-red-900 text-sm">{{
+                v$.work_experiences.$each.$response.$errors[index].website[0].$message }}</span>
             </div>
           </div>
         </div>
@@ -207,7 +225,9 @@ const removeWorkExperienceForm = (index: number) => {
               <input type="text" id="country" name="country" v-model="workExperience.country"
                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
             </div>
-            <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].country && v$.work_experiences.$each.$response.$errors[index].country[0] && v$.work_experiences.$each.$response.$errors[index].country[0].$message" class="text-red-900 text-sm">{{
+            <span
+              v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].country && v$.work_experiences.$each.$response.$errors[index].country[0] && v$.work_experiences.$each.$response.$errors[index].country[0].$message"
+              class="text-red-900 text-sm">{{
               v$.work_experiences.$each.$response.$errors[index].country[0].$message }}</span>
           </div>
         </div>
@@ -224,7 +244,9 @@ const removeWorkExperienceForm = (index: number) => {
               <textarea id="description" v-model="workExperience.description" rows="4"
                 class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0"></textarea>
             </div>
-            <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].description && v$.work_experiences.$each.$response.$errors[index].description[0] && v$.work_experiences.$each.$response.$errors[index].description[0].$message" class="text-red-900 text-sm">{{
+            <span
+              v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].description && v$.work_experiences.$each.$response.$errors[index].description[0] && v$.work_experiences.$each.$response.$errors[index].description[0].$message"
+              class="text-red-900 text-sm">{{
               v$.work_experiences.$each.$response.$errors[index].description[0].$message }}</span>
           </div>
         </div>
@@ -237,16 +259,46 @@ const removeWorkExperienceForm = (index: number) => {
               Start Month <span class="text-red-500">*</span>
             </label>
             <div class="mt-2">
-              <select v-model="workExperience.start_month"
-                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                <option :value=null>Select Month</option>
-                <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
-                  :key="`start-month-${index}-${monthIndex}`" :value="monthIndex + 1">
-                  {{ month }}
-                </option>
-              </select>
-              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].start_month && v$.work_experiences.$each.$response.$errors[index].start_month[0] && v$.work_experiences.$each.$response.$errors[index].start_month[0].$message" class="text-red-900 text-sm">{{
-              v$.work_experiences.$each.$response.$errors[index].start_month[0].$message }}</span>
+              <Listbox v-model="workExperience.start_month" class="ring-1 ring-gray-300 rounded-md">
+                <div class="relative mt-1">
+                  <ListboxButton
+                    class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                    <span class="block truncate">
+                      <span>
+                        <span v-if="!workExperience.start_month">Select Month</span>
+                        <span>
+                          {{ workExperience.start_month }}
+                        </span>
+                      </span>
+                    </span>
+                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </span>
+                  </ListboxButton>
+
+                  <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100"
+                    leave-to-class="opacity-0">
+                    <ListboxOptions
+                      class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                      <ListboxOption v-for="(month, index) in monthOptions" v-slot="{ active, selected }" :key="index"
+                        :value="month" as="template">
+                        <li
+                          :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                          <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ month
+                            }}</span>
+                          <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                          </span>
+                        </li>
+                      </ListboxOption>
+                    </ListboxOptions>
+                  </transition>
+                </div>
+              </Listbox>
+              <span
+                v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].start_month && v$.work_experiences.$each.$response.$errors[index].start_month[0] && v$.work_experiences.$each.$response.$errors[index].start_month[0].$message"
+                class="text-red-900 text-sm">{{
+                v$.work_experiences.$each.$response.$errors[index].start_month[0].$message }}</span>
             </div>
           </div>
 
@@ -256,16 +308,46 @@ const removeWorkExperienceForm = (index: number) => {
               Start Year <span class="text-red-500">*</span>
             </label>
             <div class="mt-2">
-              <select v-model="workExperience.start_year"
-                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                <option :value=null>Select Year</option>
-                <option class="truncate text-sm leading-6" v-for="(year, yearIndex) in _.range(2000, 2025)"
-                  :key="`start-year-${index}-${yearIndex}`" :value="year">
-                  {{ year }}
-                </option>
-              </select>
-              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].start_year && v$.work_experiences.$each.$response.$errors[index].start_year[0] && v$.work_experiences.$each.$response.$errors[index].start_year[0].$message" class="text-red-900 text-sm">{{
-              v$.work_experiences.$each.$response.$errors[index].start_year[0].$message }}</span>
+              <Listbox v-model="workExperience.start_year" class="ring-1 ring-gray-300 rounded-md">
+                <div class="relative mt-1">
+                  <ListboxButton
+                    class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                    <span class="block truncate">
+                      <span>
+                        <span v-if="!workExperience.start_year">Select Year</span>
+                        <span>
+                          {{ workExperience.start_year }}
+                        </span>
+                      </span>
+                    </span>
+                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </span>
+                  </ListboxButton>
+
+                  <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100"
+                    leave-to-class="opacity-0">
+                    <ListboxOptions
+                      class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                      <ListboxOption v-for="(year, index) in _.range(2000, 2025)" v-slot="{ active, selected }"
+                        :key="index" :value="year" as="template">
+                        <li
+                          :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                          <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ year
+                            }}</span>
+                          <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                          </span>
+                        </li>
+                      </ListboxOption>
+                    </ListboxOptions>
+                  </transition>
+                </div>
+              </Listbox>
+              <span
+                v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].start_year && v$.work_experiences.$each.$response.$errors[index].start_year[0] && v$.work_experiences.$each.$response.$errors[index].start_year[0].$message"
+                class="text-red-900 text-sm">{{
+                v$.work_experiences.$each.$response.$errors[index].start_year[0].$message }}</span>
             </div>
           </div>
         </div>
@@ -292,16 +374,46 @@ const removeWorkExperienceForm = (index: number) => {
               End Month <span class="text-red-500">*</span>
             </label>
             <div class="mt-2">
-              <select v-model="workExperience.end_month"
-                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                <option :value=null>Select Month</option>
-                <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
-                  :key="`start-month-${index}-${monthIndex}`" :value="monthIndex + 1">
-                  {{ month }}
-                </option>
-              </select>
-              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].end_month && v$.work_experiences.$each.$response.$errors[index].end_month[0] && v$.work_experiences.$each.$response.$errors[index].end_month[0].$message" class="text-red-900 text-sm">{{
-              v$.work_experiences.$each.$response.$errors[index].end_month[0].$message }}</span>
+              <Listbox v-model="workExperience.end_month" class="ring-1 ring-gray-300 rounded-md">
+                <div class="relative mt-1">
+                  <ListboxButton
+                    class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                    <span class="block truncate">
+                      <span>
+                        <span v-if="!workExperience.end_month">Select Month</span>
+                        <span>
+                          {{ workExperience.end_month }}
+                        </span>
+                      </span>
+                    </span>
+                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </span>
+                  </ListboxButton>
+
+                  <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100"
+                    leave-to-class="opacity-0">
+                    <ListboxOptions
+                      class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                      <ListboxOption v-for="(month, index) in monthOptions" v-slot="{ active, selected }" :key="index"
+                        :value="month" as="template">
+                        <li
+                          :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                          <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ month
+                            }}</span>
+                          <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                          </span>
+                        </li>
+                      </ListboxOption>
+                    </ListboxOptions>
+                  </transition>
+                </div>
+              </Listbox>
+              <span
+                v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].end_month && v$.work_experiences.$each.$response.$errors[index].end_month[0] && v$.work_experiences.$each.$response.$errors[index].end_month[0].$message"
+                class="text-red-900 text-sm">{{
+                v$.work_experiences.$each.$response.$errors[index].end_month[0].$message }}</span>
             </div>
           </div>
 
@@ -311,16 +423,46 @@ const removeWorkExperienceForm = (index: number) => {
               End Year <span class="text-red-500">*</span>
             </label>
             <div class="mt-2">
-              <select v-model="workExperience.end_year"
-                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                <option :value=null>Select Year</option>
-                <option class="truncate text-sm leading-6" v-for="(year, yearIndex) in _.range(2000, 2025)"
-                  :key="`start-year-${index}-${yearIndex}`" :value="year">
-                  {{ year }}
-                </option>
-              </select>
-              <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].end_year && v$.work_experiences.$each.$response.$errors[index].end_year[0] && v$.work_experiences.$each.$response.$errors[index].end_year[0].$message" class="text-red-900 text-sm">{{
-              v$.work_experiences.$each.$response.$errors[index].end_year[0].$message }}</span>
+              <Listbox v-model="workExperience.end_year" class="ring-1 ring-gray-300 rounded-md">
+                <div class="relative mt-1">
+                  <ListboxButton
+                    class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                    <span class="block truncate">
+                      <span>
+                        <span v-if="!workExperience.end_year">Select Year</span>
+                        <span>
+                          {{ workExperience.end_year }}
+                        </span>
+                      </span>
+                    </span>
+                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                      <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </span>
+                  </ListboxButton>
+
+                  <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100"
+                    leave-to-class="opacity-0">
+                    <ListboxOptions
+                      class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                      <ListboxOption v-for="(year, index) in _.range(2000, 2025)" v-slot="{ active, selected }"
+                        :key="index" :value="year" as="template">
+                        <li
+                          :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                          <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ year
+                            }}</span>
+                          <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                            <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                          </span>
+                        </li>
+                      </ListboxOption>
+                    </ListboxOptions>
+                  </transition>
+                </div>
+              </Listbox>
+              <span
+                v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].end_year && v$.work_experiences.$each.$response.$errors[index].end_year[0] && v$.work_experiences.$each.$response.$errors[index].end_year[0].$message"
+                class="text-red-900 text-sm">{{
+                v$.work_experiences.$each.$response.$errors[index].end_year[0].$message }}</span>
             </div>
           </div>
         </div>
@@ -331,15 +473,45 @@ const removeWorkExperienceForm = (index: number) => {
             Employment Type <span class="text-red-500">*</span>
           </label>
           <div class="mt-2">
-            <select id="employment" v-model="workExperience.employment"
-              class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-              <option class="truncate text-sm leading-6" value="">Select employment type</option>
-              <option class="truncate text-sm leading-6" v-for="(type) in EmploymentType" :key="`type-${index}-${type}`"
-                :value="type">
-                {{ _.capitalize(_.startCase(type)) }}
-              </option>
-            </select>
-            <span v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].employment && v$.work_experiences.$each.$response.$errors[index].employment[0] && v$.work_experiences.$each.$response.$errors[index].employment[0].$message" class="text-red-900 text-sm">{{
+            <Listbox v-model="workExperience.employment" class="ring-1 ring-gray-300 rounded-md">
+              <div class="relative mt-1">
+                <ListboxButton
+                  class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                  <span class="block truncate">
+                    <span>
+                      <span v-if="!workExperience.employment">Select Employment</span>
+                      <span>
+                        {{ _.capitalize(_.startCase(workExperience.employment))  }}
+                      </span>
+                    </span>
+                  </span>
+                  <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                    <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                  </span>
+                </ListboxButton>
+
+                <transition leave-active-class="transition duration-100 ease-in" leave-from-class="opacity-100"
+                  leave-to-class="opacity-0">
+                  <ListboxOptions
+                    class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                    <ListboxOption v-for="(type, index) in EmploymentType" v-slot="{ active, selected }"
+                      :key="index" :value="type" as="template">
+                      <li
+                        :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                        <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ _.capitalize(_.startCase(type))
+                          }}</span>
+                        <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                          <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                        </span>
+                      </li>
+                    </ListboxOption>
+                  </ListboxOptions>
+                </transition>
+              </div>
+            </Listbox>
+            <span
+              v-if="v$.work_experiences.$each.$response.$errors && v$.work_experiences.$each.$response.$errors[index] && v$.work_experiences.$each.$response.$errors[index].employment && v$.work_experiences.$each.$response.$errors[index].employment[0] && v$.work_experiences.$each.$response.$errors[index].employment[0].$message"
+              class="text-red-900 text-sm">{{
               v$.work_experiences.$each.$response.$errors[index].employment[0].$message }}</span>
           </div>
         </div>
