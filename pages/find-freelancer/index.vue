@@ -28,7 +28,8 @@ interface SearchParams {
   include: string;
   type: string;
   search: string;
-  skills: number[];
+  skills: Skill[];
+  countries: ICountry[];
 }
 
 const filters = ref([
@@ -41,6 +42,7 @@ const searchParams = ref<SearchParams>({
   type: 'FREELANCER',
   search: '',
   skills: [],
+  countries: [],
 });
 
 const { profileDisplay } = storeToRefs(profileDisplayStore());
@@ -50,16 +52,6 @@ const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: is
 
 const { data: skills, fetchData: fetchSkills, pending: isSkillsLoading } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
 
-const selectedSkills = ref<Skill[]>([]);
-const selectedCountries = ref<ICountry[]>([]);
-
-watch(
-  () => selectedSkills.value,
-  (newValue) => {
-    console.log(newValue);
-  }
-);
-
 const { sendRequest: updateFreelancer } = useSubmit<{ data: Freelancer }, ApiErrorResponse>();
 
 onMounted(async () => {
@@ -68,15 +60,15 @@ onMounted(async () => {
 });
 
 watch(
-  () => searchParams.value.search,
+  [() => searchParams.value.skills, () => searchParams.value.search, () => searchParams.value.countries],
   debounce(async () => {
     await fetchFreelancers(1);
-  }, 300)
+  }, 1000)
 );
 
 const fetchFreelancers = async (page: number) => {
   await fetchUnsavedFreelancer(
-    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&page=${page}`,
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',') }&page=${page}`,
     {
       headers: account?.value?.id
         ? {
@@ -87,7 +79,7 @@ const fetchFreelancers = async (page: number) => {
   );
 
   await fetchSavedFreelancer(
-    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[is_saved]=true&page=${page}`,
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',') }&filter[is_saved]=true&page=${page}`,
     {
       headers: account?.value?.id
         ? {
@@ -171,11 +163,11 @@ const tabCount = computed(() => {
 });
 
 const removeSkill = (skill: Skill) => {
-  selectedSkills.value = selectedSkills.value.filter(s => s.id !== skill.id);
+  searchParams.value.skills = searchParams.value.skills.filter(s => s.id !== skill.id);
 };
 
 const removeCountry = (country: ICountry) => {
-  selectedCountries.value = selectedCountries.value.filter(c => c.name !== country.name);
+  searchParams.value.countries = searchParams.value.countries.filter(c => c.name !== country.name);
 };
 
 </script>
@@ -211,15 +203,15 @@ const removeCountry = (country: ICountry) => {
             </div>
           </template>
           <template #content>
-            <Listbox v-model="selectedSkills" multiple>
+            <Listbox v-model="searchParams.skills" multiple>
               <div class="relative mt-1">
                 <ListboxButton
                   class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                   <span class="block truncate">
-                    <span v-if="selectedSkills.length === 0">Select Skills</span>
+                    <span v-if="searchParams.skills.length === 0">Select Skills</span>
                     <span v-else>
-                      <span v-for="(skill, index) in selectedSkills" :key="skill.id">
-                        {{ skill.name }}<span v-if="index < selectedSkills.length - 1">, </span>
+                      <span v-for="(skill, index) in searchParams.skills" :key="skill.id">
+                        {{ skill.name }}<span v-if="index < searchParams.skills.length - 1">, </span>
                       </span>
                     </span>
                   </span>
@@ -249,7 +241,7 @@ const removeCountry = (country: ICountry) => {
             </Listbox>
 
             <div class="mt-4 flex flex-wrap">
-              <div v-for="skill in selectedSkills" :key="skill.id" class="mr-2 my-1">
+              <div v-for="skill in searchParams.skills" :key="skill.id" class="mr-2 my-1">
                 <span
                   class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                   {{ skill.name }}
@@ -275,15 +267,15 @@ const removeCountry = (country: ICountry) => {
             </div>
           </template>
           <template #content>
-            <Listbox v-model="selectedCountries" multiple>
+            <Listbox v-model="searchParams.countries" multiple>
               <div class="relative mt-1">
                 <ListboxButton
                   class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                   <span class="block truncate">
-                    <span v-if="selectedCountries.length === 0">Select Country</span>
+                    <span v-if="searchParams.countries.length === 0">Select Country</span>
                     <span v-else>
-                      <span v-for="(country, index) in selectedCountries" :key="index">
-                        {{ country.name }}<span v-if="index < selectedCountries.length - 1">, </span>
+                      <span v-for="(country, index) in searchParams.countries" :key="index">
+                        {{ country.name }}<span v-if="index < searchParams.countries.length - 1">, </span>
                       </span>
                     </span>
                   </span>
@@ -313,7 +305,7 @@ const removeCountry = (country: ICountry) => {
             </Listbox>
 
             <div class="mt-4 flex flex-wrap">
-              <div v-for="(country, index) in selectedCountries" :key="index" class="mr-2 my-1">
+              <div v-for="(country, index) in searchParams.countries" :key="index" class="mr-2 my-1">
                 <span
                   class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                   {{ country.name }}
