@@ -26,7 +26,7 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 const { user } = storeToRefs(authStore());
 const { account } = storeToRefs(accountStore())
 
-const monthOptions = computed(() => moment.months());
+const monthOptions = computed(() => moment.months().map((month, index) => index + 1));
 
 interface FormValues {
   work_experiences: Partial<WorkExperience>[];
@@ -95,11 +95,8 @@ const submitForm = async () => {
 
   console.log(formRef.value.work_experiences)
 
-  return
-
   try {
-
-    const body = {     
+    const body = {
       work_experiences: form.value.work_experiences.map(workExperience => ({
         job_title: workExperience.job_title,
         company: workExperience.company,
@@ -110,8 +107,12 @@ const submitForm = async () => {
         start_year: workExperience.start_year,
         is_current: workExperience.is_current,
         employment: workExperience.employment,
-        ...(workExperience.is_current ? {} : { end_month: workExperience.end_month, end_year: workExperience.end_year })
-    }))};
+        ...(workExperience.is_current ? {} : { 
+          end_month: workExperience.end_month,
+          end_year: workExperience.end_year 
+        })
+      }))
+    };
 
     const response = await updateWorkExperience(`/v1/auth/accounts/${user.value.id}`, {
       method: 'PUT',
@@ -128,10 +129,23 @@ const submitForm = async () => {
   } catch (error) {
     console.error('Error updating work experience:', error);
   }
+
 };
 
 const addWorkExperienceForm = () => {
-  form.value.work_experiences.push(initialValue.work_experiences[0]);
+  form.value.work_experiences.push({
+    job_title: '',
+    company: '',
+    website: '',
+    country: '',
+    description: '',
+    start_month: undefined,
+    start_year: undefined,
+    end_month: undefined,
+    end_year: undefined,
+    is_current: false,
+    employment: EmploymentType.FULL_TIME
+  });
 };
 
 const removeWorkExperienceForm = (index: number) => {
