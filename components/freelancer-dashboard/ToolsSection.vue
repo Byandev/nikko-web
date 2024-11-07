@@ -159,7 +159,7 @@ const onCancelEdit = async () => {
       <div class="mt-4 w-full">
 
         <div class="mt-2">
-          <Listbox v-model="selectedTools" multiple>
+          <Listbox v-model="selectedTools" multiple class="ring-1 ring-gray-300 rounded-md">
             <div class="relative mt-1">
               <ListboxButton
                 class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">

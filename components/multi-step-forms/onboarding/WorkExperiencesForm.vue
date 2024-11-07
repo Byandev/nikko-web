@@ -280,7 +280,7 @@ const removeWorkExperienceForm = (index: number) => {
                     <span class="block truncate">
                       <span>
                         <span v-if="!workExperience.start_month">Select Month</span>
-                        <span>
+                        <span v-else>
                           {{ workExperience.start_month }}
                         </span>
                       </span>
@@ -329,7 +329,7 @@ const removeWorkExperienceForm = (index: number) => {
                     <span class="block truncate">
                       <span>
                         <span v-if="!workExperience.start_year">Select Year</span>
-                        <span>
+                        <span v-else>
                           {{ workExperience.start_year }}
                         </span>
                       </span>
@@ -395,7 +395,7 @@ const removeWorkExperienceForm = (index: number) => {
                     <span class="block truncate">
                       <span>
                         <span v-if="!workExperience.end_month">Select Month</span>
-                        <span>
+                        <span v-else>
                           {{ workExperience.end_month }}
                         </span>
                       </span>
@@ -444,7 +444,7 @@ const removeWorkExperienceForm = (index: number) => {
                     <span class="block truncate">
                       <span>
                         <span v-if="!workExperience.end_year">Select Year</span>
-                        <span>
+                        <span v-else>
                           {{ workExperience.end_year }}
                         </span>
                       </span>
@@ -494,7 +494,7 @@ const removeWorkExperienceForm = (index: number) => {
                   <span class="block truncate">
                     <span>
                       <span v-if="!workExperience.employment">Select Employment</span>
-                      <span>
+                      <span v-else>
                         {{ _.capitalize(_.startCase(workExperience.employment))  }}
                       </span>
                     </span>
