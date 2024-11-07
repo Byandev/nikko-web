@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia';
-import { AccountType } from '~/types/models/Account';
-import type { Freelancer } from '~/types/models/Freelancer';
+import { AccountType, type Account } from '~/types/models/Account';
 
 export const profileDisplayStore = defineStore('profileDisplay', () => {
 
-    const initialProfileDisplay: Partial<Freelancer> = {
+    const initialProfileDisplay: Partial<Account> = {
         id: 0,
         bio: '',
         type: AccountType.FREELANCER,
@@ -15,7 +14,7 @@ export const profileDisplayStore = defineStore('profileDisplay', () => {
         skills: []
     }
     
-    const profileDisplay = ref<Partial<Freelancer>>({
+    const profileDisplay = ref<Partial<Account>>({
         ...initialProfileDisplay
     });
 

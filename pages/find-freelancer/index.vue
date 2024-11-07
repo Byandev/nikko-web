@@ -4,7 +4,6 @@ import { storeToRefs } from 'pinia';
 import { accountStore } from '~/store/accountStore';
 import { profileDisplayStore } from '~/store/profileDisplayStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { Freelancer } from '~/types/models/Freelancer';
 import type { PaginatedList } from '~/types/models/Pagination';
 import { debounce } from '~/utils/debounce';
 import { ref, onMounted, watch, computed } from 'vue';
@@ -19,6 +18,7 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 import type { Skill } from '~/types/models/Skill';
 import { Country} from 'country-state-city';
 import type { ICountry } from 'country-state-city'
+import type { Account } from '~/types/models/Account';
 
 
 const router = useRouter();
@@ -47,12 +47,12 @@ const searchParams = ref<SearchParams>({
 
 const { profileDisplay } = storeToRefs(profileDisplayStore());
 
-const { data: Savedfreelancers, fetchData: fetchSavedFreelancer, pending: isLoadingSavedFreelancer } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
-const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: isLoadingUnsavedFreelancer } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
+const { data: Savedfreelancers, fetchData: fetchSavedFreelancer, pending: isLoadingSavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
+const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: isLoadingUnsavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
 
 const { data: skills, fetchData: fetchSkills, pending: isSkillsLoading } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
 
-const { sendRequest: updateFreelancer } = useSubmit<{ data: Freelancer }, ApiErrorResponse>();
+const { sendRequest: updateFreelancer } = useSubmit<{ data: Account }, ApiErrorResponse>();
 
 onMounted(async () => {
   await fetchFreelancers(1);
@@ -127,7 +127,7 @@ const setActiveTab = (tabName: string) => {
   });
 };
 
-const freelancerProfile = (user: Freelancer) => {
+const freelancerProfile = (user: Account) => {
   profileDisplay.value = user;
   router.push({ path: `/freelancer/${user.id}` });
 }

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Freelancer } from '~/types/models/Freelancer';
 import { Icon } from '@iconify/vue';
+import type { Account } from '~/types/models/Account';
 
 
 const emit = defineEmits<{
-    (e: 'profile', user: Freelancer): void;
+    (e: 'profile', user: Account): void;
     (e: 'save', id: number): void;
     (e: 'unsave', id: number): void;
 }>();
@@ -12,7 +12,7 @@ const emit = defineEmits<{
 const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
 
 const props = defineProps<{ 
-    freelancer: Freelancer 
+    freelancer: Account 
 }>();
 
 </script>
