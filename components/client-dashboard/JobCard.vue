@@ -11,7 +11,7 @@ import  { type Media } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
 
 const props = defineProps<{
-    job: Project;
+    job: Partial<Project>;
 }>();
 
 const {jobPosting} = storeToRefs(jobPostingStore());
@@ -42,7 +42,9 @@ const handleEdit = () => {
 };
 
 const handleDelete = () => {
-    emits('delete', props.job.id);
+    if (props?.job.id !== undefined) {
+        emits('delete', props.job.id);
+    }
 };
 
 const onSelectSkill = () => {
@@ -262,7 +264,7 @@ const viewJobDetails = async () => {
             </div>
             <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-500">Project Length:</span>
-                <span class="text-sm font-medium text-gray-700">{{ _.startCase(props.job.length.toLowerCase()) }}</span>
+                <span class="text-sm font-medium text-gray-700">{{ _.startCase(props.job.length?.toLowerCase() || '') }}</span>
             </div>
         </div>
         <div class="mt-4 flex items-center space-x-2">
