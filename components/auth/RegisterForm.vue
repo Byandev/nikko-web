@@ -77,7 +77,7 @@ const submitForm = async () => {
 
     await getSession()
 
-    await router.push("/email-verification");
+    await navigateTo("/email-verification", {external: true});
   } catch (error) {
     console.error(error as ApiErrorResponse)
   } finally {
