@@ -23,7 +23,9 @@ const props = defineProps<{
             <div class="flex flex-row gap-3 items-center">
                 <img :src="props.freelancer.user?.avatar?.original_url || defaultAvatarUrl" alt="profile" class="w-16 h-16 rounded-full">
                 <div class="flex flex-col justify-center">
-                    <span class="text-lg font-bold" v-if="props.freelancer.user">{{ props.freelancer.user.first_name }} {{ props.freelancer.user.last_name }}</span>
+                    <span class="text-lg font-bold" v-if="props.freelancer.user">
+                        {{ props.freelancer.user.first_name || 'No name provided' }} {{ props.freelancer.user.last_name || '' }}
+                    </span>
                     <span class="text-sm text-gray-500" v-if="props.freelancer.user">{{ props.freelancer.title }}</span>
                 </div>
             </div>

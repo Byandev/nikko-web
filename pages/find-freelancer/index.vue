@@ -31,13 +31,8 @@ interface SearchParams {
   countries: ICountry[];
 }
 
-const filters = ref([
-  { name: 'Avatar', value: 'user.avatar' },
-  { name: 'Skills', value: 'skills' },
-]);
-
 const searchParams = ref<SearchParams>({
-  include: filters.value.map(filter => filter.value).join(','),
+  include: 'user.avatar,skills',
   type: 'FREELANCER',
   search: '',
   skills: [],
@@ -128,25 +123,6 @@ const freelancerProfile = (user: Account) => {
   router.push({ path: `/freelancer/${user.id}` });
 }
 
-const updateInclude = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const includes = searchParams.value.include.split(',');
-
-  if (target.checked) {
-    if (!includes.includes(target.value)) {
-      includes.push(target.value);
-    }
-  } else {
-    const index = includes.indexOf(target.value);
-    if (index > -1) {
-      includes.splice(index, 1);
-    }
-  }
-
-  searchParams.value.include = includes.join(',');
-  fetchFreelancers(1);
-};
-
 const tabCount = computed(() => {
   return (tabName: string) => {
     if (tabName === 'All freelancer') {
@@ -175,21 +151,6 @@ const removeCountry = (country: ICountry) => {
 
       <!-- Left Column -->
       <div class="col-span-1 flex flex-col gap-4">
-
-        <!-- Filter search -->
-        <Section>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-xl font-bold">Filter</h2>
-            </div>
-          </template>
-          <template #content>
-            <div v-for="filter in filters" :key="filter.value" class="flex items-center">
-              <input type="checkbox" :value="filter.value" @change="updateInclude" class="mr-2" checked />
-              <label>{{ filter.name }}</label>
-            </div>
-          </template>
-        </Section>
 
         <!-- Skill Section -->
         <Section>
@@ -386,7 +347,6 @@ const removeCountry = (country: ICountry) => {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
