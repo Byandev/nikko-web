@@ -23,7 +23,14 @@ export default defineNuxtConfig({
     },
   ],
 
-  modules: ["@sidebase/nuxt-auth", "@pinia/nuxt", "@nuxtjs/tailwindcss", "nuxt-lodash", "nuxt-svgo"],
+  modules: [
+    "@sidebase/nuxt-auth",
+    "@pinia/nuxt",
+    "@nuxtjs/tailwindcss",
+    "nuxt-lodash",
+    "nuxt-svgo",
+    "nuxt-headlessui",
+  ],
 
   auth: {
     baseURL: process.env.API_URL,

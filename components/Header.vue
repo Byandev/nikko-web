@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
 import { authStore } from '~/store/authStore';
+import type { AuthenticationResponse } from '~/types/api/response/auth';
+import type { ApiErrorResponse } from '~/types/api/response/error';
 
 const { user } = storeToRefs(authStore());
 
-const { status, signOut } = useAuth();
+const { status } = useAuth();
 const isAuthenticated = computed(() => status.value === 'authenticated');
 const showDropdown = ref(false);
+
+const { sendRequest: signOut } = useSubmit<AuthenticationResponse, ApiErrorResponse>()
 
 const toggleDropdown = () => {
     showDropdown.value = !showDropdown.value;
@@ -18,7 +22,10 @@ const closeDropdown = () => {
 
 const handleLogout = async () => {
     closeDropdown();
-    await signOut();
+    await signOut('/v1/auth/logout', {
+        method: 'POST',
+    });
+    await navigateTo("/login", { external: true });
 };
 </script>
 
@@ -52,13 +59,13 @@ const handleLogout = async () => {
                             <span>Settings</span>
                         </div>
                     </NuxtLink>
-                    <NuxtLink to="/login" @click="handleLogout"
+                    <div @click="handleLogout"
                         class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 rounded-b-lg">
                         <div class="flex items-center space-x-2">
                             <Icon icon="mdi:logout" width="24" height="24" class="text-primary" />
                             <span>Logout</span>
                         </div>
-                    </NuxtLink>
+                    </div>
                 </div>
             </template>
             <template v-else>

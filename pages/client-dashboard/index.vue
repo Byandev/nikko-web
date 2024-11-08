@@ -7,7 +7,7 @@ import type { Media as MediaResponse } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
 import { data } from 'autoprefixer';
 
-const { fetchJobs, fetchJob, jobs, isJobsLoading } = useJobs();
+const { fetchJobs, jobs, isJobsLoading } = useJobs();
 const { sendRequest: sendRequest, pending: isLoading } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
 
 const { user } = storeToRefs(authStore());

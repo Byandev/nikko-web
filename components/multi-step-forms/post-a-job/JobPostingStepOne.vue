@@ -4,6 +4,13 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Skill } from '~/types/models/Skill';
 import { Icon } from '@iconify/vue';
 import { jobPostingStore } from '~/store/jobPostingStore';
+import {
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
+} from '@headlessui/vue';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 
 const emits = defineEmits<{ (e: 'submit'): void; (e: 'back'): void; }>();
 
@@ -22,8 +29,6 @@ const initialValue: FormData = {
 }
 
 const { jobPosting } = storeToRefs(jobPostingStore());
-
-const selectedSkillId = ref<number>(0)
 
 const selectedFiles = ref<File[]>([]);
 
@@ -48,18 +53,6 @@ const rules = {
 };
 
 const { formRef, v$ } = useValidation(form, rules);
-
-const onSelect = () => {
-    if (selectedSkillId.value) {
-        const selectedSkill = skillOptions.value.find(skill => skill.id === selectedSkillId.value)
-
-        if (selectedSkill && !form.value.skills?.find(skill => skill.id === selectedSkillId.value)) {
-            form.value.skills?.push(selectedSkill)
-        }
-
-        selectedSkillId.value = 0
-    }
-}
 
 const onRemoveSkill = (index: number) => {
     form.value.skills?.splice(index, 1);
@@ -155,7 +148,7 @@ const submitForm = () => {
                         Click to select a file</p>
                 </div>
                 <span v-if="v$.images.$error" class="text-red-900 text-sm">{{
-                        v$.images.$errors[0].$message }}</span>
+                    v$.images.$errors[0].$message }}</span>
             </div>
 
             <div v-if="selectedFiles.length || formRef.images.length" class="mt-4">
@@ -164,11 +157,10 @@ const submitForm = () => {
                         class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">
                         <div class="flex items-center space-x-2 w-full">
                             <Icon icon="mdi:file" class="text-gray-500" width="24" height="24" />
-                            <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96"
-                                :title="image.name">{{ image.name }}</span>
+                            <span class="text-sm text-gray-900 truncate max-w-52 lg:max-w-96" :title="image.name">{{
+                                image.name }}</span>
                         </div>
-                        <button @click="handleRemoveFile(String(image.name))"
-                            class="text-red-500 hover:text-red-700">
+                        <button @click="handleRemoveFile(String(image.name))" class="text-red-500 hover:text-red-700">
                             <Icon icon="mdi:close" width="16" height="16" />
                         </button>
                     </li>
@@ -181,14 +173,45 @@ const submitForm = () => {
                     Skills <span class="text-red-500">*</span>
                 </label>
                 <div class="mt-2">
-                    <select id="skills" required @change="onSelect" v-model="selectedSkillId"
-                        class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                        <option :value="0">Select Skill</option>
-                        <option class="truncate text-sm leading-6" v-for="skill in skillOptions" :key="skill.id"
-                            :value="skill.id">
-                            {{ skill.name }}
-                        </option>
-                    </select>
+                    <Listbox v-model="formRef.skills" multiple class="ring-1 ring-gray-300 rounded-md">
+                        <div class="relative mt-1">
+                            <ListboxButton
+                                class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                <span class="block truncate">
+                                    <span v-if="formRef.skills.length === 0">Select Skill</span>
+                                    <span v-else>
+                                        <span v-for="(skill, index) in formRef.skills" :key="index">
+                                            {{ skill.name }}<span v-if="index < formRef.skills.length - 1">, </span>
+                                        </span>
+                                    </span>
+                                </span>
+                                <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                    <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                </span>
+                            </ListboxButton>
+
+                            <transition leave-active-class="transition duration-100 ease-in"
+                                leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                <ListboxOptions
+                                    class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                    <ListboxOption v-for="(skill, index) in skillOptions" v-slot="{ active, selected }"
+                                        :key="index" :value="skill" as="template">
+                                        <li
+                                            :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                            <span
+                                                :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                                skill.name
+                                                }}</span>
+                                            <span v-if="selected"
+                                                class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                                <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                            </span>
+                                        </li>
+                                    </ListboxOption>
+                                </ListboxOptions>
+                            </transition>
+                        </div>
+                    </Listbox>
                     <span v-if="v$.skills.$error" class="text-red-900 text-sm">{{
                         v$.skills.$errors[0].$message }}</span>
                 </div>

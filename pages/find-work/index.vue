@@ -1,3 +1,83 @@
+<script setup lang="ts">
+import { Level, Status, Term, type Project } from '~/types/models/Project';
+
+
+interface SearchParams {
+  search: string;
+}
+
+const searchParams = ref<SearchParams>({
+  search: "",
+});
+
+const tabs = ref([
+  { name: `Latest Jobs`, current: true },
+  { name: `Saved Jobs`, current: false },
+]);
+
+const setActiveTab = (tabName: string) => {
+  tabs.value.forEach(tab => {
+    tab.current = (tab.name === tabName);
+  });
+};
+
+const savedJobs = ref<Partial<Project>[]>([
+  {
+    id: 1,
+    title: "Seeking Web Developer",
+    description: "In search of a skilled web developer to create a responsive website.",
+    estimated_budget: "$1000 - $2000",
+    length: Term.EXTENDED,
+    experience_level: Level.INTERMEDIATE,
+    status: Status.ACTIVE,
+    languages: [],
+    images: [],
+    skills: [],
+  },
+  {
+    id: 2,
+    title: "Hiring Mobile App Developer",
+    description: "Looking for a mobile app developer for a new initiative.",
+    estimated_budget: "$2000 - $3000",
+    length: Term.EXTENDED,
+    experience_level: Level.INTERMEDIATE,
+    status: Status.ACTIVE,
+    languages: [],
+    images: [],
+    skills: [],
+  },
+]);
+
+
+const jobs = ref<Partial<Project>[]>([
+  {
+    id: 1,
+    title: "Web Developer Needed",
+    description: "Looking for an experienced web developer to build a responsive website.",
+    estimated_budget: "$1000 - $2000",
+    length: Term.EXTENDED,
+    experience_level: Level.INTERMEDIATE,
+    status: Status.ACTIVE,
+    languages: [],
+    images: [],
+    skills: [],
+  },
+  {
+    id: 2,
+    title: "Mobile App Developer",
+    description: "Need a mobile app developer for a new project.",
+    estimated_budget: "$2000 - $3000",
+    length: Term.EXTENDED,
+    experience_level: Level.INTERMEDIATE,
+    status: Status.ACTIVE,
+    languages: [],
+    images: [],
+    skills: [],
+  },
+]);
+
+</script>
+
 <template>
   <div class="my-8 lg:mx-auto mx-5">
     <ProfileInfo class="max-w-6xl mx-auto " />
@@ -8,7 +88,7 @@
         <Section>
           <template #header>
             <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Your Bids</h2>
+              <h2 class="text-xl font-bold">Your Bids</h2>
             </div>
           </template>
           <template #content>
@@ -22,7 +102,7 @@
         <Section class="mt-5">
           <template #header>
             <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">All Contracts</h2>
+              <h2 class="text-xl font-bold">All Contracts</h2>
             </div>
           </template>
           <template #content>
@@ -36,7 +116,7 @@
         <Section class="mt-5">
           <template #header>
             <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Tools</h2>
+              <h2 class="text-xl font-bold">Tools</h2>
               <div>
                 <button class="text-blue-500">Request Tools</button>
                 <button class="text-gray-500 ml-5">Edit</button>
@@ -54,7 +134,7 @@
         <Section class="mt-5">
           <template #header>
             <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold">Verification</h2>
+              <h2 class="text-xl font-bold">Verification</h2>
             </div>
           </template>
           <template #content>
@@ -69,90 +149,31 @@
       <!-- Right Column -->
       <div class="col-span-1 lg:col-span-2">
         <div class="grid grid-cols-1 gap-5">
-          <Section>
-            <template #header>
-              <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">About</h2>
-                <div>
-                  <button class="text-gray-500 ml-5">Edit</button>
-                </div>
-              </div>
-            </template>
-            <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">About Section</p>
-              </div>
-            </template>
-          </Section>
+          <div class="border border-gray-300 rounded-lg p-4 flex flex-row items-center gap-2">
+            <Icon icon="material-symbols:search" class=" text-xl text-gray-400" />
+            <input v-model="searchParams.search" type="text" placeholder="Search for any jobs"
+              class="w-full outline-none border-none" />
+          </div>
 
-          <Section>
-            <template #header>
-              <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Feedback & History</h2>
-              </div>
-            </template>
-            <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Feedback & History Section</p>
-              </div>
-            </template>
-          </Section>
+          <div>
+            <nav class="flex space-x-4" aria-label="Tabs">
+              <template v-for="tab in tabs" :key="tab.name">
+                <a href="#" @click.prevent="setActiveTab(tab.name)"
+                  :class="tab.current ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
+                  class="px-3 py-2 font-medium text-sm rounded-md">
+                  {{ tab.name }}
+                </a>
+              </template>
+            </nav>
 
-          <Section>
-            <template #header>
-              <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Show Your Talent</h2>
-              </div>
-            </template>
-            <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Show Your Talent Section</p>
-              </div>
-            </template>
-          </Section>
+            <div v-if="tabs[0].current" class="flex flex-col gap-4 mt-5">
+              <JobCard v-for="job in jobs" :key="job.id" :job="job" />
+            </div>
 
-          <Section>
-            <template #header>
-              <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Certifications</h2>
-              </div>
-            </template>
-            <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Certifications Section</p>
-              </div>
-            </template>
-          </Section>
-
-          <Section>
-            <template #header>
-              <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Share Your Education</h2>
-                <div>
-                  <button class="text-blue-500">Add Education</button>
-                </div>
-              </div>
-
-            </template>
-            <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Share Your Education Section</p>
-              </div>
-            </template>
-          </Section>
-
-          <Section>
-            <template #header>
-              <div class="flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Share Your Professional Journey</h2>
-              </div>
-            </template>
-            <template #content>
-              <div class="mt-4">
-                <p class="text-gray-500">Share Your Professional Journey Section</p>
-              </div>
-            </template>
-          </Section>
+            <div v-if="tabs[1].current" class="flex flex-col gap-4 mt-5">
+              <JobCard v-for="job in savedJobs" :key="job.id" :job="job" />
+            </div>
+          </div>
         </div>
       </div>
     </div>

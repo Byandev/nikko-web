@@ -21,7 +21,6 @@ onMounted(async () => {
             } : undefined,
         }
     );
-    console.log(job);
 });
 
 const goBack = () => {
