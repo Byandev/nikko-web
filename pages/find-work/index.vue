@@ -92,7 +92,6 @@ const updateSaveStatus = async (id: number, isSaved: boolean) => {
     );
     console.log('Freelancer unsaved', response.data);
   }
-  await fetchProjects(1);
 };
 
 const tabCount = computed(() => {
