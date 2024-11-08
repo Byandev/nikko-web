@@ -10,6 +10,14 @@ import { Level, Term, type Project } from '~/types/models/Project';
 import _ from 'lodash';
 import type { Media } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
+import {
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
+} from '@headlessui/vue';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
+import type { Language } from '~/types/models/Language';
 
 const emits = defineEmits<{ (e: 'submit'): void; (e: 'back'): void; }>();
 
@@ -262,7 +270,8 @@ const submitForm = async () => {
                 </div>
 
                 <div class="mt-2">
-                    <div v-if="!isEditing.description" class="flex flex-row justify-between px-2 py-1 rounded bg-gray-100">
+                    <div v-if="!isEditing.description"
+                        class="flex flex-row justify-between px-2 py-1 rounded bg-gray-100">
                         <p>{{ formRef.description }}</p>
                     </div>
                     <div v-else>
@@ -296,15 +305,45 @@ const submitForm = async () => {
                         <p>{{ _.startCase(formRef.length.toLowerCase()) }}</p>
                     </div>
                     <div v-else>
-                        <div
-                            class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
-                            <Icon icon="mdi:calendar" :ssr="true" />
-                            <select id="length" v-model="formRef.length"
-                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
-                                <option v-for="term in Term" :key="term" :value="term">{{ _.startCase(term.toLowerCase()) }}
-                                </option>
-                            </select>
-                        </div>
+                        <Listbox v-model="formRef.length" class="ring-1 ring-gray-300 rounded-md">
+                            <div class="relative mt-1">
+                                <ListboxButton
+                                    class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                    <span class="block truncate">
+                                        <span>
+                                            <span v-if="!formRef.length">Select length</span>
+                                            <span v-else>
+                                                {{ _.capitalize(_.startCase(formRef.length)) }}
+                                            </span>
+                                        </span>
+                                    </span>
+                                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </span>
+                                </ListboxButton>
+
+                                <transition leave-active-class="transition duration-100 ease-in"
+                                    leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                    <ListboxOptions
+                                        class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                        <ListboxOption v-for="(term, index) in Term" v-slot="{ active, selected }"
+                                            :key="index" :value="term" as="template">
+                                            <li
+                                                :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                                <span
+                                                    :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                                    _.capitalize(_.startCase(term))
+                                                    }}</span>
+                                                <span v-if="selected"
+                                                    class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                </span>
+                                            </li>
+                                        </ListboxOption>
+                                    </ListboxOptions>
+                                </transition>
+                            </div>
+                        </Listbox>
                         <span v-if="v$.length.$error" class="text-red-900 text-sm">{{
                             v$.length.$errors[0].$message }}</span>
                     </div>
@@ -318,25 +357,59 @@ const submitForm = async () => {
                         Experience Level <span class="text-red-500">*</span>
                     </label>
                     <div v-if="!isEditing.experience_level">
-                        <button type="button" @click="toggleEdit('experience_level')" class="text-blue-500">Edit</button>
+                        <button type="button" @click="toggleEdit('experience_level')"
+                            class="text-blue-500">Edit</button>
                     </div>
                     <div v-else>
-                        <button type="button" @click="toggleEdit('experience_level')" class="text-blue-500">Save</button>
+                        <button type="button" @click="toggleEdit('experience_level')"
+                            class="text-blue-500">Save</button>
                     </div>
                 </div>
                 <div class="mt-2">
-                    <div v-if="!isEditing.experience_level" class="flex flex-row justify-between px-2 py-1 rounded bg-gray-100">
+                    <div v-if="!isEditing.experience_level"
+                        class="flex flex-row justify-between px-2 py-1 rounded bg-gray-100">
                         <p>{{ _.capitalize(formRef.experience_level) }}</p>
                     </div>
                     <div v-else>
-                        <div
-                            class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500">
-                            <Icon icon="mdi:account" :ssr="true" />
-                            <select id="experience_level" v-model="formRef.experience_level"
-                                class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
-                                <option v-for="level in Object.values(Level)" :key="level" :value="level">{{ _.capitalize(level) }}</option>
-                            </select>
-                        </div>
+                        <Listbox v-model="formRef.experience_level" class="ring-1 ring-gray-300 rounded-md">
+                            <div class="relative mt-1">
+                                <ListboxButton
+                                    class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                    <span class="block truncate">
+                                        <span>
+                                            <span v-if="!formRef.experience_level">Select experience_level</span>
+                                            <span v-else>
+                                                {{ _.capitalize(_.startCase(formRef.experience_level)) }}
+                                            </span>
+                                        </span>
+                                    </span>
+                                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </span>
+                                </ListboxButton>
+
+                                <transition leave-active-class="transition duration-100 ease-in"
+                                    leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                    <ListboxOptions
+                                        class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                        <ListboxOption v-for="(level, index) in Object.values(Level)"
+                                            v-slot="{ active, selected }" :key="index" :value="level" as="template">
+                                            <li
+                                                :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                                <span
+                                                    :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                                    _.capitalize(level)
+                                                    }}</span>
+                                                <span v-if="selected"
+                                                    class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                </span>
+                                            </li>
+                                        </ListboxOption>
+                                    </ListboxOptions>
+                                </transition>
+                            </div>
+                        </Listbox>
                         <span v-if="v$.experience_level.$error" class="text-red-900 text-sm">{{
                             v$.experience_level.$errors[0].$message }}</span>
                     </div>
@@ -367,21 +440,53 @@ const submitForm = async () => {
                         </div>
                     </div>
                     <div v-else>
-                        <div>
-                            <select @change="onSelectedLanguage" v-model="selectedLanguageName"
-                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                <option :value=null selected>Select Language</option>
-                                <option :value="language" class="truncate text-sm leading-6"
-                                    v-for="language in languageOptions" :key="language">
-                                    {{ language }}
-                                </option>
-                            </select>
-                        </div>
-                        <span v-if="v$.languages.$error" class="text-red-900 text-sm">{{ v$.languages.$errors[0].$message
+                        <Listbox v-model="formRef.languages" multiple class="ring-1 ring-gray-300 rounded-md">
+                            <div class="relative mt-1">
+                                <ListboxButton
+                                    class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                    <span class="block truncate">
+                                        <span v-if="formRef.languages.length === 0">Select language</span>
+                                        <span v-else>
+                                            <span v-for="(language, index) in formRef.languages" :key="index">
+                                                {{ language.name }}<span v-if="index < formRef.languages.length - 1">,
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </span>
+                                </ListboxButton>
+
+                                <transition leave-active-class="transition duration-100 ease-in"
+                                    leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                    <ListboxOptions
+                                        class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                        <ListboxOption v-for="(language, index) in languageOptions"
+                                            v-slot="{ active, selected }" :key="index" :value="{ name: language }"
+                                            as="template">
+                                            <li
+                                                :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                                <span
+                                                    :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                                    language
+                                                    }}</span>
+                                                <span v-if="selected"
+                                                    class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                </span>
+                                            </li>
+                                        </ListboxOption>
+                                    </ListboxOptions>
+                                </transition>
+                            </div>
+                        </Listbox>
+                        <span v-if="v$.languages.$error" class="text-red-900 text-sm">{{
+                            v$.languages.$errors[0].$message
                             }}</span>
-                         <div class="mt-5 flex flex-wrap">
-                            <div v-for="(language, idx) in formRef.languages" :key="`selected-language-${language.name}`"
-                                class="mr-2 my-1">
+                        <div class="mt-5 flex flex-wrap">
+                            <div v-for="(language, idx) in formRef.languages"
+                                :key="`selected-language-${language.name}`" class="mr-2 my-1">
                                 <span
                                     class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                                     {{ language.name }}
@@ -408,14 +513,17 @@ const submitForm = async () => {
                         Estimated Budget <span class="text-red-500">*</span>
                     </label>
                     <div v-if="!isEditing.estimated_budget">
-                        <button type="button" @click="toggleEdit('estimated_budget')" class="text-blue-500">Edit</button>
+                        <button type="button" @click="toggleEdit('estimated_budget')"
+                            class="text-blue-500">Edit</button>
                     </div>
                     <div v-else>
-                        <button type="button" @click="toggleEdit('estimated_budget')" class="text-blue-500">Save</button>
+                        <button type="button" @click="toggleEdit('estimated_budget')"
+                            class="text-blue-500">Save</button>
                     </div>
                 </div>
                 <div class="mt-2">
-                    <div v-if="!isEditing.estimated_budget" class="flex flex-row justify-between px-2 py-1 rounded bg-gray-100">
+                    <div v-if="!isEditing.estimated_budget"
+                        class="flex flex-row justify-between px-2 py-1 rounded bg-gray-100">
                         <p>{{ formRef.estimated_budget }}</p>
                     </div>
                     <div v-else>
@@ -513,14 +621,45 @@ const submitForm = async () => {
                         </div>
                     </div>
                     <div v-else>
-                        <select id="skills" required @change="onSelectSkill" v-model="selectedSkillId"
-                            class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                            <option :value="0">Select Skill</option>
-                            <option class="truncate text-sm leading-6 whitespace-nowrap" v-for="skill in skillOptions" :key="skill.id"
-                                :value="skill.id">
-                                {{ skill.name }}
-                            </option>
-                        </select>
+                        <Listbox v-model="formRef.skills" multiple class="ring-1 ring-gray-300 rounded-md">
+                            <div class="relative mt-1">
+                                <ListboxButton
+                                    class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                    <span class="block truncate">
+                                        <span v-if="formRef.skills.length === 0">Select Skill</span>
+                                        <span v-else>
+                                            <span v-for="(skill, index) in formRef.skills" :key="index">
+                                                {{ skill.name }}<span v-if="index < formRef.skills.length - 1">, </span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                    <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </span>
+                                </ListboxButton>
+
+                                <transition leave-active-class="transition duration-100 ease-in"
+                                    leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                    <ListboxOptions
+                                        class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                        <ListboxOption v-for="(skill, index) in skillOptions"
+                                            v-slot="{ active, selected }" :key="index" :value="skill" as="template">
+                                            <li
+                                                :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                                <span
+                                                    :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                                        skill.name
+                                                    }}</span>
+                                                <span v-if="selected"
+                                                    class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                                    <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                </span>
+                                            </li>
+                                        </ListboxOption>
+                                    </ListboxOptions>
+                                </transition>
+                            </div>
+                        </Listbox>
                         <span v-if="v$.skills.$error" class="text-red-900 text-sm">{{ v$.skills.$errors[0].$message
                             }}</span>
                         <div v-if="formRef.skills.length" class="mt-4 flex flex-row">
@@ -548,8 +687,10 @@ const submitForm = async () => {
             <div class="flex mt-5 justify-between w-full">
                 <Button text="Back" type="button" background="white" foreground="primary" @click="emits('back')" />
                 <div class="flex flex-row">
-                    <Button :isLoading="isUploading || isSubmitting" text="Save Draft" type="submit" background="white" @click="status = 'DRAFT'" foreground="primary" />
-                    <Button :isLoading="isUploading || isSubmitting" text="Publish" type="submit" background="primary" @click="status = 'ACTIVE'" foreground="white" />
+                    <Button :isLoading="isUploading || isSubmitting" text="Save Draft" type="submit" background="white"
+                        @click="status = 'DRAFT'" foreground="primary" />
+                    <Button :isLoading="isUploading || isSubmitting" text="Publish" type="submit" background="primary"
+                        @click="status = 'ACTIVE'" foreground="white" />
                 </div>
             </div>
         </form>

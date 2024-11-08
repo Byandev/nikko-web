@@ -6,6 +6,13 @@ import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
 import moment from 'moment';
 import { helpers, required } from '@vuelidate/validators';
+import {
+    Listbox,
+    ListboxButton,
+    ListboxOptions,
+    ListboxOption,
+} from '@headlessui/vue';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 
 const isModalOpen = ref(false);
 const isViewModalOpen = ref(false);
@@ -61,7 +68,7 @@ const rules = {
 
 const { formRef, v$ } = useValidation(form, rules);
 
-const monthOptions = computed(() => moment.months());
+const monthOptions = computed(() => moment.months().map((month, index) => index + 1));
 
 const { account } = storeToRefs(accountStore());
 
@@ -203,7 +210,7 @@ const handleSubmit = async () => {
         </template>
         <template #content>
             <form class="w-full max-w-lg text-start">
-                
+
                 <!-- Degree -->
                 <div class="mt-4">
                     <label for="degree" class="block text-sm font-medium leading-6 text-gray-900">
@@ -263,16 +270,48 @@ const handleSubmit = async () => {
                             Start Month <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-2">
-                            <select v-model="formRef.start_month"
-                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                <option :value="0">Select Month</option>
-                                <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
-                                    :key="`start-month-${monthIndex}`" :value="monthIndex + 1">
-                                    {{ month }}
-                                </option>
-                            </select>
+                            <Listbox v-model="formRef.start_month" class="ring-1 ring-gray-300 rounded-md">
+                                <div class="relative mt-1">
+                                    <ListboxButton
+                                        class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                        <span class="block truncate">
+                                            <span>
+                                                <span v-if="!formRef.start_month">Select Month</span>
+                                                <span v-else>
+                                                    {{ formRef.start_month }}
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span
+                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                            <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                        </span>
+                                    </ListboxButton>
+
+                                    <transition leave-active-class="transition duration-100 ease-in"
+                                        leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                        <ListboxOptions
+                                            class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                            <ListboxOption v-for="(month, index) in monthOptions"
+                                                v-slot="{ active, selected }" :key="index" :value="month" as="template">
+                                                <li
+                                                    :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                                    <span
+                                                        :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                                        month
+                                                        }}</span>
+                                                    <span v-if="selected"
+                                                        class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                                        <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                    </span>
+                                                </li>
+                                            </ListboxOption>
+                                        </ListboxOptions>
+                                    </transition>
+                                </div>
+                            </Listbox>
                             <span v-if="v$.start_month.$error" class="text-red-900 text-sm">{{
-                            v$.start_month.$errors[0].$message }}</span>
+                                v$.start_month.$errors[0].$message }}</span>
                         </div>
                     </div>
 
@@ -282,17 +321,50 @@ const handleSubmit = async () => {
                             Start Year <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-2">
-                            <select v-model="formRef.start_year"
-                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                <option :value="0">Select Year</option>
-                                <option class="truncate text-sm leading-6"
-                                    v-for="(year, yearIndex) in _.range(2000, 2025)"
-                                    :key="`start-year-${yearIndex}`" :value="year">
-                                    {{ year }}
-                                </option>
-                            </select>
+                            <Listbox v-model="formRef.start_year" class="ring-1 ring-gray-300 rounded-md">
+                                <div class="relative mt-1">
+                                    <ListboxButton
+                                        class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                        <span class="block truncate">
+                                            <span>
+                                                <span v-if="!formRef.start_year">Select Year</span>
+                                                <span v-else>
+                                                    {{ formRef.start_year }}
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span
+                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                            <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                        </span>
+                                    </ListboxButton>
+
+                                    <transition leave-active-class="transition duration-100 ease-in"
+                                        leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                        <ListboxOptions
+                                            class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                            <ListboxOption v-for="(year, index) in _.range(2000, 2025)"
+                                                v-slot="{ active, selected }" :key="index" :value="year" as="template">
+                                                <li
+                                                    :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                                    <span
+                                                        :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                                        year
+                                                        }}</span>
+                                                    <span v-if="selected"
+                                                        class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                                        <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                    </span>
+                                                </li>
+                                            </ListboxOption>
+                                        </ListboxOptions>
+                                    </transition>
+                                </div>
+                            </Listbox>
+
+
                             <span v-if="v$.start_year.$error" class="text-red-900 text-sm">{{
-                            v$.start_year.$errors[0].$message }}</span>
+                                v$.start_year.$errors[0].$message }}</span>
                         </div>
                     </div>
                 </div>
@@ -305,16 +377,48 @@ const handleSubmit = async () => {
                             End Month <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-2">
-                            <select v-model="formRef.end_month"
-                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                <option :value="0">Select Month</option>
-                                <option class="truncate text-sm leading-6" v-for="(month, monthIndex) in monthOptions"
-                                    :key="`start-month-${monthIndex}`" :value="monthIndex + 1">
-                                    {{ month }}
-                                </option>
-                            </select>
+                            <Listbox v-model="formRef.end_month" class="ring-1 ring-gray-300 rounded-md">
+                                <div class="relative mt-1">
+                                    <ListboxButton
+                                        class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                        <span class="block truncate">
+                                            <span>
+                                                <span v-if="!formRef.end_month">Select Month</span>
+                                                <span v-else>
+                                                    {{ formRef.end_month }}
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span
+                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                            <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                        </span>
+                                    </ListboxButton>
+
+                                    <transition leave-active-class="transition duration-100 ease-in"
+                                        leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                        <ListboxOptions
+                                            class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                            <ListboxOption v-for="(month, index) in monthOptions"
+                                                v-slot="{ active, selected }" :key="index" :value="month" as="template">
+                                                <li
+                                                    :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                                    <span
+                                                        :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                                        month
+                                                        }}</span>
+                                                    <span v-if="selected"
+                                                        class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                                        <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                    </span>
+                                                </li>
+                                            </ListboxOption>
+                                        </ListboxOptions>
+                                    </transition>
+                                </div>
+                            </Listbox>
                             <span v-if="v$.end_month.$error" class="text-red-900 text-sm">{{
-                            v$.end_month.$errors[0].$message }}</span>
+                                v$.end_month.$errors[0].$message }}</span>
                         </div>
                     </div>
 
@@ -324,17 +428,48 @@ const handleSubmit = async () => {
                             End Year <span class="text-red-500">*</span>
                         </label>
                         <div class="mt-2">
-                            <select v-model="formRef.end_year"
-                                class="w-full px-2 block text-sm leading-6 rounded-md border-0 py-2 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                                <option :value="0">Select Year</option>
-                                <option class="truncate text-sm leading-6"
-                                    v-for="(year, yearIndex) in _.range(2000, 2025)"
-                                    :key="`start-year-${yearIndex}`" :value="year">
-                                    {{ year }}
-                                </option>
-                            </select>
+                            <Listbox v-model="formRef.end_year" class="ring-1 ring-gray-300 rounded-md">
+                                <div class="relative mt-1">
+                                    <ListboxButton
+                                        class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                        <span class="block truncate">
+                                            <span>
+                                                <span v-if="!formRef.end_year">Select Year</span>
+                                                <span v-else>
+                                                    {{ formRef.end_year }}
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <span
+                                            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                            <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                        </span>
+                                    </ListboxButton>
+
+                                    <transition leave-active-class="transition duration-100 ease-in"
+                                        leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                        <ListboxOptions
+                                            class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                            <ListboxOption v-for="(year, index) in _.range(2000, 2025)"
+                                                v-slot="{ active, selected }" :key="index" :value="year" as="template">
+                                                <li
+                                                    :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                                    <span
+                                                        :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                                        year
+                                                        }}</span>
+                                                    <span v-if="selected"
+                                                        class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                                        <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                                    </span>
+                                                </li>
+                                            </ListboxOption>
+                                        </ListboxOptions>
+                                    </transition>
+                                </div>
+                            </Listbox>
                             <span v-if="v$.end_year.$error" class="text-red-900 text-sm">{{
-                                    v$.end_year.$errors[0].$message }}</span>
+                                v$.end_year.$errors[0].$message }}</span>
                         </div>
                     </div>
                 </div>

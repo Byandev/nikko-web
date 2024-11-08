@@ -5,6 +5,13 @@ import type { AuthenticationResponse } from "~/types/api/response/auth";
 import type { ApiErrorResponse } from "~/types/api/response/error";
 import { Icon } from '@iconify/vue';
 import { AccountType } from '~/types/models/Account';
+import {
+  Listbox,
+  ListboxButton,
+  ListboxOptions,
+  ListboxOption,
+} from '@headlessui/vue';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 
 const router = useRouter();
 const route = useRoute();
@@ -70,7 +77,7 @@ const submitForm = async () => {
 
     await getSession()
 
-    await router.push("/email-verification");
+    await navigateTo("/email-verification", {external: true});
   } catch (error) {
     console.error(error as ApiErrorResponse)
   } finally {
@@ -135,12 +142,42 @@ const submitForm = async () => {
                         <label class="block text-sm font-medium leading-6 text-gray-900" for="account_type">Choose
                           Type</label>
                         <div class="mt-2">
-                          <select id="account_type" v-model="formRef.account_type"
-                            :class="{ 'ring-red-300': v$.account_type.$error, 'ring-gray-300': !v$.account_type.$error }"
-                            class="block w-full rounded-md border-0 py-1.5 px-2 shadow-sm ring-1 ring-inset placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                            <option v-for="(account, index) in AccountType" :key="index" :value="account">I am a {{
-                              useCapitalize(account) }}</option>
-                          </select>
+                          <Listbox v-model="formRef.account_type" class="ring-1 ring-gray-300 rounded-md">
+                            <div class="relative mt-1">
+                              <ListboxButton
+                                class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
+                                <span class="block truncate">
+                                  <span v-if="!formRef.account_type">Select Type</span>
+                                  <span v-else>
+                                    {{ useCapitalize(formRef.account_type) }}
+                                  </span>
+                                </span>
+                                <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                  <ChevronUpDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                </span>
+                              </ListboxButton>
+
+                              <transition leave-active-class="transition duration-100 ease-in"
+                                leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                <ListboxOptions
+                                  class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                                  <ListboxOption v-for="(account, index) in AccountType" v-slot="{ active, selected }"
+                                    :key="index" :value="account" as="template">
+                                    <li
+                                      :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
+                                      <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
+                                          useCapitalize(account)
+                                      }}</span>
+                                      <span v-if="selected"
+                                        class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
+                                        <CheckIcon class="h-5 w-5" aria-hidden="true" />
+                                      </span>
+                                    </li>
+                                  </ListboxOption>
+                                </ListboxOptions>
+                              </transition>
+                            </div>
+                          </Listbox>
                           <span v-if="v$.account_type.$error" class="text-red-900 text-sm">{{
                             v$.account_type.$errors[0].$message }}</span>
                         </div>
@@ -222,7 +259,8 @@ const submitForm = async () => {
                           <div
                             class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                             <Icon icon="mdi:lock-check" :ssr="true" />
-                            <input id="password_confirmation" v-model="formRef.password_confirmation" autocomplete="new-password"
+                            <input id="password_confirmation" v-model="formRef.password_confirmation"
+                              autocomplete="new-password"
                               :class="{ 'ring-red-300': v$.password_confirmation.$error, 'ring-gray-300': !v$.password_confirmation.$error }"
                               class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none"
                               type="password">
