@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import { Level, Status, Term, type Project } from '~/types/models/Project';
-
-const { data: savedJobs, fetchData: fetchSavedJobs, pending: isLoadingSavedJobs } = useFetchData<{ data: Project }, ApiErrorResponse>();
-const { data: allJobs, fetchData: fetchAllJobs, pending: isLoadingAllJobs } = useFetchData<{ data: Project }, ApiErrorResponse>();
-
-onMounted(() => {
-  fetchSavedJobs(`/v1/projects`);
-  fetchAllJobs(`/v1/projects`);
-});
+import type { Project } from '~/types/models/Project';
+import { accountStore } from '~/store/accountStore';
 
 interface SearchParams {
   search: string;
@@ -16,6 +9,13 @@ interface SearchParams {
 
 const searchParams = ref<SearchParams>({
   search: "",
+});
+
+const { account } = storeToRefs(accountStore());
+const { fetchProjects, projects, isProjectsLoading } = useProject();
+
+onMounted(async() => {
+  await fetchProjects(1, '/v1/projects');
 });
 
 const tabs = ref([
@@ -27,6 +27,33 @@ const setActiveTab = (tabName: string) => {
   tabs.value.forEach(tab => {
     tab.current = (tab.name === tabName);
   });
+};
+
+const { sendRequest: updateProject } = useSubmit<{ data: Project }, ApiErrorResponse>();
+
+const updateSaveStatus = async (id: number, isSaved: boolean) => {
+  if (!isSaved) {
+    const response = await updateProject(`v1/projects/${id}/save`,
+      {
+        method: 'POST',
+        headers: account?.value?.id ? {
+          'X-ACCOUNT-ID': account.value.id.toString(),
+        } : undefined,
+      }
+    );
+    console.log('Freelancer saved', response.data);
+  } else {
+    const response = await updateProject(`v1/projects/${id}/un-save`,
+      {
+        method: 'DELETE',
+        headers: account?.value?.id ? {
+          'X-ACCOUNT-ID': account.value.id.toString(),
+        } : undefined,
+      }
+    );
+    console.log('Freelancer unsaved', response.data);
+  }
+  await fetchProjects(1, '/v1/projects');
 };
 
 </script>
@@ -120,11 +147,15 @@ const setActiveTab = (tabName: string) => {
             </nav>
 
             <div v-if="tabs[0].current" class="flex flex-col gap-4 mt-5">
-              <JobCard v-for="job in allJobs" :key="job.id" :job="job" />
+              <FindWorkJobCard @save="updateSaveStatus($event,false)" @unsave="updateSaveStatus($event,true)" v-for="job in projects.data" :key="job.id" :job="job" />
+              <Pagination v-if="!isProjectsLoading && projects.data.length > 0"
+              :pagination="projects.meta" 
+              @prev-page="fetchProjects(projects.meta.current_page - 1, '/v1/projects')"
+              @next-page="fetchProjects(projects.meta.current_page + 1, '/v1/projects')" />
             </div>
 
             <div v-if="tabs[1].current" class="flex flex-col gap-4 mt-5">
-              {{ savedJobs }}
+              <FindWorkJobCard @save="updateSaveStatus($event,false)" @unsave="updateSaveStatus($event,true)" v-for="job in projects.data.filter(project => project.is_saved)" :key="job.id" :job="job" />
             </div>
           </div>
         </div>

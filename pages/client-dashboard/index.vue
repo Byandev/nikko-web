@@ -5,10 +5,8 @@ import { ref, watch, computed } from 'vue';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media as MediaResponse } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
-import type { PaginatedList } from '~/types/models/Pagination';
-import type { Project } from '~/types/models/Project';
 
-const { data: allJobs, fetchData: fetchAllJobs, pending: isLoadingAllJobs } = useFetchData<{ data: PaginatedList<Project> }, ApiErrorResponse>();
+const { fetchProjects, projects, isProjectsLoading } = useProject();
 const { sendRequest: sendRequest, pending: isLoading } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
 
 const { user } = storeToRefs(authStore());
@@ -95,8 +93,8 @@ const uploadImage = async () => {
     }
 };
 
-const fetchJobs = async (page: number) => {
-    fetchAllJobs(`/v1/projects?page=${page}`);
+const refreshJobs = async () => {
+    fetchProjects(1,'v1/client/projects');
 };
 
 const deleteAJob = async (jobId: number) => {
@@ -110,7 +108,7 @@ const deleteAJob = async (jobId: number) => {
     } catch (error) {
         console.error('Error deleting job:', error);
     } finally {
-        fetchJobs(1);
+        refreshJobs();
     }
 };
 
@@ -132,20 +130,12 @@ const confirmDeleteJob = async () => {
 
 const searchQuery = ref('');
 
-const filteredJobs = ref<Project[]>([]);
-
-watch([allJobs, searchQuery], () => {
-    filteredJobs.value = allJobs.value?.data?.data?.filter((job: Project) => job.title.toLowerCase().includes(searchQuery.value.toLowerCase())) || [];
-}, { immediate: true });
-
-onMounted(async () => {
-    await fetchJobs(1);
+const filteredJobs = computed(() => {
+    if (!projects.value?.data) return [];
+    return projects.value.data.filter(project => project.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
 });
 
-watch(allJobs, (newJobs) => {
-    console.log('Updated Jobs:', newJobs);
-});
-
+fetchProjects(1,'v1/client/projects');
 </script>
 
 <template>
@@ -258,9 +248,9 @@ watch(allJobs, (newJobs) => {
                                     class="p-2 border rounded-md" />
                             </div>
                         </div>
-                        <div v-if="!isLoadingAllJobs && filteredJobs">
+                        <div v-if="!isProjectsLoading">
                             <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'ACTIVE')" :key="job.id">
-                                <JobCard @submit="fetchJobs(1)" @delete="openDeleteModal" :job="job" />
+                                <JobCard @submit="refreshJobs" @delete="openDeleteModal" :job="job" />
                             </div>
                         </div>
                         <div v-else>
@@ -272,10 +262,10 @@ watch(allJobs, (newJobs) => {
                     </div>
                     
                     <Pagination
-                        v-if="!isLoading && allJobs?.data.meta && (allJobs.data.data ?? []).length > 0 && !tabs[0].current && tabs[1].current && allJobs.data.data.filter(job => job.status === 'ACTIVE').length > 0"
-                        :pagination="allJobs.data.meta"
-                        @prev-page="fetchJobs(allJobs?.data?.meta?.current_page - 1)"
-                        @next-page="fetchJobs(allJobs?.data?.meta?.current_page + 1)"
+                        v-if="!isLoading && (projects.data ?? []).length > 0 && !tabs[0].current && tabs[1].current && projects.data.filter(project => project.status === 'ACTIVE').length > 0"
+                        :pagination="projects.meta"
+                        @prev-page="fetchProjects(projects.meta.current_page - 1,'v1/client/projects')"
+                        @next-page="fetchProjects(projects.meta.current_page + 1,'v1/client/projects')"
                     />
 
                     <div v-if="tabs[2].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -292,9 +282,9 @@ watch(allJobs, (newJobs) => {
                                     class="p-2 border rounded-md" />
                             </div>
                         </div>
-                        <div v-if="!isLoadingAllJobs">
+                        <div v-if="!isProjectsLoading">
                             <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'DRAFT')" :key="job.id">
-                                <JobCard @submit="fetchJobs(1)" @delete="deleteAJob" :job="job" />
+                                <JobCard @submit="refreshJobs" @delete="deleteAJob" :job="job" />
                             </div>
                         </div>
                         <div v-else>
@@ -306,10 +296,10 @@ watch(allJobs, (newJobs) => {
                     </div>
 
                     <Pagination
-                        v-if="!isLoading && allJobs?.data.meta && (allJobs?.data.data ?? []).length > 0 && !tabs[0].current && tabs[2].current && allJobs?.data?.data.filter((job: Project) => job.status === 'DRAFT').length > 0"
-                        :pagination="allJobs.data.meta"
-                        @prev-page="fetchJobs(allJobs.data.meta.current_page - 1)"
-                        @next-page="fetchJobs(allJobs.data.meta.current_page + 1)"
+                        v-if="!isLoading && (projects.data ?? []).length > 0 && !tabs[0].current && tabs[2].current && projects.data.filter(project => project.status === 'DRAFT').length > 0"
+                        :pagination="projects.meta"
+                        @prev-page="fetchProjects(projects.meta.current_page - 1, 'v1/client/projects')"
+                        @next-page="fetchProjects(projects.meta.current_page + 1, 'v1/client/projects')"
                     />
                 </div>
             </div>

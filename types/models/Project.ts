@@ -27,6 +27,7 @@ export interface Project {
     description: string;
     estimated_budget: string;
     length: Term;
+    is_saved: boolean;
     experience_level: Level;
     status: Status, 
     languages: Language[];

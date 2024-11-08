@@ -47,7 +47,7 @@ const searchParams = ref<SearchParams>({
 const { data: Savedfreelancers, fetchData: fetchSavedFreelancer, pending: isLoadingSavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
 const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: isLoadingUnsavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
 
-const { data: skills, fetchData: fetchSkills, pending: isSkillsLoading } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
+const { data: skills, fetchData: fetchSkills } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
 
 const { sendRequest: updateFreelancer } = useSubmit<{ data: Account }, ApiErrorResponse>();
 
