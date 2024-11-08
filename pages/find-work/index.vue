@@ -56,6 +56,14 @@ const updateSaveStatus = async (id: number, isSaved: boolean) => {
   await fetchProjects(1, '/v1/projects');
 };
 
+const tabCount = computed(() => {
+  return (tabName: string) => {
+    if (tabName === 'Latest Jobs') {
+      return projects.value?.meta.total || 0;
+    } 
+    return 0;
+  };
+});
 </script>
 
 <template>
@@ -141,7 +149,7 @@ const updateSaveStatus = async (id: number, isSaved: boolean) => {
                 <a href="#" @click.prevent="setActiveTab(tab.name)"
                   :class="tab.current ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
                   class="px-3 py-2 font-medium text-sm rounded-md">
-                  {{ tab.name }}
+                  {{ tab.name }} ({{ tabCount(tab.name) }})
                 </a>
               </template>
             </nav>

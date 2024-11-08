@@ -234,8 +234,8 @@ fetchProjects(1,'v1/client/projects');
                         </div>
                     </div>
 
-                    <div v-if="tabs[1].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center">
+                    <div v-if="tabs[1].current" class="">
+                        <div class="bg-white shadow px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center ring-1 ring-gray-300 rounded-md">
                             <div>
                                 <h3 class="text-lg font-medium leading-6 text-gray-900">All Jobs Post</h3>
                                 <p class="mt-1 max-w-2xl text-sm text-gray-500">
@@ -248,7 +248,7 @@ fetchProjects(1,'v1/client/projects');
                                     class="p-2 border rounded-md" />
                             </div>
                         </div>
-                        <div v-if="!isProjectsLoading">
+                        <div v-if="!isProjectsLoading" class="mt-5">
                             <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'ACTIVE')" :key="job.id">
                                 <JobCard @submit="refreshJobs" @delete="openDeleteModal" :job="job" />
                             </div>
@@ -268,8 +268,8 @@ fetchProjects(1,'v1/client/projects');
                         @next-page="fetchProjects(projects.meta.current_page + 1,'v1/client/projects')"
                     />
 
-                    <div v-if="tabs[2].current" class="bg-white shadow overflow-hidden sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center">
+                    <div v-if="tabs[2].current">
+                        <div class="bg-white shadow px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center ring-1 ring-gray-300 rounded-md">
                             <div>
                                 <h3 class="text-lg font-medium leading-6 text-gray-900">All Saved Draft</h3>
                                 <p class="mt-1 max-w-2xl text-sm text-gray-500">
@@ -282,7 +282,7 @@ fetchProjects(1,'v1/client/projects');
                                     class="p-2 border rounded-md" />
                             </div>
                         </div>
-                        <div v-if="!isProjectsLoading">
+                        <div v-if="!isProjectsLoading" class="mt-5">
                             <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'DRAFT')" :key="job.id">
                                 <JobCard @submit="refreshJobs" @delete="deleteAJob" :job="job" />
                             </div>

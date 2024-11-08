@@ -14,14 +14,14 @@ const emit = defineEmits<{
 
 const router = useRouter();
 
-const viewJobDetails = async () => {
+const sendProposal = async () => {
     await router.push(`/jobs/${props.job.id}`);
 };
 
 </script>
 
 <template>
-    <div class="job-card bg-white border-b-2 border-t-2 border-black p-6">
+    <div class="job-card bg-white hover:bg-gray-100 p-5 ring-1 ring-gray-300 rounded-md">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-bold text-gray-800">{{ props.job.title }}</h2>
         </div>
@@ -36,7 +36,7 @@ const viewJobDetails = async () => {
                 <span class="text-sm font-medium text-gray-700">{{ _.startCase(props.job.length?.toLowerCase() || '') }}</span>
             </div>
         </div>
-        <div class="mt-4 flex items-center space-x-2">
+        <div class="mt-4 flex items-center space-x-2" v-if="props.job.languages">
             <span class="text-sm text-gray-500">Languages:</span>
             <div class="flex flex-wrap gap-2">
                 <span v-for="(language, index) in props.job.languages" :key="index" class="bg-primary/15 text-primary  text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
@@ -44,7 +44,7 @@ const viewJobDetails = async () => {
                 </span>
             </div>
         </div>
-        <div class="mt-4 flex items-center space-x-2">
+        <div class="mt-4 flex items-center space-x-2" v-if="props.job.skills">
             <span class="text-sm text-gray-500">Skills:</span>
             <div class="flex flex-wrap gap-2">
                 <span v-for="(skill, index) in props.job.skills" :key="index" class="bg-primary/15 text-primary text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
@@ -54,8 +54,8 @@ const viewJobDetails = async () => {
         </div>
         <div class="mt-4 flex items-center justify-between">
             <span class="text-lg font-semibold text-gray-800">${{ props.job.estimated_budget }}</span>
-            <div class="flex flex-col gap-4">
-                <Button @click="viewJobDetails" text="View Details" type="button" background="primary" foreground="white" />
+            <div class="flex flex-col gap-2 sm:gap-3">
+                <Button @click="sendProposal" text="Apply Now" type="button" background="primary" foreground="white" />
                 <div v-if="!props.job.is_saved" @click="emit('save',Number(job.id))" class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
                     <Icon icon="mdi:heart" class="text-primary"  />
                     <button class="text-primary">Save</button>
