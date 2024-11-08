@@ -153,7 +153,7 @@ const tabCount = computed(() => {
                         :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
                         <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
                           _.capitalize(_.startCase(term))
-                          }}</span>
+                        }}</span>
                         <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
                           <CheckIcon class="h-5 w-5" aria-hidden="true" />
                         </span>
@@ -247,6 +247,9 @@ const tabCount = computed(() => {
                 @prev-page="fetchProjects(allProjects.meta.current_page - 1)"
                 @next-page="fetchProjects(allProjects.meta.current_page + 1)" />
             </div>
+            <div v-if="tabs[0].current && allProjects?.data.length === 0">
+                <p class="text-gray-500">No jobs found. Please adjust your search criteria and try again.</p>
+            </div>
             <div v-if="tabs[0].current && isAllProjectsLoading && !allProjects" class="flex flex-col gap-4 mt-5">
               <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl h-60">
                 <div class="rounded-full bg-gray-300 h-12 w-12"></div>
@@ -267,6 +270,9 @@ const tabCount = computed(() => {
               <Pagination v-if="!isAllProjectsLoading && savedProjects.data.length > 0" :pagination="savedProjects.meta"
                 @prev-page="fetchProjects(savedProjects.meta.current_page - 1)"
                 @next-page="fetchProjects(savedProjects.meta.current_page + 1)" />
+            </div>
+            <div v-if="tabs[1].current && savedProjects?.data.length === 0">
+                <p class="text-gray-500">No jobs found. Please adjust your search criteria and try again.</p>
             </div>
             <div v-if="tabs[1].current && isSavedProjectsLoading && !savedProjects" class="flex flex-col gap-4 mt-5">
               <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl h-60">

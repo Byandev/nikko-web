@@ -314,6 +314,9 @@ const removeCountry = (country: ICountry) => {
               @prev-page="fetchFreelancers(Unsavedfreelancers.meta.current_page - 1)"
               @next-page="fetchFreelancers(Unsavedfreelancers.meta.current_page + 1)" />
           </div>
+          <div v-if="tabs[0].current && Unsavedfreelancers?.data.length === 0">
+                <p class="text-gray-500">No freelancer found. Please adjust your search criteria and try again.</p>
+          </div>
           <div v-if="tabs[0].current && isLoadingUnsavedFreelancer && !Unsavedfreelancers" class="flex flex-col gap-4">
             <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl">
               <div class="rounded-full bg-gray-300 h-12 w-12"></div>
@@ -335,6 +338,9 @@ const removeCountry = (country: ICountry) => {
             <Pagination v-if="!isLoadingSavedFreelancer && Savedfreelancers.data.length > 0"
               :pagination="Savedfreelancers.meta" @prev-page="fetchFreelancers(Savedfreelancers.meta.current_page - 1)"
               @next-page="fetchFreelancers(Savedfreelancers.meta.current_page + 1)" />
+          </div>
+          <div v-if="tabs[1].current && Savedfreelancers?.data.length === 0">
+                <p class="text-gray-500">No freelancer found. Please adjust your search criteria and try again.</p>
           </div>
           <div v-if="tabs[1].current && isLoadingSavedFreelancer && !Savedfreelancers" class="flex flex-col gap-4">
             <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl">
