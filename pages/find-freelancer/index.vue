@@ -155,7 +155,8 @@ const removeCountry = (country: ICountry) => {
         <!-- Skill Section -->
         <Section>
           <template #header>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-start items-center gap-3">
+              <Icon icon="material-symbols:filter-list" class="text-2xl text-primary" />
               <h2 class="text-xl font-bold">Skills</h2>
             </div>
           </template>
@@ -219,7 +220,8 @@ const removeCountry = (country: ICountry) => {
         <!-- Country Section -->
         <Section>
           <template #header>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-start items-center gap-3">
+              <Icon icon="material-symbols:filter-list" class="text-2xl text-primary" />
               <h2 class="text-xl font-bold">Country</h2>
             </div>
           </template>

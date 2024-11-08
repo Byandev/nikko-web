@@ -34,9 +34,13 @@ onMounted(async () => {
   await fetchProjects(1);
 });
 
-watch([()=>searchParams.value.search,()=>searchParams.value.length,()=>searchParams.value.experience_level], async () => {
-  await fetchProjects(1);
-}, { deep: true });
+watch(
+  [()=>searchParams.value.search,()=>searchParams.value.length,()=>searchParams.value.experience_level],
+  debounce(async () => {
+    await fetchProjects(1);
+  }, 1000)
+);
+
 
 const fetchProjects = async (page: number) => {
   await fetchAllProjects(`/v1/projects?page=${page}&filter[search]=${searchParams.value.search}&filter[length]=${searchParams.value.length}&filter[experience_level]=${searchParams.value.experience_level}&include=account.user.avatar`,
