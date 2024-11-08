@@ -4,7 +4,7 @@ import { Icon } from '@iconify/vue';
 import _ from 'lodash';
 
 const props = defineProps<{
-    job: Partial<Project>;
+    job: Project;
 }>();
 
 const emit = defineEmits<{
@@ -12,7 +12,15 @@ const emit = defineEmits<{
     (e: 'unsave', id: number): void;
 }>();
 
+const {job} = toRefs(props)
+
 const router = useRouter();
+
+const save = (isSave: boolean) => {
+  job.value.is_saved = isSave;
+  isSave ? emit('save', job.value.id): emit('unsave', job.value.id)
+}
+
 
 const sendProposal = async () => {
     await router.push(`/submit-proposal/${props.job.id}`);
@@ -56,11 +64,11 @@ const sendProposal = async () => {
             <span class="text-lg font-semibold text-gray-800">${{ props.job.estimated_budget }}</span>
             <div class="flex flex-col gap-2 sm:gap-3">
                 <Button @click="sendProposal" text="Apply Now" type="button" background="primary" foreground="white" />
-                <div v-if="!props.job.is_saved" @click="emit('save',Number(job.id))" class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
+                <div v-if="!props.job.is_saved" @click="save(true)" class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
                     <Icon icon="mdi:heart" class="text-primary"  />
                     <button class="text-primary">Save</button>
                 </div>
-                <div v-else @click="emit('unsave',Number(job.id))" class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
+                <div v-else @click="save(false)" class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
                     <Icon icon="mdi:heart-outline" class="text-primary" />
                     <button class="text-primary">Unsave</button>
                 </div>

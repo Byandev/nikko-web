@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { authStore } from '~/store/authStore';
 import { Icon } from '@iconify/vue';
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, warn } from 'vue';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media as MediaResponse } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
+import type { PaginatedList } from '~/types/models/Pagination';
+import type { Project } from '~/types/models/Project';
+import { debounce } from '~/utils/debounce';
 
-const { fetchProjects, projects, isProjectsLoading } = useProject();
 const { sendRequest: sendRequest, pending: isLoading } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
+const {data: allProjects, fetchData:fetchAllProjects, pending: isAllProjectsLoading} = useFetchData< PaginatedList<Project>, ApiErrorResponse>();
+const {data: draftProject, fetchData:fetchDraftProjects, pending: isDraftProjectsLoading} = useFetchData< PaginatedList<Project>, ApiErrorResponse>();
 
 const { user } = storeToRefs(authStore());
 const { updateUser } = authStore();
@@ -21,6 +25,7 @@ const tabs = ref([
 ]);
 
 const isAvatarModalOpen = ref(false);
+const searchQuery = ref('');
 
 const avatarImage = ref<File | null>(null);
 const avatarImagePreview = ref<string | null>(null);
@@ -93,8 +98,19 @@ const uploadImage = async () => {
     }
 };
 
-const refreshJobs = async () => {
-    fetchProjects(1,'v1/client/projects');
+const fetchProjects = async (page: number) => {
+    await fetchAllProjects(`v1/client/projects?page=${page}&filter[status]=ACTIVE&filter[search]=${searchQuery.value}`,{
+        headers: account?.value?.id ? {
+            'X-ACCOUNT-ID': account.value.id.toString(),
+        } : undefined,
+    });
+    await fetchDraftProjects(`v1/client/projects?page=${page}&filter[status]=DRAFT&filter[search]=${searchQuery.value}`,
+        {
+            headers: account?.value?.id ? {
+            'X-ACCOUNT-ID': account.value.id.toString(),
+        } : undefined,
+        }
+    );
 };
 
 const deleteAJob = async (jobId: number) => {
@@ -108,7 +124,7 @@ const deleteAJob = async (jobId: number) => {
     } catch (error) {
         console.error('Error deleting job:', error);
     } finally {
-        refreshJobs();
+        
     }
 };
 
@@ -128,14 +144,17 @@ const confirmDeleteJob = async () => {
     }
 };
 
-const searchQuery = ref('');
+watch(
+  [searchQuery],
+  debounce(async () => {
+    await fetchProjects(1);
+  }, 500)
+);
 
-const filteredJobs = computed(() => {
-    if (!projects.value?.data) return [];
-    return projects.value.data.filter(project => project.title.toLowerCase().includes(searchQuery.value.toLowerCase()));
+onMounted(() => {
+    fetchProjects(1);
 });
 
-fetchProjects(1,'v1/client/projects');
 </script>
 
 <template>
@@ -248,9 +267,9 @@ fetchProjects(1,'v1/client/projects');
                                     class="p-2 border rounded-md" />
                             </div>
                         </div>
-                        <div v-if="!isProjectsLoading" class="mt-5">
-                            <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'ACTIVE')" :key="job.id">
-                                <JobCard @submit="refreshJobs" @delete="openDeleteModal" :job="job" />
+                        <div v-if="!isAllProjectsLoading" class="mt-5 flex flex-col gap-5">
+                            <div v-for="(job, idx) in allProjects?.data" :key="job.id">
+                                <JobCard @submit="fetchProjects(1)" @delete="openDeleteModal" :job="job" />
                             </div>
                         </div>
                         <div v-else>
@@ -262,10 +281,10 @@ fetchProjects(1,'v1/client/projects');
                     </div>
                     
                     <Pagination
-                        v-if="!isLoading && (projects.data ?? []).length > 0 && !tabs[0].current && tabs[1].current && projects.data.filter(project => project.status === 'ACTIVE').length > 0"
-                        :pagination="projects.meta"
-                        @prev-page="fetchProjects(projects.meta.current_page - 1,'v1/client/projects')"
-                        @next-page="fetchProjects(projects.meta.current_page + 1,'v1/client/projects')"
+                        v-if="!isLoading && allProjects?.meta  && (allProjects?.data ?? []).length > 0 && !tabs[0].current && tabs[1].current && allProjects.data.length > 0"
+                        :pagination="allProjects?.meta"
+                        @prev-page="fetchProjects(allProjects.meta.current_page - 1)"
+                        @next-page="fetchProjects(allProjects.meta.current_page + 1)"
                     />
 
                     <div v-if="tabs[2].current">
@@ -282,9 +301,9 @@ fetchProjects(1,'v1/client/projects');
                                     class="p-2 border rounded-md" />
                             </div>
                         </div>
-                        <div v-if="!isProjectsLoading" class="mt-5">
-                            <div v-for="(job, idx) in filteredJobs.filter(job => job.status === 'DRAFT')" :key="job.id">
-                                <JobCard @submit="refreshJobs" @delete="deleteAJob" :job="job" />
+                        <div v-if="!isDraftProjectsLoading" class="mt-5 flex flex-col gap-5">
+                            <div v-for="(job, idx) in draftProject?.data" :key="job.id">
+                                <JobCard @submit="fetchProjects(1)" @delete="deleteAJob" :job="job" />
                             </div>
                         </div>
                         <div v-else>
@@ -296,10 +315,10 @@ fetchProjects(1,'v1/client/projects');
                     </div>
 
                     <Pagination
-                        v-if="!isLoading && (projects.data ?? []).length > 0 && !tabs[0].current && tabs[2].current && projects.data.filter(project => project.status === 'DRAFT').length > 0"
-                        :pagination="projects.meta"
-                        @prev-page="fetchProjects(projects.meta.current_page - 1, 'v1/client/projects')"
-                        @next-page="fetchProjects(projects.meta.current_page + 1, 'v1/client/projects')"
+                        v-if="!isLoading && draftProject?.meta && (draftProject.data ?? []).length > 0 && !tabs[0].current && tabs[2].current && draftProject.data.filter(project => project.status === 'DRAFT').length > 0"
+                        :pagination="draftProject.meta"
+                        @prev-page="fetchProjects(draftProject.meta.current_page - 1)"
+                        @next-page="fetchProjects(draftProject.meta.current_page + 1)"
                     />
                 </div>
             </div>
