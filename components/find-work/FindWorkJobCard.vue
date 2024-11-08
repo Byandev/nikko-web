@@ -15,13 +15,13 @@ const emit = defineEmits<{
 const router = useRouter();
 
 const sendProposal = async () => {
-    await router.push(`/jobs/${props.job.id}`);
+    await router.push(`/submit-proposal/${props.job.id}`);
 };
 
 </script>
 
 <template>
-    <div class="job-card bg-white hover:bg-gray-100 p-5 ring-1 ring-gray-300 rounded-md">
+    <div class="job-card bg-white hover:bg-gray-100 p-5 ring-1 ring-gray-300 rounded-md hover:cursor-pointer">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-bold text-gray-800">{{ props.job.title }}</h2>
         </div>

@@ -241,7 +241,7 @@ const viewJobDetails = async () => {
 </script>
 
 <template>
-    <div class="job-card bg-white p-5 ring-1 ring-gray-300 rounded-md">
+    <div class="job-card bg-white p-5 ring-1 ring-gray-300 rounded-md hover:cursor-pointer">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-bold text-gray-800">{{ props.job.title }}</h2>
             <div class="relative">
