@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue';
-import { profileDisplayStore } from '~/store/profileDisplayStore';
+import type { Account } from '~/types/models/Account';
 
-const { profileDisplay } = storeToRefs(profileDisplayStore());
-
+const props = defineProps<{
+    freelancerDetails: Account;
+}>();
 
 const defaultBannerUrl = 'https://wallpapers.com/images/hd/grey-aesthetic-pattern-190rmn46ypy7vq2q.jpg';
 const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
 
-const bannerUrl = ref(profileDisplay.value.user?.banner?.original_url ?? defaultBannerUrl);
-const avatarUrl = ref(profileDisplay.value.user?.avatar?.original_url || defaultAvatarUrl);
+const bannerUrl = computed(() => props.freelancerDetails.user.banner?.original_url ?? defaultBannerUrl);
+const avatarUrl = computed(() => props.freelancerDetails?.user?.avatar?.original_url || defaultAvatarUrl);
 
 </script>
 
@@ -26,12 +27,12 @@ const avatarUrl = ref(profileDisplay.value.user?.avatar?.original_url || default
         </div>
         <div class="mt-20 sm:mt-4 mb-4 px-4 flex flex-col sm:flex-row items-center sm:items-start">
             <div class="sm:ml-44 mt-4 sm:mt-0 text-center sm:text-left">
-                <h2 class="text-2xl font-bold text-gray-900">{{ profileDisplay.user?.first_name }} {{ profileDisplay.user?.last_name }}</h2>
-                <p class="mt-2 text-md text-gray-600">Joined on {{ profileDisplay.created_at ? new Date(profileDisplay.created_at).toLocaleString('en-US', {
+                <h2 class="text-2xl font-bold text-gray-900">{{ props.freelancerDetails?.user?.first_name }} {{ props.freelancerDetails?.user?.last_name }}</h2>
+                <p class="mt-2 text-md text-gray-600">Joined on {{ props.freelancerDetails?.user?.created_at ? new Date(props.freelancerDetails.user?.created_at).toLocaleString('en-US', {
                     month: 'long', day: 'numeric', year: 'numeric' }) : 'N/A' }}</p>
                 <div class="mt-2 flex items-center space-x-2 justify-center sm:justify-start">
                     <Icon icon="mdi:map-marker" width="15" height="15" />
-                    <span class="text-sm text-black font-semibold">{{ profileDisplay.user?.country_code }}</span>
+                    <span class="text-sm text-black font-semibold">{{ props.freelancerDetails?.user?.country_code }}</span>
                 </div>
             </div>
         </div>

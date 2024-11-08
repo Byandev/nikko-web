@@ -2,7 +2,6 @@
 import { Icon } from '@iconify/vue';
 import { storeToRefs } from 'pinia';
 import { accountStore } from '~/store/accountStore';
-import { profileDisplayStore } from '~/store/profileDisplayStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { PaginatedList } from '~/types/models/Pagination';
 import { debounce } from '~/utils/debounce';
@@ -44,8 +43,6 @@ const searchParams = ref<SearchParams>({
   skills: [],
   countries: [],
 });
-
-const { profileDisplay } = storeToRefs(profileDisplayStore());
 
 const { data: Savedfreelancers, fetchData: fetchSavedFreelancer, pending: isLoadingSavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
 const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: isLoadingUnsavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
@@ -128,7 +125,6 @@ const setActiveTab = (tabName: string) => {
 };
 
 const freelancerProfile = (user: Account) => {
-  profileDisplay.value = user;
   router.push({ path: `/freelancer/${user.id}` });
 }
 
