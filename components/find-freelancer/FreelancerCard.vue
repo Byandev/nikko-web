@@ -11,9 +11,17 @@ const emit = defineEmits<{
 
 const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
 
-const props = defineProps<{ 
-    freelancer: Account 
+const props = defineProps<{
+    freelancer: Account
 }>();
+
+const {freelancer} = toRefs(props)
+
+const save = (isSave: boolean) => {
+  freelancer.value.is_saved = isSave;
+  isSave ? emit('save', freelancer.value.id): emit('unsave', freelancer.value.id)
+}
+
 
 </script>
 
@@ -23,17 +31,19 @@ const props = defineProps<{
             <div class="flex flex-row gap-3 items-center">
                 <img :src="props.freelancer.user?.avatar?.original_url || defaultAvatarUrl" alt="profile" class="w-16 h-16 rounded-full">
                 <div class="flex flex-col justify-center">
-                    <span class="text-lg font-bold" v-if="props.freelancer.user">{{ props.freelancer.user.first_name }} {{ props.freelancer.user.last_name }}</span>
+                    <span class="text-lg font-bold" v-if="props.freelancer.user">
+                        {{ props.freelancer.user.first_name || 'No name provided' }} {{ props.freelancer.user.last_name || '' }}
+                    </span>
                     <span class="text-sm text-gray-500" v-if="props.freelancer.user">{{ props.freelancer.title }}</span>
                 </div>
             </div>
             <div class="flex flex-col gap-3">
                 <Button @click="emit('profile',freelancer)"  text="See Profile" type="button" background="primary" foreground="white"/>
-                <div v-if="!props.freelancer.is_saved" @click="emit('save',freelancer.id)" class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
+                <div v-if="!props.freelancer.is_saved" @click="save(true)" class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
                     <Icon icon="mdi:heart" class="text-primary"  />
                     <button class="text-primary">Save</button>
                 </div>
-                <div v-else @click="emit('unsave',freelancer.id)" class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
+                <div v-else @click="save(false)" class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
                     <Icon icon="mdi:heart-outline" class="text-primary" />
                     <button class="text-primary">Unsave</button>
                 </div>

@@ -15,7 +15,7 @@ import {
 } from '@headlessui/vue';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 import type { Skill } from '~/types/models/Skill';
-import { Country} from 'country-state-city';
+import { Country } from 'country-state-city';
 import type { ICountry } from 'country-state-city'
 import type { Account } from '~/types/models/Account';
 
@@ -31,13 +31,8 @@ interface SearchParams {
   countries: ICountry[];
 }
 
-const filters = ref([
-  { name: 'Avatar', value: 'user.avatar' },
-  { name: 'Skills', value: 'skills' },
-]);
-
 const searchParams = ref<SearchParams>({
-  include: filters.value.map(filter => filter.value).join(','),
+  include: 'user.avatar,skills',
   type: 'FREELANCER',
   search: '',
   skills: [],
@@ -47,7 +42,7 @@ const searchParams = ref<SearchParams>({
 const { data: Savedfreelancers, fetchData: fetchSavedFreelancer, pending: isLoadingSavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
 const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: isLoadingUnsavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
 
-const { data: skills, fetchData: fetchSkills, pending: isSkillsLoading } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
+const { data: skills, fetchData: fetchSkills } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
 
 const { sendRequest: updateFreelancer } = useSubmit<{ data: Account }, ApiErrorResponse>();
 
@@ -60,12 +55,12 @@ watch(
   [() => searchParams.value.skills, () => searchParams.value.search, () => searchParams.value.countries],
   debounce(async () => {
     await fetchFreelancers(1);
-  }, 1000)
+  }, 500)
 );
 
 const fetchFreelancers = async (page: number) => {
   await fetchUnsavedFreelancer(
-    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',') }&page=${page}`,
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',')}&page=${page}`,
     {
       headers: account?.value?.id
         ? {
@@ -76,7 +71,7 @@ const fetchFreelancers = async (page: number) => {
   );
 
   await fetchSavedFreelancer(
-    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',') }&filter[is_saved]=true&page=${page}`,
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',')}&filter[is_saved]=true&page=${page}`,
     {
       headers: account?.value?.id
         ? {
@@ -109,7 +104,7 @@ const updateSaveStatus = async (id: number, isSaved: boolean) => {
     );
     console.log('Freelancer unsaved', response.data);
   }
-  await fetchFreelancers(1);
+  
   console.log('Freelancer updated', Savedfreelancers.value?.data, Unsavedfreelancers.value?.data);
 };
 
@@ -127,25 +122,6 @@ const setActiveTab = (tabName: string) => {
 const freelancerProfile = (user: Account) => {
   router.push({ path: `/freelancer/${user.id}` });
 }
-
-const updateInclude = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const includes = searchParams.value.include.split(',');
-
-  if (target.checked) {
-    if (!includes.includes(target.value)) {
-      includes.push(target.value);
-    }
-  } else {
-    const index = includes.indexOf(target.value);
-    if (index > -1) {
-      includes.splice(index, 1);
-    }
-  }
-
-  searchParams.value.include = includes.join(',');
-  fetchFreelancers(1);
-};
 
 const tabCount = computed(() => {
   return (tabName: string) => {
@@ -176,25 +152,11 @@ const removeCountry = (country: ICountry) => {
       <!-- Left Column -->
       <div class="col-span-1 flex flex-col gap-4">
 
-        <!-- Filter search -->
-        <Section>
-          <template #header>
-            <div class="flex justify-between items-center">
-              <h2 class="text-xl font-bold">Filter</h2>
-            </div>
-          </template>
-          <template #content>
-            <div v-for="filter in filters" :key="filter.value" class="flex items-center">
-              <input type="checkbox" :value="filter.value" @change="updateInclude" class="mr-2" checked />
-              <label>{{ filter.name }}</label>
-            </div>
-          </template>
-        </Section>
-
         <!-- Skill Section -->
         <Section>
           <template #header>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-start items-center gap-3">
+              <Icon icon="material-symbols:filter-list" class="text-2xl text-primary" />
               <h2 class="text-xl font-bold">Skills</h2>
             </div>
           </template>
@@ -258,7 +220,8 @@ const removeCountry = (country: ICountry) => {
         <!-- Country Section -->
         <Section>
           <template #header>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-start items-center gap-3">
+              <Icon icon="material-symbols:filter-list" class="text-2xl text-primary" />
               <h2 class="text-xl font-bold">Country</h2>
             </div>
           </template>
@@ -329,8 +292,7 @@ const removeCountry = (country: ICountry) => {
             <input v-model="searchParams.search" type="text" placeholder="Search for freelancers..."
               class="w-full outline-none border-none" />
           </div>
-          <div
-            v-if="!isLoadingSavedFreelancer && !isLoadingUnsavedFreelancer && (Savedfreelancers || Unsavedfreelancers)">
+          <div>
             <nav class="flex space-x-4" aria-label="Tabs">
               <template v-for="tab in tabs" :key="tab.name">
                 <a href="#" @click.prevent="setActiveTab(tab.name)"
@@ -342,15 +304,18 @@ const removeCountry = (country: ICountry) => {
             </nav>
           </div>
 
-          <div v-if="tabs[0].current && !isLoadingUnsavedFreelancer && Unsavedfreelancers" class="flex flex-col gap-4">
-            <div v-for="(freelancer, idx) in Unsavedfreelancers.data" :key="idx">
-              <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
-                :freelancer="freelancer" @profile="freelancerProfile" />
-            </div>
+          <div v-if="tabs[0].current && Unsavedfreelancers?.meta && !isLoadingUnsavedFreelancer && Unsavedfreelancers"
+            class="flex flex-col gap-4">
+            <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
+              v-for="(freelancer, idx) in Unsavedfreelancers.data" :key="idx" :freelancer="freelancer"
+              @profile="freelancerProfile" />
             <Pagination v-if="!isLoadingUnsavedFreelancer && Unsavedfreelancers.data.length > 0"
               :pagination="Unsavedfreelancers.meta"
               @prev-page="fetchFreelancers(Unsavedfreelancers.meta.current_page - 1)"
               @next-page="fetchFreelancers(Unsavedfreelancers.meta.current_page + 1)" />
+          </div>
+          <div v-if="tabs[0].current && Unsavedfreelancers?.data.length === 0">
+                <p class="text-gray-500">No freelancer found. Please adjust your search criteria and try again.</p>
           </div>
           <div v-if="tabs[0].current && isLoadingUnsavedFreelancer && !Unsavedfreelancers" class="flex flex-col gap-4">
             <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl">
@@ -365,14 +330,17 @@ const removeCountry = (country: ICountry) => {
             </div>
           </div>
 
-          <div v-if="tabs[1].current && !isLoadingSavedFreelancer && Savedfreelancers" class="flex flex-col gap-4">
-            <div v-for="(freelancer, idx) in Savedfreelancers.data" :key="idx">
-              <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
-                :freelancer="freelancer" @profile="freelancerProfile" />
-            </div>
+          <div v-if="tabs[1].current && Savedfreelancers?.meta && !isLoadingSavedFreelancer && Savedfreelancers"
+            class="flex flex-col gap-4">
+            <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
+              v-for="(freelancer, idx) in Savedfreelancers.data" :key="idx" :freelancer="freelancer"
+              @profile="freelancerProfile" />
             <Pagination v-if="!isLoadingSavedFreelancer && Savedfreelancers.data.length > 0"
               :pagination="Savedfreelancers.meta" @prev-page="fetchFreelancers(Savedfreelancers.meta.current_page - 1)"
               @next-page="fetchFreelancers(Savedfreelancers.meta.current_page + 1)" />
+          </div>
+          <div v-if="tabs[1].current && Savedfreelancers?.data.length === 0">
+                <p class="text-gray-500">No freelancer found. Please adjust your search criteria and try again.</p>
           </div>
           <div v-if="tabs[1].current && isLoadingSavedFreelancer && !Savedfreelancers" class="flex flex-col gap-4">
             <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl">
@@ -386,7 +354,6 @@ const removeCountry = (country: ICountry) => {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
