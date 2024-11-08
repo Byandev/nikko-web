@@ -148,7 +148,7 @@ watch(
   [searchQuery],
   debounce(async () => {
     await fetchProjects(1);
-  }, 1000)
+  }, 500)
 );
 
 onMounted(() => {
