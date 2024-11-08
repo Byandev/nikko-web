@@ -33,6 +33,20 @@ const rules = {
 
 const { formRef, v$ } = useValidation(form, rules);
 
+interface ServerError {
+    email: string | null;
+    password: string | null;
+}
+
+const serverError = ref<Partial<ServerError>>({
+   email: null,
+    password: null,
+});
+
+watch([() => serverError.value.email, ()=> serverError.value.password], () => {
+    console.log(serverError.value)
+});
+
 const submitForm = async () => {
 
     v$.value.$touch();
@@ -59,7 +73,7 @@ const submitForm = async () => {
             await router.push("/find-freelancer");
         }
     } catch (error) {
-        console.error(error)
+        serverError.value = { email: 'Invalid email or password', password: 'Invalid email or password' };
     }
 };
 </script>
@@ -126,12 +140,18 @@ const submitForm = async () => {
                                                         class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
                                                         <Icon icon="mdi:email" />
                                                         <input id="email" v-model="formRef.email" autocomplete="email"
+                                                            @input="serverError = {
+                                                                email: null,
+                                                                password: serverError.password
+                                                            }"
                                                             :class="{ 'ring-red-300': v$.email.$error, 'ring-gray-300': !v$.email.$error }"
                                                             class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none"
                                                             type="email">
                                                     </div>
                                                     <span v-if="v$.email.$error" class="text-red-900 text-sm">{{
                                                         v$.email.$errors[0].$message }}</span>
+                                                    <span v-if="serverError.email" class="text-red-900 text-sm">{{
+                                                        serverError.email }}</span>
                                                 </div>
                                             </div>
 
@@ -144,12 +164,18 @@ const submitForm = async () => {
                                                         <Icon icon="mdi:lock" />
                                                         <input id="password" v-model="formRef.password"
                                                             autocomplete="current-password"
+                                                            @input="serverError = {
+                                                                email: serverError.email,
+                                                                password: null,
+                                                            }"
                                                             :class="{ 'ring-red-300': v$.password.$error, 'ring-gray-300': !v$.password.$error }"
                                                             class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none"
                                                             type="password">
                                                     </div>
                                                     <span v-if="v$.password.$error" class="text-red-900 text-sm">{{
                                                         v$.password.$errors[0].$message }}</span>
+                                                    <span v-if="serverError.password" class="text-red-900 text-sm">{{
+                                                        serverError.password }}</span>
                                                 </div>
                                             </div>
 
