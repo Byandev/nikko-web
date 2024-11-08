@@ -40,11 +40,7 @@ interface ServerError {
 
 const serverError = ref<Partial<ServerError>>({
    email: null,
-    password: null,
-});
-
-watch([() => serverError.value.email, ()=> serverError.value.password], () => {
-    console.log(serverError.value)
+   password: null,
 });
 
 const submitForm = async () => {
