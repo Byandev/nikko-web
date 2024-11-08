@@ -15,7 +15,7 @@ import {
 } from '@headlessui/vue';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 import type { Skill } from '~/types/models/Skill';
-import { Country} from 'country-state-city';
+import { Country } from 'country-state-city';
 import type { ICountry } from 'country-state-city'
 import type { Account } from '~/types/models/Account';
 
@@ -55,12 +55,12 @@ watch(
   [() => searchParams.value.skills, () => searchParams.value.search, () => searchParams.value.countries],
   debounce(async () => {
     await fetchFreelancers(1);
-  }, 1000)
+  }, 500)
 );
 
 const fetchFreelancers = async (page: number) => {
   await fetchUnsavedFreelancer(
-    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',') }&page=${page}`,
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',')}&page=${page}`,
     {
       headers: account?.value?.id
         ? {
@@ -71,7 +71,7 @@ const fetchFreelancers = async (page: number) => {
   );
 
   await fetchSavedFreelancer(
-    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',') }&filter[is_saved]=true&page=${page}`,
+    `v1/accounts?include=${searchParams.value.include}&filter[type]=${searchParams.value.type}&filter[search]=${searchParams.value.search}&filter[skills]=${searchParams.value.skills.map(skill => skill.id).join(',')}&filter[user_countries]=${searchParams.value.countries.map(country => country.isoCode).join(',')}&filter[is_saved]=true&page=${page}`,
     {
       headers: account?.value?.id
         ? {
@@ -292,8 +292,7 @@ const removeCountry = (country: ICountry) => {
             <input v-model="searchParams.search" type="text" placeholder="Search for freelancers..."
               class="w-full outline-none border-none" />
           </div>
-          <div
-            v-if="!isLoadingSavedFreelancer && !isLoadingUnsavedFreelancer && (Savedfreelancers || Unsavedfreelancers)">
+          <div>
             <nav class="flex space-x-4" aria-label="Tabs">
               <template v-for="tab in tabs" :key="tab.name">
                 <a href="#" @click.prevent="setActiveTab(tab.name)"
@@ -305,11 +304,11 @@ const removeCountry = (country: ICountry) => {
             </nav>
           </div>
 
-          <div v-if="tabs[0].current && !isLoadingUnsavedFreelancer && Unsavedfreelancers" class="flex flex-col gap-4">
-            <div v-for="(freelancer, idx) in Unsavedfreelancers.data" :key="idx">
-              <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
-                :freelancer="freelancer" @profile="freelancerProfile" />
-            </div>
+          <div v-if="tabs[0].current && Unsavedfreelancers?.meta && !isLoadingUnsavedFreelancer && Unsavedfreelancers"
+            class="flex flex-col gap-4">
+            <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
+              v-for="(freelancer, idx) in Unsavedfreelancers.data" :key="idx" :freelancer="freelancer"
+              @profile="freelancerProfile" />
             <Pagination v-if="!isLoadingUnsavedFreelancer && Unsavedfreelancers.data.length > 0"
               :pagination="Unsavedfreelancers.meta"
               @prev-page="fetchFreelancers(Unsavedfreelancers.meta.current_page - 1)"
@@ -328,11 +327,11 @@ const removeCountry = (country: ICountry) => {
             </div>
           </div>
 
-          <div v-if="tabs[1].current && !isLoadingSavedFreelancer && Savedfreelancers" class="flex flex-col gap-4">
-            <div v-for="(freelancer, idx) in Savedfreelancers.data" :key="idx">
-              <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
-                :freelancer="freelancer" @profile="freelancerProfile" />
-            </div>
+          <div v-if="tabs[1].current && Savedfreelancers?.meta && !isLoadingSavedFreelancer && Savedfreelancers"
+            class="flex flex-col gap-4">
+            <FreelancerCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
+              v-for="(freelancer, idx) in Savedfreelancers.data" :key="idx" :freelancer="freelancer"
+              @profile="freelancerProfile" />
             <Pagination v-if="!isLoadingSavedFreelancer && Savedfreelancers.data.length > 0"
               :pagination="Savedfreelancers.meta" @prev-page="fetchFreelancers(Savedfreelancers.meta.current_page - 1)"
               @next-page="fetchFreelancers(Savedfreelancers.meta.current_page + 1)" />

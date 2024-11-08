@@ -21,7 +21,7 @@ interface SearchParams {
 }
 
 const searchParams = ref<SearchParams>({
-  search: " ",
+  search: "",
   length: '',
   experience_level: '',
 });
@@ -35,10 +35,10 @@ onMounted(async () => {
 });
 
 watch(
-  [()=>searchParams.value.search,()=>searchParams.value.length,()=>searchParams.value.experience_level],
+  [() => searchParams.value.search, () => searchParams.value.length, () => searchParams.value.experience_level],
   debounce(async () => {
     await fetchProjects(1);
-  }, 1000)
+  }, 500)
 );
 
 
@@ -50,7 +50,7 @@ const fetchProjects = async (page: number) => {
       } : undefined,
     }
   );
-  await fetchSavedProjects(`/v1/projects?page=${page}&filter[is_saved]=true&filter[search]=${searchParams.value.search}&filter[length]=${searchParams.value.length}&filter[experience_level]=${searchParams.value.experience_level}&include=account.user.avatar`,{
+  await fetchSavedProjects(`/v1/projects?page=${page}&filter[is_saved]=true&filter[search]=${searchParams.value.search}&filter[length]=${searchParams.value.length}&filter[experience_level]=${searchParams.value.experience_level}&include=account.user.avatar`, {
     headers: account?.value?.id ? {
       'X-ACCOUNT-ID': account.value.id.toString(),
     } : undefined,
@@ -99,7 +99,7 @@ const tabCount = computed(() => {
   return (tabName: string) => {
     if (tabName === 'Latest Jobs') {
       return allProjects.value?.meta.total || 0;
-    }else if (tabName === 'Saved Jobs') {
+    } else if (tabName === 'Saved Jobs') {
       return savedProjects.value?.meta.total || 0;
     }
     return 0;
@@ -143,13 +143,18 @@ const tabCount = computed(() => {
                   leave-to-class="opacity-0">
                   <ListboxOptions
                     class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                    <ListboxOption value="">
+                      <li :class="['relative cursor-default select-none py-2 pl-10 pr-4']">
+                        <span class="block truncate">Select Length</span>
+                      </li>
+                    </ListboxOption>
                     <ListboxOption v-for="(term, index) in Term" v-slot="{ active, selected }" :key="index"
                       :value="term" as="template">
                       <li
                         :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
                         <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
                           _.capitalize(_.startCase(term))
-                        }}</span>
+                          }}</span>
                         <span v-if="selected" class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
                           <CheckIcon class="h-5 w-5" aria-hidden="true" />
                         </span>
@@ -190,6 +195,11 @@ const tabCount = computed(() => {
                   leave-to-class="opacity-0">
                   <ListboxOptions
                     class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
+                    <ListboxOption value="">
+                      <li :class="['relative cursor-default select-none py-2 pl-10 pr-4']">
+                        <span class="block truncate">Select Level</span>
+                      </li>
+                    </ListboxOption>
                     <ListboxOption v-for="(level, index) in Level" v-slot="{ active, selected }" :key="index"
                       :value="level" as="template">
                       <li
@@ -238,6 +248,19 @@ const tabCount = computed(() => {
                 @prev-page="fetchProjects(allProjects.meta.current_page - 1)"
                 @next-page="fetchProjects(allProjects.meta.current_page + 1)" />
             </div>
+            <div v-if="tabs[0].current && isAllProjectsLoading && !allProjects" class="flex flex-col gap-4 mt-5">
+              <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl h-60">
+                <div class="rounded-full bg-gray-300 h-12 w-12"></div>
+                <div class="flex-1 space-y-4 py-1">
+                  <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+                  <div class="space-y-2">
+                    <div class="h-4 bg-gray-300 rounded"></div>
+                    <div class="h-4 bg-gray-300 rounded w-5/6"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
 
             <div v-if="tabs[1].current && savedProjects?.data && savedProjects?.meta" class="flex flex-col gap-4 mt-5">
               <FindWorkJobCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
@@ -245,6 +268,18 @@ const tabCount = computed(() => {
               <Pagination v-if="!isAllProjectsLoading && savedProjects.data.length > 0" :pagination="savedProjects.meta"
                 @prev-page="fetchProjects(savedProjects.meta.current_page - 1)"
                 @next-page="fetchProjects(savedProjects.meta.current_page + 1)" />
+            </div>
+            <div v-if="tabs[1].current && isSavedProjectsLoading && !savedProjects" class="flex flex-col gap-4 mt-5">
+              <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl h-60">
+                <div class="rounded-full bg-gray-300 h-12 w-12"></div>
+                <div class="flex-1 space-y-4 py-1">
+                  <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+                  <div class="space-y-2">
+                    <div class="h-4 bg-gray-300 rounded"></div>
+                    <div class="h-4 bg-gray-300 rounded w-5/6"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
