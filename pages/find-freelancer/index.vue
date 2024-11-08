@@ -104,7 +104,7 @@ const updateSaveStatus = async (id: number, isSaved: boolean) => {
     );
     console.log('Freelancer unsaved', response.data);
   }
-  await fetchFreelancers(1);
+  
   console.log('Freelancer updated', Savedfreelancers.value?.data, Unsavedfreelancers.value?.data);
 };
 
