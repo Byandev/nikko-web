@@ -14,6 +14,7 @@ export interface Account {
     bio: string;
     type: AccountType;
     title: string;
+    is_saved: boolean;
     created_at: string;
     updated_at: string;
     user: User;

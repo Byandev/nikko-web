@@ -2,9 +2,7 @@
 import { Icon } from '@iconify/vue';
 import { storeToRefs } from 'pinia';
 import { accountStore } from '~/store/accountStore';
-import { profileDisplayStore } from '~/store/profileDisplayStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { Freelancer } from '~/types/models/Freelancer';
 import type { PaginatedList } from '~/types/models/Pagination';
 import { debounce } from '~/utils/debounce';
 import { ref, onMounted, watch, computed } from 'vue';
@@ -19,6 +17,7 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 import type { Skill } from '~/types/models/Skill';
 import { Country} from 'country-state-city';
 import type { ICountry } from 'country-state-city'
+import type { Account } from '~/types/models/Account';
 
 
 const router = useRouter();
@@ -45,14 +44,12 @@ const searchParams = ref<SearchParams>({
   countries: [],
 });
 
-const { profileDisplay } = storeToRefs(profileDisplayStore());
-
-const { data: Savedfreelancers, fetchData: fetchSavedFreelancer, pending: isLoadingSavedFreelancer } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
-const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: isLoadingUnsavedFreelancer } = useFetchData<PaginatedList<Freelancer>, ApiErrorResponse>();
+const { data: Savedfreelancers, fetchData: fetchSavedFreelancer, pending: isLoadingSavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
+const { data: Unsavedfreelancers, fetchData: fetchUnsavedFreelancer, pending: isLoadingUnsavedFreelancer } = useFetchData<PaginatedList<Account>, ApiErrorResponse>();
 
 const { data: skills, fetchData: fetchSkills, pending: isSkillsLoading } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
 
-const { sendRequest: updateFreelancer } = useSubmit<{ data: Freelancer }, ApiErrorResponse>();
+const { sendRequest: updateFreelancer } = useSubmit<{ data: Account }, ApiErrorResponse>();
 
 onMounted(async () => {
   await fetchFreelancers(1);
@@ -127,8 +124,7 @@ const setActiveTab = (tabName: string) => {
   });
 };
 
-const freelancerProfile = (user: Freelancer) => {
-  profileDisplay.value = user;
+const freelancerProfile = (user: Account) => {
   router.push({ path: `/freelancer/${user.id}` });
 }
 
@@ -203,7 +199,7 @@ const removeCountry = (country: ICountry) => {
             </div>
           </template>
           <template #content>
-            <Listbox v-model="searchParams.skills" multiple>
+            <Listbox v-model="searchParams.skills" multiple class="ring-1 ring-gray-300 rounded-md">
               <div class="relative mt-1">
                 <ListboxButton
                   class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
@@ -267,7 +263,7 @@ const removeCountry = (country: ICountry) => {
             </div>
           </template>
           <template #content>
-            <Listbox v-model="searchParams.countries" multiple>
+            <Listbox v-model="searchParams.countries" multiple class="ring-1 ring-gray-300 rounded-md">
               <div class="relative mt-1">
                 <ListboxButton
                   class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
@@ -288,8 +284,8 @@ const removeCountry = (country: ICountry) => {
                   leave-to-class="opacity-0">
                   <ListboxOptions
                     class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
-                    <ListboxOption v-for="(country, index) in Country.getAllCountries()" v-slot="{ active, selected }" :key="index"
-                      :value="country" as="template">
+                    <ListboxOption v-for="(country, index) in Country.getAllCountries()" v-slot="{ active, selected }"
+                      :key="index" :value="country" as="template">
                       <li
                         :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
                         <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{ country.name

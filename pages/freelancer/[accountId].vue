@@ -1,12 +1,24 @@
 <script setup lang="ts">
-import { profileDisplayStore } from '~/store/profileDisplayStore';
+import type { ApiErrorResponse } from '~/types/api/response/error';
+import type { Account } from '~/types/models/Account';
 
-const { profileDisplay } = storeToRefs(profileDisplayStore());
+
+const { data: freelancerDetails, fetchData: fetchFreelancerDetails, pending: isLoading } = useFetchData<{ data: Account }, ApiErrorResponse>();
+
+const route = useRoute();
+
+fetchFreelancerDetails(`/v1/accounts/${route.params.accountId}`);
+
 </script>
 
 <template>
     <div class="my-8 lg:mx-auto mx-5">
-        <ProfileDisplay class="max-w-6xl mx-auto " />
+        <ProfileDisplay v-if="freelancerDetails?.data && !isLoading" :freelancer-details="freelancerDetails.data" class="max-w-6xl mx-auto" />
+        <div v-else class="max-w-6xl mx-auto">
+            <div class="animate-pulse space-y-4">
+            <div class=" h-80 bg-gray-200 rounded"></div>
+            </div>
+        </div>
         <div class="max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-4 mt-5 mx-auto ">
 
             <!-- Left Column -->
@@ -43,10 +55,10 @@ const { profileDisplay } = storeToRefs(profileDisplayStore());
                 </template>
                 <template #content>
                 <div class="flex flex-wrap">
-                    <div v-if="profileDisplay.skills?.length === 0" class="text-gray-500">
+                    <div v-if="freelancerDetails?.data.skills?.length === 0" class="text-gray-500">
                     No skills yet.
                     </div>
-                    <div v-else v-for="(skill, idx) in profileDisplay?.skills" :key="`selected-skill-${skill.id}`" class="mr-2 my-1">
+                    <div v-else v-for="(skill, idx) in freelancerDetails?.data?.skills" :key="`selected-skill-${skill.id}`" class="mr-2 my-1">
                     <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                         {{skill.name}}
                     </span>
