@@ -56,7 +56,7 @@ const submitForm = async () => {
         if (account.value.type === "FREELANCER") {
             await router.push("/freelancer-dashboard");
         } else if (account.value.type === "CLIENT") {
-            await router.push("/find-work");
+            await router.push("/client-dashboard");
         }
     } catch (error) {
         console.error(error)
