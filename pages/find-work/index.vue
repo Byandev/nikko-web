@@ -1,6 +1,14 @@
 <script setup lang="ts">
+import type { ApiErrorResponse } from '~/types/api/response/error';
 import { Level, Status, Term, type Project } from '~/types/models/Project';
 
+const { data: savedJobs, fetchData: fetchSavedJobs, pending: isLoadingSavedJobs } = useFetchData<{ data: Project }, ApiErrorResponse>();
+const { data: allJobs, fetchData: fetchAllJobs, pending: isLoadingAllJobs } = useFetchData<{ data: Project }, ApiErrorResponse>();
+
+onMounted(() => {
+  fetchSavedJobs(`/v1/projects`);
+  fetchAllJobs(`/v1/projects`);
+});
 
 interface SearchParams {
   search: string;
@@ -20,61 +28,6 @@ const setActiveTab = (tabName: string) => {
     tab.current = (tab.name === tabName);
   });
 };
-
-const savedJobs = ref<Partial<Project>[]>([
-  {
-    id: 1,
-    title: "Seeking Web Developer",
-    description: "In search of a skilled web developer to create a responsive website.",
-    estimated_budget: "$1000 - $2000",
-    length: Term.EXTENDED,
-    experience_level: Level.INTERMEDIATE,
-    status: Status.ACTIVE,
-    languages: [],
-    images: [],
-    skills: [],
-  },
-  {
-    id: 2,
-    title: "Hiring Mobile App Developer",
-    description: "Looking for a mobile app developer for a new initiative.",
-    estimated_budget: "$2000 - $3000",
-    length: Term.EXTENDED,
-    experience_level: Level.INTERMEDIATE,
-    status: Status.ACTIVE,
-    languages: [],
-    images: [],
-    skills: [],
-  },
-]);
-
-
-const jobs = ref<Partial<Project>[]>([
-  {
-    id: 1,
-    title: "Web Developer Needed",
-    description: "Looking for an experienced web developer to build a responsive website.",
-    estimated_budget: "$1000 - $2000",
-    length: Term.EXTENDED,
-    experience_level: Level.INTERMEDIATE,
-    status: Status.ACTIVE,
-    languages: [],
-    images: [],
-    skills: [],
-  },
-  {
-    id: 2,
-    title: "Mobile App Developer",
-    description: "Need a mobile app developer for a new project.",
-    estimated_budget: "$2000 - $3000",
-    length: Term.EXTENDED,
-    experience_level: Level.INTERMEDIATE,
-    status: Status.ACTIVE,
-    languages: [],
-    images: [],
-    skills: [],
-  },
-]);
 
 </script>
 
@@ -167,11 +120,11 @@ const jobs = ref<Partial<Project>[]>([
             </nav>
 
             <div v-if="tabs[0].current" class="flex flex-col gap-4 mt-5">
-              <JobCard v-for="job in jobs" :key="job.id" :job="job" />
+              <JobCard v-for="job in allJobs" :key="job.id" :job="job" />
             </div>
 
             <div v-if="tabs[1].current" class="flex flex-col gap-4 mt-5">
-              <JobCard v-for="job in savedJobs" :key="job.id" :job="job" />
+              {{ savedJobs }}
             </div>
           </div>
         </div>
