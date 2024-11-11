@@ -41,6 +41,7 @@ watch(
   }, 500)
 );
 
+const router = useRouter();
 
 const fetchProjects = async (page: number) => {
   await fetchAllProjects(`/v1/projects?page=${page}&filter[search]=${searchParams.value.search}&filter[length]=${searchParams.value.length}&filter[experience_level]=${searchParams.value.experience_level}&include=account.user.avatar`,
@@ -104,6 +105,10 @@ const tabCount = computed(() => {
     return 0;
   };
 });
+
+const viewJob = async (id: number) => {
+    await router.push(`/jobs/${id}`);
+};
 </script>
 
 <template>
@@ -241,7 +246,7 @@ const tabCount = computed(() => {
             </nav>
 
             <div v-if="tabs[0].current && allProjects?.meta && allProjects.data" class="flex flex-col gap-4 mt-5">
-              <FindWorkJobCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
+              <FindWorkJobCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)" @view="viewJob"
                 v-for="job in allProjects.data" :key="job.id" :job="job" />
               <Pagination v-if="!isAllProjectsLoading && allProjects.data.length > 0" :pagination="allProjects.meta"
                 @prev-page="fetchProjects(allProjects.meta.current_page - 1)"
@@ -265,7 +270,7 @@ const tabCount = computed(() => {
 
 
             <div v-if="tabs[1].current && savedProjects?.data && savedProjects?.meta" class="flex flex-col gap-4 mt-5">
-              <FindWorkJobCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
+              <FindWorkJobCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)" @view="viewJob"
                 v-for="job in savedProjects.data" :key="job.id" :job="job" />
               <Pagination v-if="!isAllProjectsLoading && savedProjects.data.length > 0" :pagination="savedProjects.meta"
                 @prev-page="fetchProjects(savedProjects.meta.current_page - 1)"

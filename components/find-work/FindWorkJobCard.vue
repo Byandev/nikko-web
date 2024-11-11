@@ -8,6 +8,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
+    (e: 'view', id: number): void;
     (e: 'save', id: number): void;
     (e: 'unsave', id: number): void;
 }>();
@@ -31,7 +32,7 @@ const sendProposal = async () => {
 <template>
     <div class="job-card bg-white hover:bg-gray-100 p-5 ring-1 ring-gray-300 rounded-md hover:cursor-pointer">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-gray-800">{{ props.job.title }}</h2>
+            <h2 @click="emit('view', job.id)" class="text-xl font-bold text-gray-800 hover:underline">{{ props.job.title }}</h2>
         </div>
         <p class="text-gray-600 mb-4">{{ props.job.description }}</p>
         <div class="mt-5 flex  items-center justify-start lg:justify-between gap-3">
