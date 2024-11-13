@@ -19,7 +19,7 @@ const tabs = [
 const router = useRouter();
 
 const viewJob = async (id: number) => {
-    await router.push(`/jobs/${id}`);
+    await router.push(`/proposal/${id}`);
 };
 
 
@@ -37,8 +37,8 @@ onMounted(() => {
 });
 
 const handleWithdrawProposal = async (id: number) => {
-    await withdrawProposal(`/v1/proposals/${id}/withdraw`, {
-        method: 'POST',
+    await withdrawProposal(`/v1/proposals/${id}`, {
+        method: 'DELETE',
         headers: account?.value?.id ? {
             'X-ACCOUNT-ID': account.value.id.toString(),
         } : undefined,
@@ -57,7 +57,8 @@ const handleWithdrawProposal = async (id: number) => {
                         class="ring-1 ring-gray-300 rounded-md p-4 mb-5">
                         <p class="text-sm text-gray-500 mb-2">Project ID: {{ proposal.project_id }}</p>
                         <JobCard @view="viewJob" :key="proposal.project_id" :job="proposal.project" class="mb-5">
-                            <Button text="Withdraw" @click="" type="button" foreground="white" background="primary" />
+                            <Button text="Withdraw" @click="handleWithdrawProposal(proposal.id)" type="button"
+                                foreground="white" background="primary" />
                         </JobCard>
                         <div class="flex flex-row mb-2 space-x-2">
                             <p class="bg-primary/15 text-primary text-xs font-medium px-2.5 py-0.5 rounded">

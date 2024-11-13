@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { type Project } from '~/types/models/Project';
-import { Icon } from '@iconify/vue';
 import _ from 'lodash';
-import type { Proposal } from '~/types/models/Proposal';
 
 const props = defineProps<{
     job: Project;
