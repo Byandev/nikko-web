@@ -98,12 +98,12 @@ const goBack = () => {
 
                 <div class="border-t-2 mt-5" v-if="job.data.skills || job.data.languages || job.data.images">
                     <div v-if="job.data.skills" class="w-full mt-5">
-                        <h2 class="text-base mb-2">Skills</h2>
+                        <h2 class="text-base mb-1">Skills</h2>
                         <!-- Flex container for row layout -->
                         <div class="flex flex-wrap gap-2">
                             <div v-for="(skill, idx) in job.data.skills" :key="`selected-skill-${skill.id}`">
                                 <span
-                                    class="rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                    class="bg-primary/15 text-primary  text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
                                     {{ skill.name }}
                                 </span>
                             </div>
@@ -112,13 +112,13 @@ const goBack = () => {
                 </div>
                 <div class="mt-5">
                     <div v-if="job.data.languages" class="w-full mt-5">
-                        <h2 class="text-base mb-2">Languages</h2>
+                        <h2 class="text-base mb-1">Languages</h2>
                         <!-- Flex container for row layout -->
                         <div class="flex flex-wrap gap-2">
                             <div v-for="(language, idx) in job.data.languages"
                                 :key="`selected-language-${language.id}`">
                                 <span
-                                    class="rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                                    class="bg-primary/15 text-primary  text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
                                     {{ language.name }}
                                 </span>
                             </div>
@@ -127,14 +127,11 @@ const goBack = () => {
                 </div>
                 <div class="mt-5">
                     <div v-if="job.data.images" class="w-full mt-5">
-                        <h2 class="text-base mb-2">Attachments</h2>
+                        <h2 class="text-base mb-1">Attachments</h2>
                         <div class="flex flex-wrap gap-2">
                             <div v-for="(image, idx) in job.data.images" :key="`selected-image-${image.id}`">
-                                <a :href="image.original_url"
-                                    :download="image.name" target="_blank"
-                                    class="rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1
-                                    ring-inset ring-green-600/20"
-                                    >
+                                <a :href="image.original_url" :download="image.name" target="_blank"
+                                    class="bg-primary/15 text-primary  text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
                                     {{ image.name }}
                                 </a>
                             </div>
