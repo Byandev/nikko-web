@@ -76,6 +76,8 @@ const handleFileChange = (event: Event) => {
 const { sendRequest: submitProposal, pending: isSubmitting } = useSubmit<{ data: Proposal }, ApiErrorResponse>();
 const { sendRequest: uploadMedia, pending: isUploading } = useSubmit<{ data: Media }, ApiErrorResponse>();
 
+const router = useRouter();
+
 const submitForm = async () => {
   v$.value.$touch();
   if (v$.value.$invalid) return;
@@ -109,6 +111,8 @@ const submitForm = async () => {
       } : undefined,
       body: body.value,
     });
+
+    router.push('/find-work');
   } catch (error) {
     
   }

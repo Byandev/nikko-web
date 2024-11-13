@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { email, minLength, required, sameAs } from "@vuelidate/validators";
+import { email, helpers, minLength, required, sameAs } from "@vuelidate/validators";
 import { useSubmit } from "~/composables/useSubmit";
 import type { AuthenticationResponse } from "~/types/api/response/auth";
 import type { ApiErrorResponse } from "~/types/api/response/error";
@@ -27,7 +27,7 @@ interface RegisterForm {
   password: string;
   password_confirmation: string;
   account_type: AccountType;
-  accept_policy: boolean;
+  accept_policy: boolean | null;
 }
 
 const RegisterForm = ref<RegisterForm>({
@@ -37,17 +37,17 @@ const RegisterForm = ref<RegisterForm>({
   password: '',
   password_confirmation: '',
   account_type: AccountType.FREELANCER,
-  accept_policy: false,
+  accept_policy: null,
 });
 
 const RegisterRules = {
-  first_name: { required },
-  last_name: { required },
-  email: { required, email },
-  password: { required, minLength: minLength(6) },
-  password_confirmation: { required, sameAsRef: sameAs(computed(() => RegisterForm.value.password)) },
-  account_type: { required },
-  accept_policy: { required },
+  first_name: { required: helpers.withMessage('First name is required', required) },
+  last_name: { required: helpers.withMessage('Last name is required', required) },
+  email: { required: helpers.withMessage('Email is required', required), email },
+  password: { required: helpers.withMessage('Password is required', required), minLength: minLength(6) },
+  password_confirmation: { required: helpers.withMessage('Password confirmation is required', required), sameAsRef: sameAs(computed(() => RegisterForm.value.password)) },
+  account_type: { required: helpers.withMessage('Account type is required', required) },
+  accept_policy: { required: helpers.withMessage('You must accept the policy and terms of service and Privacy Policy', required) },
 };
 
 const { formRef, v$ } = useValidation(RegisterForm, RegisterRules);

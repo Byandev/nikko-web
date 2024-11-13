@@ -32,8 +32,6 @@ onMounted(async () => {
             }
         );
     }
-
-    console.log(job);
 });
 
 const goBack = () => {
