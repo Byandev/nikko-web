@@ -12,6 +12,7 @@ const { status } = useAuth();
 const isAuthenticated = computed(() => status.value === 'authenticated');
 const showDropdown = ref(false);
 const showDropdownMyContract = ref(false);
+const showSidebar = ref(false);
 
 const { sendRequest: signOut } = useSubmit<AuthenticationResponse, ApiErrorResponse>()
 
@@ -28,6 +29,10 @@ const closeDropdown = () => {
     showDropdownMyContract.value = false;
 }
 
+const toggleSidebar = () => {
+    showSidebar.value = !showSidebar.value;
+};
+
 const handleLogout = async () => {
     closeDropdown();
     await signOut('/v1/auth/logout', {
@@ -41,18 +46,21 @@ const handleLogout = async () => {
     <header
         class="flex flex-row justify-between items-center border-b-2 border-gray-200 text-white py-2 px-4 sm:px-16 bg-white">
         <div class="flex items-center">
-            <NuxtLink to="/" @click="closeDropdown">
+            <button @click="toggleSidebar" class="sm:hidden">
+                <Icon icon="mdi:menu" width="24" height="24" class="text-black" />
+            </button>
+            <NuxtLink to="/" @click="closeDropdown" class="ml-4 sm:ml-0">
                 <img src="@/assets/icons/artsycrowd.png" alt="Dummy Logo" class="h-10 object-cover rounded-full">
             </NuxtLink>
 
-            <div class="ml-5 border-l-2 pl-5">
+            <div class="hidden sm:block ml-5 border-l-2 pl-5">
                 <NuxtLink :to="account?.type === 'FREELANCER' ? '/find-work' : 'find-freelancer'" @click="closeDropdown"
                     class="text-sm text-black">
                     {{ account?.type === 'FREELANCER' ? 'Find Work' : 'Find Freelancer' }}
                 </NuxtLink>
             </div>
 
-            <div class="relative ml-5 text-sm">
+            <div class="hidden sm:block relative ml-5 text-sm">
                 <button @click="toggleDropdownMyContract" class="flex items-center space-x-2 text-black">
                     <span>My contract</span>
                     <Icon icon="mdi:chevron-down" width="24" height="24" />
@@ -112,4 +120,21 @@ const handleLogout = async () => {
             </template>
         </div>
     </header>
+
+    <div v-if="showSidebar" class="fixed inset-0 bg-black bg-opacity-50 z-50 sm:hidden" @click="toggleSidebar">
+        <div class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-50" @click.stop>
+            <div class="flex flex-col p-4 space-y-4">
+                <NuxtLink to="/" @click="toggleSidebar" class="text-black font-bold">
+                    Home
+                </NuxtLink>
+                <NuxtLink :to="account?.type === 'FREELANCER' ? '/find-work' : 'find-freelancer'" @click="toggleSidebar"
+                    class="text-black">
+                    {{ account?.type === 'FREELANCER' ? 'Find Work' : 'Find Freelancer' }}
+                </NuxtLink>
+                <NuxtLink to="/my-contract/submit-contract" @click="toggleSidebar" class="text-black">
+                    Submit proposals
+                </NuxtLink>
+            </div>
+        </div>
+    </div>
 </template>
