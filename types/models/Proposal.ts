@@ -8,6 +8,6 @@ export interface Proposal {
     transaction_fee: string;
     length: string;
     status: string;
-    project: Project;
+    my_proposal: Project;
     attachments: Media[];
 }

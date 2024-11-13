@@ -46,7 +46,7 @@ onMounted(() => {
                     <div v-if="submittedProposals?.data" v-for="proposal in submittedProposals.data"
                         class="ring-1 ring-gray-300 rounded-md p-4 mb-5">
                         <p class="text-sm text-gray-500 mb-2">Project ID: {{ proposal.project_id }}</p>
-                        <JobCard @view="viewJob" :key="proposal.project_id" :job="proposal.project" class="mb-5">
+                        <JobCard @view="viewJob" :key="proposal.project_id" :job="proposal.my_proposal" class="mb-5">
                             <Button text="Withdraw" @click="" type="button" foreground="white" background="primary" />
                         </JobCard>
                         <div class="flex flex-row mb-2 space-x-2">
