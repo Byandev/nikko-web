@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { email, required} from "@vuelidate/validators";
+import { email, required, helpers} from "@vuelidate/validators";
 import { useSubmit } from "~/composables/useSubmit";
 import type { AuthenticationResponse } from "~/types/api/response/auth";
 import type { ApiErrorResponse } from "~/types/api/response/error";
@@ -27,11 +27,16 @@ const form = ref<LoginForm>({
 });
 
 const rules = {
-    email: { required, email },
-    password: { required},
+    email: {
+      required: helpers.withMessage('Email is required', required),
+      email
+    },
+    password: {
+      required: helpers.withMessage('Password is required', required),
+    },
 };
 
-const { formRef, v$ } = useValidation(form, rules);
+const { formRef, v$, $externalResults } = useValidation(form, rules);
 
 const submitForm = async () => {
 
@@ -59,7 +64,7 @@ const submitForm = async () => {
             await router.push("/find-freelancer");
         }
     } catch (error) {
-        console.error(error)
+        $externalResults.value = (error as ApiErrorResponse)?.data?.errors
     }
 };
 </script>
