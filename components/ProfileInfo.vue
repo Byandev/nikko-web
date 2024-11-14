@@ -12,6 +12,8 @@ enum MediaType {
 }
 
 const { user } = storeToRefs(authStore());
+
+console.log(user.value);
 const { updateUser } = authStore();
 
 const isAvatarModalOpen = ref(false);
