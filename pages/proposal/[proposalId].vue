@@ -34,7 +34,7 @@ onMounted(async () => {
         cover_letter: proposal?.value?.data.cover_letter ?? '',
         bid: proposal?.value?.data.bid ?? 0,
         length: proposal?.value?.data.length ?? '',
-        attachments: proposal?.value?.data.attachments ? proposal.value.data.attachments.map((attachment: Media) => ({ name: attachment.name, id: attachment.id })) : [],
+        attachments: proposal?.value?.data.attachments ?? [],
     };
 });
 
@@ -42,7 +42,7 @@ interface Form {
     cover_letter: string;
     bid: number;
     length: string;
-    attachments: {name: string, id?:number}[];
+    attachments: Media[] | File[];
 }
 
 const form = ref<Form>({
@@ -70,7 +70,7 @@ const handleClick = () => {
 
 const handleRemoveFile = (fileNameToRemove: string) => {
     selectedFiles.value = selectedFiles.value.filter(file => file.name !== fileNameToRemove);
-    form.value.attachments = form.value.attachments.filter(attachment => attachment.name !== fileNameToRemove);
+    form.value.attachments = form.value.attachments.filter(attachment => attachment.name !== fileNameToRemove) as File[];
 };
 
 const handleFileChange = (event: Event) => {
@@ -78,7 +78,7 @@ const handleFileChange = (event: Event) => {
     if (target.files) {
         const newFiles = Array.from(target.files);
         selectedFiles.value = selectedFiles.value.concat(newFiles);
-        form.value.attachments = form.value.attachments.concat(newFiles.map(file => ({ name: file.name })));
+        form.value.attachments = form.value.attachments.concat(newFiles) as File[];
     }
 };
 
@@ -104,12 +104,17 @@ const submitForm = async (id: number) => {
         const uploadResponses = await Promise.all(uploadPromises);
         const uploadedAttachments = uploadResponses.map(response => response.data.id);
 
+        // Extract only the id from Media objects
+        const mediaData = form.value.attachments
+            .filter(file => !(file instanceof File))
+            .map(media => (media as Media).id);
+
         const body = ref({
             project_id: route.params.projectId,
             cover_letter: form.value.cover_letter,
             bid: form.value.bid,
             length: form.value.length,
-            attachments: [...uploadedAttachments, form.value.attachments.map(attachment => attachment.id)].flat().filter(id => id !== null),
+            attachments: [...uploadedAttachments, ...mediaData]
         });
 
         await submitProposal(`/v1/proposals/${id}`, {
