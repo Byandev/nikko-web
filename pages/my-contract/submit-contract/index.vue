@@ -59,6 +59,8 @@ const handleWithdrawProposal = async (id: number) => {
                         <JobCard @view="viewJob" :key="proposal.project_id" :job="proposal.project" class="mb-5">
                             <Button text="Withdraw" @click="handleWithdrawProposal(proposal.id)" type="button"
                                 foreground="white" background="primary" />
+                            <Button text="View" @click="handleWithdrawProposal(proposal.id)" type="button"
+                                foreground="primary" background="white" />
                         </JobCard>
                         <div class="flex flex-row mb-2 space-x-2">
                             <p class="bg-primary/15 text-primary text-xs font-medium px-2.5 py-0.5 rounded">
