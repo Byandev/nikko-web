@@ -25,6 +25,7 @@ const {jobPosting} = storeToRefs(jobPostingStore());
 const { resetJobPosting } = jobPostingStore();
 const { account } = storeToRefs(accountStore());
 const status = ref<string | null>(null);
+const router = useRouter();
 
 interface FormData {
     title: string;
@@ -243,15 +244,15 @@ const submitForm = async () => {
 
 <template>
     <div class="job-card bg-white p-5 ring-1 ring-gray-300 rounded-md hover:cursor-pointer">
-        <div class=" border-b-2 border-primary mb-5 pb-3 flex gap-3">
-            <Button text="View Job" background="white" foreground="primary" class="ring-1 ring-primary" @click=""
-                type="button" />
-            <Button text="All Proposal" background="white" foreground="primary" class="ring-1 ring-primary" @click=""
-                type="button" />
+        <div class=" border-b-2 border-gray-300 mb-5 pb-3 flex gap-3">
+            <Button text="View Job" background="white" foreground="primary" class="ring-1 ring-primary"
+                @click="router.push(`/posts/${props.job.id}/details`)" type="button" />
+            <Button text="All Proposal" background="white" foreground="primary" class="ring-1 ring-primary"
+                @click="router.push(`/posts/${props.job.id}/proposals`)" type="button" />
             <Button text="Invite Freelancers" background="white" foreground="primary" class="ring-1 ring-primary"
-                @click="" type="button" />
-            <Button text="Hired" background="white" foreground="primary" class="ring-1 ring-primary" @click=""
-                type="button" />
+                @click="router.push(`/posts/${props.job.id}/invite`)" type="button" />
+            <Button text="Hired" background="white" foreground="primary" class="ring-1 ring-primary"
+                @click="router.push(`/posts/${props.job.id}/hires`)" type="button" />
         </div>
         <div>
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
