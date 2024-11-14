@@ -41,6 +41,7 @@ watch(
   }, 500)
 );
 
+const router = useRouter();
 
 const fetchProjects = async (page: number) => {
   await fetchAllProjects(`/v1/projects?page=${page}&filter[search]=${searchParams.value.search}&filter[length]=${searchParams.value.length}&filter[experience_level]=${searchParams.value.experience_level}&include=account.user.avatar`,
@@ -104,6 +105,15 @@ const tabCount = computed(() => {
     return 0;
   };
 });
+
+const viewJob = async (id: number) => {
+  await router.push(`/jobs/${id}`);
+};
+
+const sendProposal = async (id: number) => {
+  await router.push(`/submit-proposal/${id}`);
+};
+
 </script>
 
 <template>
@@ -241,14 +251,29 @@ const tabCount = computed(() => {
             </nav>
 
             <div v-if="tabs[0].current && allProjects?.meta && allProjects.data" class="flex flex-col gap-4 mt-5">
-              <FindWorkJobCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
-                v-for="job in allProjects.data" :key="job.id" :job="job" />
+              <JobCard @view="viewJob" v-for="job in allProjects.data" :key="job.id" :job="job">
+                <Button @click="sendProposal(job.id)" text="Apply Now" type="button" background="primary" foreground="white" />
+                <div v-if="!job.is_saved" @click="{job.is_saved ? job.is_saved = false : job.is_saved = true;
+                  updateSaveStatus(job.id, false)
+                }"
+                  class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
+                  <Icon icon="mdi:heart" class="text-primary" />
+                  <button class="text-primary">Save</button>
+                </div>
+                <div v-else @click="{job.is_saved ? job.is_saved = false : job.is_saved = true;
+                  updateSaveStatus(job.id, true)
+                }"
+                  class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
+                  <Icon icon="mdi:heart-outline" class="text-primary" />
+                  <button class="text-primary">Unsave</button>
+                </div>
+              </JobCard>
               <Pagination v-if="!isAllProjectsLoading && allProjects.data.length > 0" :pagination="allProjects.meta"
                 @prev-page="fetchProjects(allProjects.meta.current_page - 1)"
                 @next-page="fetchProjects(allProjects.meta.current_page + 1)" />
             </div>
             <div v-if="tabs[0].current && allProjects?.data.length === 0">
-                <p class="text-gray-500">No jobs found. Please adjust your search criteria and try again.</p>
+              <p class="text-gray-500">No jobs found. Please adjust your search criteria and try again.</p>
             </div>
             <div v-if="tabs[0].current && isAllProjectsLoading && !allProjects" class="flex flex-col gap-4 mt-5">
               <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl h-60">
@@ -265,14 +290,29 @@ const tabCount = computed(() => {
 
 
             <div v-if="tabs[1].current && savedProjects?.data && savedProjects?.meta" class="flex flex-col gap-4 mt-5">
-              <FindWorkJobCard @save="updateSaveStatus($event, false)" @unsave="updateSaveStatus($event, true)"
-                v-for="job in savedProjects.data" :key="job.id" :job="job" />
+              <JobCard @view="viewJob" v-for="job in savedProjects.data" :key="job.id" :job="job">
+                <Button @click="sendProposal(job.id)" text="Apply Now" type="button" background="primary" foreground="white" />
+                <div v-if="!job.is_saved" @click="{job.is_saved ? job.is_saved = false : job.is_saved = true;
+                  updateSaveStatus(job.id, false)
+                }"
+                  class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
+                  <Icon icon="mdi:heart" class="text-primary" />
+                  <button class="text-primary">Save</button>
+                </div>
+                <div v-else @click="{job.is_saved ? job.is_saved = false : job.is_saved = true;
+                  updateSaveStatus(job.id, true)
+                }"
+                  class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
+                  <Icon icon="mdi:heart-outline" class="text-primary" />
+                  <button class="text-primary">Unsave</button>
+                </div>
+              </JobCard>
               <Pagination v-if="!isAllProjectsLoading && savedProjects.data.length > 0" :pagination="savedProjects.meta"
                 @prev-page="fetchProjects(savedProjects.meta.current_page - 1)"
                 @next-page="fetchProjects(savedProjects.meta.current_page + 1)" />
             </div>
             <div v-if="tabs[1].current && savedProjects?.data.length === 0">
-                <p class="text-gray-500">No jobs found. Please adjust your search criteria and try again.</p>
+              <p class="text-gray-500">No jobs found. Please adjust your search criteria and try again.</p>
             </div>
             <div v-if="tabs[1].current && isSavedProjectsLoading && !savedProjects" class="flex flex-col gap-4 mt-5">
               <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl h-60">

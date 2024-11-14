@@ -13,14 +13,25 @@ const router = useRouter();
 const route = useRoute();
 
 onMounted(async () => {
-    await fetchJob(`v1/client/projects/${route.params.projectId}`,
-        {
-            method: 'GET',
-            headers: account?.value?.id ? {
-                'X-ACCOUNT-ID': account.value.id.toString(),
-            } : undefined,
-        }
-    );
+    if (account.value?.type === 'FREELANCER') {
+        await fetchJob(`v1/projects/${route.params.projectId}`,
+            {
+                method: 'GET',
+                headers: account?.value?.id ? {
+                    'X-ACCOUNT-ID': account.value.id.toString(),
+                } : undefined,
+            }
+        );
+    } else {
+        await fetchJob(`v1/client/projects/${route.params.projectId}`,
+            {
+                method: 'GET',
+                headers: account?.value?.id ? {
+                    'X-ACCOUNT-ID': account.value.id.toString(),
+                } : undefined,
+            }
+        );
+    }
 });
 
 const goBack = () => {
@@ -30,48 +41,113 @@ const goBack = () => {
 </script>
 
 <template>
-    <div class="my-10 max-w-xl mx-5 lg:mx-auto border border-gray-300 rounded-lg py-10 px-4 sm:px-16 bg-white shadow-lg">
-        <button @click="goBack" class="mb-6 inline-flex items-center gap-x-1 rounded-md bg-green-50 px-3 py-2 text-sm font-medium text-primary ring-1 ring-inset ring-green-600/20 hover:bg-green-100">
+    <div class="my-10 max-w-6xl mx-5 lg:mx-auto">
+        <button @click="goBack"
+            class="mb-2 inline-flex items-center gap-x-1 rounded-md bg-white px-3 py-2 text-sm font-medium text-primary ring-1 ring-inset ring-green-600/20">
             <Icon icon="mdi:arrow-left" class="text-lg" />
             Return
         </button>
-        <div v-if="!isLoading && job">
-            <h1 class="text-3xl font-bold mb-6 text-gray-800">{{ job.data.title }}</h1>
-            <p class="mb-4 text-gray-600"><strong>Posted On:</strong> {{ new Date(job.data.created_at).toLocaleDateString() }}</p>
-            <p class="mb-4 text-gray-600"><strong>Description:</strong> {{ job.data.description }}</p>
-            <p class="mb-4 text-gray-600"><strong>Estimated Budget:</strong> {{ job.data.estimated_budget }}</p>
-            <p class="mb-4 text-gray-600"><strong>Experience Level:</strong> {{ _.capitalize(job.data.experience_level) }}</p>
-            <p class="mb-4 text-gray-600"><strong>Project Length:</strong> {{ _.startCase(_.lowerCase(job.data.length)) }}</p>
-            <p class="mb-4 text-gray-600"><strong>Languages:</strong></p>
-            <div class="flex flex-wrap mb-4">
-                <div v-for="(language, idx) in job.data.languages" :key="`selected-language-${language.id}`" class="mr-2 my-1">
-                    <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20 whitespace-nowrap">
-                        {{ language.name }}
-                    </span>
+        <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3" v-if="!isLoading && job">
+            <header class="py-4 md:py-6">
+                <h2 class="text-xl md:text-2xl mb-2 md:mb-3">Job details</h2>
+            </header>
+            <section class="pb-6 md:pb-8">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-5">
+
+                    <!-- Left Side -->
+                    <div class="md:col-span-8 lg:col-span-9">
+                        <h2 class="text-lg md:text-xl mb-4 md:mb-6">{{ job.data.title ?? 'No title' }}</h2>
+                        <div>
+                            <span class=" text-sm">{{ job.data.description ?? 'No description' }}</span>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Side -->
+                    <div class="border-l-0 md:border-l-2 block md:col-span-4 lg:col-span-3 pl-0 md:pl-4"
+                        v-if="job.data.experience_level || job.data.length || job.data.estimated_budget">
+                        <ul>
+                            <li class="flex justify-start items-center gap-2 md:gap-3" v-if="job.data.experience_level">
+                                <Icon icon="mdi-light:diamond-stone" style="color: black" />
+                                <div class="flex flex-col">
+                                    <strong>{{ _.capitalize(job.data.experience_level) ?? 'Any' }}</strong>
+                                    <small>Experience Level</small>
+                                </div>
+                            </li>
+
+                            <li class="flex justify-start items-center gap-2 md:gap-3" v-if="job.data.estimated_budget">
+                                <Icon icon="fluent-mdl2:money" style="color: black" />
+                                <div class="flex flex-col">
+                                    <strong>{{ job.data.estimated_budget }}</strong>
+                                    <small>Estimated Budget</small>
+                                </div>
+                            </li>
+
+                            <li class="flex justify-start items-center gap-2 md:gap-3" v-if="job.data.length">
+                                <Icon icon="mingcute:time-duration-line" style="color: black" />
+                                <div class="flex flex-col">
+                                    <strong>{{ _.startCase(job.data.length.toLowerCase()) }}</strong>
+                                    <small>Duration</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            <p class="mb-4 text-gray-600"><strong>Skills:</strong></p>
-            <div class="flex flex-wrap mb-4">
-                <div v-for="(skill, idx) in job.data.skills" :key="`selected-skill-${skill.id}`" class="mr-2 my-1">
-                    <span class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20 whitespace-nowrap">
-                        {{ skill.name }}
-                    </span>
+
+                <div class="border-t-2 mt-5" v-if="job.data.skills || job.data.languages || job.data.images">
+                    <div v-if="job.data.skills" class="w-full mt-5">
+                        <h2 class="text-base mb-1">Skills</h2>
+                        <!-- Flex container for row layout -->
+                        <div class="flex flex-wrap gap-2">
+                            <div v-for="(skill, idx) in job.data.skills" :key="`selected-skill-${skill.id}`">
+                                <span
+                                    class="bg-primary/15 text-primary  text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
+                                    {{ skill.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <p class="mb-4 text-gray-600"><strong>File Attachments:</strong></p>
-            <div class="flex flex-wrap mb-4">
-                <div v-for="(attachment, idx) in job.data.images" :key="`selected-attachment-${attachment.id}`" class="mr-2 my-1">
-                    <a :href="attachment.original_url" target="_blank" class="inline-flex items-center gap-x-1 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20 whitespace-nowrap">
-                        <Icon icon="gg:attachment" class="text-lg" />
-                        {{ attachment.name }}
-                        <Icon icon="material-symbols:download" class="text-lg"/>
-                    </a>
+                <div class="mt-5">
+                    <div v-if="job.data.languages" class="w-full mt-5">
+                        <h2 class="text-base mb-1">Languages</h2>
+                        <!-- Flex container for row layout -->
+                        <div class="flex flex-wrap gap-2">
+                            <div v-for="(language, idx) in job.data.languages"
+                                :key="`selected-language-${language.id}`">
+                                <span
+                                    class="bg-primary/15 text-primary  text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
+                                    {{ language.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
+                <div class="mt-5">
+                    <div v-if="job.data.images" class="w-full mt-5">
+                        <h2 class="text-base mb-1">Attachments</h2>
+                        <div class="flex flex-wrap gap-2">
+                            <div v-for="(image, idx) in job.data.images" :key="`selected-image-${image.id}`">
+                                <a :href="image.original_url" :download="image.name" target="_blank"
+                                    class="bg-primary/15 text-primary  text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
+                                    {{ image.name }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
         </div>
         <div v-else>
-            <p class="text-gray-600">Loading...</p>
+            <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 py-16 flex gap-2 flex-col">
+                <div class="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/4 animate-pulse"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/4 animate-pulse"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+            </div>
         </div>
     </div>
 </template>

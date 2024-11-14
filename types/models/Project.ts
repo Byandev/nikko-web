@@ -1,3 +1,4 @@
+import type { Account } from "./Account";
 import type { Language } from "./Language";
 import type { Media } from "./Media";
 import type { Skill } from "./Skill";
@@ -31,6 +32,7 @@ export interface Project {
     experience_level: Level;
     status: Status, 
     languages: Language[];
+    account: Account;
     images: Media[];
     skills: Skill[];
     created_at: string,

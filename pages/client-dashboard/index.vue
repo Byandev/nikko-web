@@ -144,6 +144,10 @@ const confirmDeleteJob = async () => {
     }
 };
 
+const viewJobDetails = async (id: number) => {
+    await router.push(`/jobs/${id}`);
+};
+
 watch(
   [searchQuery],
   debounce(async () => {
@@ -181,8 +185,8 @@ onMounted(() => {
                             <h2 class="text-2xl font-bold text-gray-900">{{ user.first_name }} {{ user.last_name }}</h2>
                             <p class="mt-2 text-md text-gray-600">
                                 Joined on {{ new Date(user.created_at).toLocaleString('en-US', {
-                                    month: 'long', day:
-                                        'numeric', year: 'numeric'
+                                month: 'long', day:
+                                'numeric', year: 'numeric'
                                 }) }}
                             </p>
                             <div class="mt-2 flex items-center space-x-2 justify-center">
@@ -254,7 +258,8 @@ onMounted(() => {
                     </div>
 
                     <div v-if="tabs[1].current" class="">
-                        <div class="bg-white shadow px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center ring-1 ring-gray-300 rounded-md">
+                        <div
+                            class="bg-white shadow px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center ring-1 ring-gray-300 rounded-md">
                             <div>
                                 <h3 class="text-lg font-medium leading-6 text-gray-900">All Jobs Post</h3>
                                 <p class="mt-1 max-w-2xl text-sm text-gray-500">
@@ -269,7 +274,11 @@ onMounted(() => {
                         </div>
                         <div v-if="!isAllProjectsLoading" class="mt-5 flex flex-col gap-5">
                             <div v-for="(job, idx) in allProjects?.data" :key="job.id">
-                                <JobCard @submit="fetchProjects(1)" @delete="openDeleteModal" :job="job" />
+                                <ClientDashJobCard @submit="fetchProjects(1)" @delete="openDeleteModal" :job="job"
+                                    :options="true">
+                                    <Button @click="viewJobDetails(job.id)" text="View Details" type="button"
+                                        background="primary" foreground="white" />
+                                </ClientDashJobCard>
                             </div>
                         </div>
                         <div v-else>
@@ -279,16 +288,15 @@ onMounted(() => {
                             </div>
                         </div>
                     </div>
-                    
+
                     <Pagination
                         v-if="!isLoading && allProjects?.meta  && (allProjects?.data ?? []).length > 0 && !tabs[0].current && tabs[1].current && allProjects.data.length > 0"
-                        :pagination="allProjects?.meta"
-                        @prev-page="fetchProjects(allProjects.meta.current_page - 1)"
-                        @next-page="fetchProjects(allProjects.meta.current_page + 1)"
-                    />
+                        :pagination="allProjects?.meta" @prev-page="fetchProjects(allProjects.meta.current_page - 1)"
+                        @next-page="fetchProjects(allProjects.meta.current_page + 1)" />
 
                     <div v-if="tabs[2].current">
-                        <div class="bg-white shadow px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center ring-1 ring-gray-300 rounded-md">
+                        <div
+                            class="bg-white shadow px-4 py-5 sm:px-6 flex flex-col gap-5 lg:flex-row justify-between items-center ring-1 ring-gray-300 rounded-md">
                             <div>
                                 <h3 class="text-lg font-medium leading-6 text-gray-900">All Saved Draft</h3>
                                 <p class="mt-1 max-w-2xl text-sm text-gray-500">
@@ -303,7 +311,11 @@ onMounted(() => {
                         </div>
                         <div v-if="!isDraftProjectsLoading" class="mt-5 flex flex-col gap-5">
                             <div v-for="(job, idx) in draftProject?.data" :key="job.id">
-                                <JobCard @submit="fetchProjects(1)" @delete="deleteAJob" :job="job" />
+                                <ClientDashJobCard @submit="fetchProjects(1)" @delete="deleteAJob" :job="job"
+                                    :options="true">
+                                    <Button @click="viewJobDetails(job.id)" text="View Details" type="button"
+                                        background="primary" foreground="white" />
+                                </ClientDashJobCard>
                             </div>
                         </div>
                         <div v-else>
@@ -316,10 +328,8 @@ onMounted(() => {
 
                     <Pagination
                         v-if="!isLoading && draftProject?.meta && (draftProject.data ?? []).length > 0 && !tabs[0].current && tabs[2].current && draftProject.data.filter(project => project.status === 'DRAFT').length > 0"
-                        :pagination="draftProject.meta"
-                        @prev-page="fetchProjects(draftProject.meta.current_page - 1)"
-                        @next-page="fetchProjects(draftProject.meta.current_page + 1)"
-                    />
+                        :pagination="draftProject.meta" @prev-page="fetchProjects(draftProject.meta.current_page - 1)"
+                        @next-page="fetchProjects(draftProject.meta.current_page + 1)" />
                 </div>
             </div>
 
