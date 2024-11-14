@@ -76,8 +76,8 @@ const handleLogout = async () => {
         <div class="relative flex justify-end space-x-4 group">
             <template v-if="isAuthenticated">
                 <div @click="toggleDropdown" class="cursor-pointer">
-                    <template v-if="user.avatar?.original_url">
-                        <img :src="user.avatar?.original_url" alt="User Avatar"
+                    <template v-if="user?.avatar?.original_url">
+                        <img :src="user?.avatar?.original_url" alt="User Avatar"
                             class="h-10 w-10 object-cover rounded-full">
                     </template>
                     <template v-else>
