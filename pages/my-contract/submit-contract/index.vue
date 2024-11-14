@@ -27,7 +27,7 @@ const { data: submittedProposals, fetchData: fetchSubmittedProposals } = useFetc
 const { sendRequest: withdrawProposal } = useSubmit<Proposal, ApiErrorResponse>();
 
 onMounted(() => {
-    fetchSubmittedProposals('/v1/proposals?include=project.account.user.avatar',{
+    fetchSubmittedProposals('/v1/proposals?include=project.account.user.avatar,attachments',{
         method: 'GET',
         headers: account?.value?.id ? {
             'X-ACCOUNT-ID': account.value.id.toString(),
@@ -45,6 +45,10 @@ const handleWithdrawProposal = async (id: number) => {
     });
 };
 
+const viewProposal = async (id: number) => {
+    await router.push(`/proposal/${id}`);
+};
+
 </script>
 
 <template>
@@ -59,8 +63,8 @@ const handleWithdrawProposal = async (id: number) => {
                         <JobCard @view="viewJob" :key="proposal.project_id" :job="proposal.project" class="mb-5">
                             <Button text="Withdraw" @click="handleWithdrawProposal(proposal.id)" type="button"
                                 foreground="white" background="primary" />
-                            <Button text="View" @click="handleWithdrawProposal(proposal.id)" type="button"
-                                foreground="primary" background="white" />
+                            <Button text="View" @click="viewProposal(proposal.id)" type="button"
+                                foreground="primary" background="white" class="ring-1 ring-primary rounded-md" />
                         </JobCard>
                         <div class="flex flex-row mb-2 space-x-2">
                             <p class="bg-primary/15 text-primary text-xs font-medium px-2.5 py-0.5 rounded">

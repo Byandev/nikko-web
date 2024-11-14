@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { accountStore } from '~/store/accountStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { Project } from '~/types/models/Project';
 import { Icon } from '@iconify/vue';
 import {
     Listbox,
@@ -19,21 +18,29 @@ import type { Media } from '~/types/models/Media';
 
 const route = useRoute();
 const { account } = storeToRefs(accountStore());
-const { data: project, fetchData: fetchProject, pending: isLoading } = useFetchData<{ data: Project }, ApiErrorResponse>();
+const { data: proposal, fetchData: fetchProposal, pending: isLoading } = useFetchData<{ data: Proposal }, ApiErrorResponse>();
+const isEditing = false;
 
 onMounted(async () => {
-    await fetchProject(`v1/proposals/${route.params.proposalId}`, {
+    await fetchProposal(`v1/proposals/${route.params.proposalId}`, {
         headers: account?.value?.id ? {
             'X-ACCOUNT-ID': account.value.id.toString(),
         } : undefined,
     });
+
+    form.value = {
+        cover_letter: proposal?.value?.data.cover_letter ?? '',
+        bid: proposal?.value?.data.bid ?? 0,
+        length: proposal?.value?.data.length ?? '',
+        attachments: proposal?.value?.data.attachments ?? [],
+    };
 });
 
 interface Form {
     cover_letter: string;
     bid: number;
     length: string;
-    attachments: File[];
+    attachments: File[] | Media[];
 }
 
 const form = ref<Form>({
@@ -61,7 +68,7 @@ const handleClick = () => {
 
 const handleRemoveFile = (fileNameToRemove: string) => {
     selectedFiles.value = selectedFiles.value.filter(file => file.name !== fileNameToRemove);
-    form.value.attachments = form.value.attachments.filter(attachment => attachment.name !== fileNameToRemove);
+    form.value.attachments = form.value.attachments.filter(attachment => attachment.name !== fileNameToRemove) as File[];
 };
 
 const handleFileChange = (event: Event) => {
@@ -69,7 +76,7 @@ const handleFileChange = (event: Event) => {
     if (target.files) {
         const newFiles = Array.from(target.files);
         selectedFiles.value = selectedFiles.value.concat(newFiles);
-        form.value.attachments = form.value.attachments.concat(newFiles);
+        form.value.attachments = form.value.attachments.concat(newFiles) as File[];
     }
 };
 
@@ -86,7 +93,7 @@ const submitForm = async () => {
         // Upload each file and collect the responses
         const uploadPromises = form.value.attachments.map(file => {
             const formData = new FormData();
-            formData.append('file', file);
+            formData.append('file', file as File);
             return uploadMedia('/v1/medias', {
                 method: 'POST',
                 body: formData,
@@ -125,7 +132,7 @@ const submitForm = async () => {
         <div class="max-w-6xl grid grid-cols-1 gap-4 mt-5 mx-auto">
             <h1 class="text-4xl font-medium whitespace-nowrap">Submit a proposal</h1>
             <div class="flex flex-col gap-4">
-                <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3 flex-1" v-if="!isLoading && project">
+                <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3 flex-1" v-if="!isLoading && proposal">
                     <header class="py-4 md:py-6">
                         <h2 class="text-xl md:text-2xl mb-2 md:mb-3">Job details</h2>
                     </header>
@@ -133,36 +140,39 @@ const submitForm = async () => {
                         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-5">
                             <!-- Left Side -->
                             <div class="md:col-span-8 lg:col-span-9">
-                                <h2 class="text-lg md:text-xl mb-4 md:mb-6">{{ project.data.title ?? 'No title' }}</h2>
+                                <h2 class="text-lg md:text-xl mb-4 md:mb-6">{{ proposal.data.project.title ?? 'No title'
+                                    }}</h2>
                                 <div>
-                                    <span class="text-sm">{{ project.data.description ?? 'No description' }}</span>
+                                    <span class="text-sm">{{ proposal.data.project.description ?? 'No description'
+                                        }}</span>
                                 </div>
                             </div>
                             <!-- Right Side -->
                             <div class="border-l-0 md:border-l-2 block md:col-span-4 lg:col-span-3 pl-0 md:pl-4"
-                                v-if="project.data.experience_level || project.data.length || project.data.estimated_budget">
+                                v-if="proposal.data.project.experience_level || proposal.data.length || proposal.data.project.estimated_budget">
                                 <ul>
                                     <li class="flex justify-start items-center gap-2 md:gap-3"
-                                        v-if="project.data.experience_level">
+                                        v-if="proposal.data.project.experience_level">
                                         <Icon icon="mdi-light:diamond-stone" style="color: black" />
                                         <div class="flex flex-col">
-                                            <strong>{{ _.capitalize(project.data.experience_level) ?? 'Any' }}</strong>
+                                            <strong>{{ _.capitalize(proposal.data.project.experience_level) ?? 'Any'
+                                                }}</strong>
                                             <small>Experience Level</small>
                                         </div>
                                     </li>
                                     <li class="flex justify-start items-center gap-2 md:gap-3"
-                                        v-if="project.data.estimated_budget">
+                                        v-if="proposal.data.project.estimated_budget">
                                         <Icon icon="fluent-mdl2:money" style="color: black" />
                                         <div class="flex flex-col">
-                                            <strong>{{ project.data.estimated_budget }}</strong>
+                                            <strong>{{ proposal.data.project.estimated_budget }}</strong>
                                             <small>Estimated Budget</small>
                                         </div>
                                     </li>
                                     <li class="flex justify-start items-center gap-2 md:gap-3"
-                                        v-if="project.data.length">
+                                        v-if="proposal.data.length">
                                         <Icon icon="mingcute:time-duration-line" style="color: black" />
                                         <div class="flex flex-col">
-                                            <strong>{{ _.startCase(project.data.length.toLowerCase()) }}</strong>
+                                            <strong>{{ _.startCase(proposal.data.length.toLowerCase()) }}</strong>
                                             <small>Duration</small>
                                         </div>
                                     </li>
@@ -173,12 +183,13 @@ const submitForm = async () => {
                 </div>
                 <form @submit.prevent="submitForm">
 
-                    <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3 flex-1" v-if="!isLoading && project">
+                    <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3 flex-1" v-if="!isLoading && proposal">
                         <header class="py-4 md:py-6">
-                            <h3 class="text-base">How long will this project takes?</h3>
+                            <h3 class="text-base">How long will this proposal takes?</h3>
                         </header>
                         <section class="pb-6 md:pb-8">
-                            <Listbox v-model="form.length" class="ring-1 ring-gray-300 rounded-md max-w-72">
+                            <Listbox :disabled="!isEditing" v-model="form.length"
+                                class="ring-1 ring-gray-300 rounded-md max-w-72">
                                 <div class="relative mt-1">
                                     <ListboxButton
                                         class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
@@ -202,7 +213,7 @@ const submitForm = async () => {
                                                     :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
                                                     <span
                                                         :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
-                                                            _.startCase(term.toLowerCase())
+                                                        _.startCase(term.toLowerCase())
                                                         }}</span>
                                                     <span v-if="selected"
                                                         class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
@@ -219,14 +230,14 @@ const submitForm = async () => {
                         </section>
                     </div>
 
-                    <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3 flex-1" v-if="!isLoading && project">
+                    <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3 flex-1" v-if="!isLoading && proposal">
                         <header class="py-4 md:py-6">
                             <h3 class="text-base">Terms</h3>
                         </header>
                         <section class="pb-6 md:pb-8">
                             <div class="flex flex-col gap-4 max-w-72">
                                 <label for="hourly_rate" class="text-sm font-medium text-gray-700">Bid</label>
-                                <input type="number" id="hourly_rate" v-model="form.bid"
+                                <input :disable="!isEditing" type="number" id="hourly_rate" v-model="form.bid"
                                     class="mt-1 block w-full rounded-md ring-1 ring-gray-300 shadow-sm sm:text-sm p-2"
                                     placeholder="Enter your hourly rate" />
                             </div>
@@ -235,14 +246,14 @@ const submitForm = async () => {
                         </section>
                     </div>
 
-                    <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3 flex-1" v-if="!isLoading && project">
+                    <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3 flex-1" v-if="!isLoading && proposal">
                         <header class="py-4 md:py-6">
                             <h3 class="text-base">Additional details</h3>
                         </header>
                         <section class="pb-6 md:pb-8">
                             <div class="flex flex-col gap-4 h-64">
                                 <label for="cover_letter" class="text-sm font-medium text-gray-700">Cover letter</label>
-                                <textarea id="cover_letter" v-model="form.cover_letter"
+                                <textarea :disable="!isEditing" id="cover_letter" v-model="form.cover_letter"
                                     class="mt-1 block w-full h-full rounded-md ring-1 ring-gray-300 shadow-sm sm:text-sm p-2"
                                     placeholder="Enter your cover letter"></textarea>
                             </div>
@@ -260,8 +271,8 @@ const submitForm = async () => {
                                 <div class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500 cursor-pointer"
                                     @click="handleClick">
                                     <Icon icon="mdi:file" :ssr="true" />
-                                    <input type="file" id="file" multiple @change="handleFileChange" class="hidden"
-                                        accept="image/*">
+                                    <input :disable="!isEditing" type="file" id="file" multiple
+                                        @change="handleFileChange" class="hidden" accept="image/*">
                                     <p
                                         class="block w-full px-2 placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none ring-0">
                                         Click to select a file</p>
@@ -289,10 +300,10 @@ const submitForm = async () => {
                         </section>
                     </div>
                     <div class="flex flex-row gap-2 w-full justify-end">
-                        <Button text="Submit Proposal" type="submit" background="primary"
-                            :is-loading="isLoading || isSubmitting" foreground="white" />
+                        <Button text="Update Proposal" type="submit" background="primary" :is-loading="isLoading || isSubmitting || isUploading
+                            " foreground="white" />
                         <NuxtLink :to="`/find-work`">
-                            <Button text="Cancel" type="button" :is-loading="isLoading || isSubmitting"
+                            <Button text="Cancel" type="button" :is-loading="isLoading || isSubmitting || isUploading"
                                 background="white" foreground="primary" />
                         </NuxtLink>
                     </div>

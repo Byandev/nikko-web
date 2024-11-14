@@ -5,10 +5,11 @@ export interface Proposal {
     id: number;
     account_id: number;
     project_id: number;
-    bid: string;
-    transaction_fee: string;
+    bid: number;
+    transaction_fee: number;
     length: string;
     status: string;
+    cover_letter: string;
     project: Project;
     attachments: Media[];
 }
