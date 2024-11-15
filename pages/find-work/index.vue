@@ -12,99 +12,60 @@ import {
 } from '@headlessui/vue';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 import _ from 'lodash';
-import type { PaginatedList } from '~/types/models/Pagination';
+import type {PaginatedList, PaginationMeta} from '~/types/models/Pagination';
 
-interface SearchParams {
-  search: string;
-  length: string;
-  experience_level: string;
+ interface ProjectPaginationMeta extends PaginationMeta {
+  total_count: number;
+  total_saved_count: number;
 }
 
-const searchParams = ref<SearchParams>({
+interface ProjectList extends PaginatedList<Project> {
+   meta: ProjectPaginationMeta
+}
+
+const router = useRouter();
+const page = ref(1)
+
+const filters = ref<{search: string, length: string, experience_level: string, is_saved: boolean}>({
   search: "",
-  length: '',
-  experience_level: '',
+  length: "",
+  experience_level: "",
+  is_saved: false
 });
 
 const { account } = storeToRefs(accountStore());
-const { data: allProjects, fetchData: fetchAllProjects, pending: isAllProjectsLoading } = useFetchData<PaginatedList<Project>, ApiErrorResponse>();
-const { data: savedProjects, fetchData: fetchSavedProjects, pending: isSavedProjectsLoading } = useFetchData<PaginatedList<Project>, ApiErrorResponse>();
+const { data: projects, fetchData, pending: isLoading } = useFetchData<ProjectList, ApiErrorResponse>();
 
-onMounted(async () => {
-  await fetchProjects(1);
-});
+
+const queryString = computed(() => {
+  let params: Record<string, string>  = {
+    ...(filters.value.search ? {"filter[search]": filters.value.search}: {}),
+    ...(filters.value.length ? {"filter[length]": filters.value.length}: {}),
+    ...(filters.value.experience_level ? {"filter[experience_level]": filters.value.experience_level}: {}),
+    ...(filters.value.is_saved ? {"filter[is_saved]": "true"}: {}),
+    include: 'account.user,skills,myProposal',
+    page: page.value.toString()
+  }
+
+  return new URLSearchParams(params).toString();
+})
+
+const totalCount = computed(() => projects.value?.meta?.total_count ?? 0);
+const totalSavedCount = computed(() => projects.value?.meta?.total_saved_count ?? 0);
+
+const requestHeaders = computed<HeadersInit | undefined>(() =>
+    account.value?.id ? { 'X-ACCOUNT-ID' : account.value.id.toString()} : undefined
+);
 
 watch(
-  [() => searchParams.value.search, () => searchParams.value.length, () => searchParams.value.experience_level],
+  [() => queryString.value],
   debounce(async () => {
-    await fetchProjects(1);
+    await fetchData(`/v1/projects?${queryString.value}`, { headers: requestHeaders.value})
   }, 500)
 );
 
-const router = useRouter();
+fetchData(`/v1/projects?${queryString.value}`, { headers: requestHeaders.value})
 
-const fetchProjects = async (page: number) => {
-  await fetchAllProjects(`/v1/projects?page=${page}&filter[search]=${searchParams.value.search}&filter[length]=${searchParams.value.length}&filter[experience_level]=${searchParams.value.experience_level}&include=account.user.avatar`,
-    {
-      headers: account?.value?.id ? {
-        'X-ACCOUNT-ID': account.value.id.toString(),
-      } : undefined,
-    }
-  );
-  await fetchSavedProjects(`/v1/projects?page=${page}&filter[is_saved]=true&filter[search]=${searchParams.value.search}&filter[length]=${searchParams.value.length}&filter[experience_level]=${searchParams.value.experience_level}&include=account.user.avatar`, {
-    headers: account?.value?.id ? {
-      'X-ACCOUNT-ID': account.value.id.toString(),
-    } : undefined,
-  });
-};
-
-const tabs = ref([
-  { name: `Latest Jobs`, current: true },
-  { name: `Saved Jobs`, current: false },
-]);
-
-const setActiveTab = (tabName: string) => {
-  tabs.value.forEach(tab => {
-    tab.current = (tab.name === tabName);
-  });
-};
-
-const { sendRequest: updateProject } = useSubmit<{ data: Project }, ApiErrorResponse>();
-
-const updateSaveStatus = async (id: number, isSaved: boolean) => {
-  if (!isSaved) {
-    const response = await updateProject(`v1/projects/${id}/save`,
-      {
-        method: 'POST',
-        headers: account?.value?.id ? {
-          'X-ACCOUNT-ID': account.value.id.toString(),
-        } : undefined,
-      }
-    );
-    console.log('Freelancer saved', response.data);
-  } else {
-    const response = await updateProject(`v1/projects/${id}/un-save`,
-      {
-        method: 'DELETE',
-        headers: account?.value?.id ? {
-          'X-ACCOUNT-ID': account.value.id.toString(),
-        } : undefined,
-      }
-    );
-    console.log('Freelancer unsaved', response.data);
-  }
-};
-
-const tabCount = computed(() => {
-  return (tabName: string) => {
-    if (tabName === 'Latest Jobs') {
-      return allProjects.value?.meta.total || 0;
-    } else if (tabName === 'Saved Jobs') {
-      return savedProjects.value?.meta.total || 0;
-    }
-    return 0;
-  };
-});
 
 const viewJob = async (id: number) => {
   await router.push(`/jobs/${id}`);
@@ -118,8 +79,8 @@ const sendProposal = async (id: number) => {
 
 <template>
   <div class="my-8 lg:mx-auto mx-5">
-    <ProfileInfo class="max-w-6xl mx-auto " />
-    <div class="max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-4 mt-5 mx-auto ">
+    <ProfileInfo class="max-w-7xl mx-auto " />
+    <div class="max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-4 mt-5 mx-auto ">
 
       <!-- Left Column -->
       <div class="col-span-1 flex flex-col gap-5">
@@ -133,14 +94,14 @@ const sendProposal = async (id: number) => {
             </div>
           </template>
           <template #content>
-            <Listbox v-model="searchParams.length" class="ring-1 ring-gray-300 rounded-md">
+            <Listbox v-model="filters.length" class="ring-1 ring-gray-300 rounded-md">
               <div class="relative mt-1">
                 <ListboxButton
                   class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                   <span class="block truncate">
-                    <span v-if="!searchParams.length">Select Length</span>
+                    <span v-if="!filters.length">Select Length</span>
                     <span v-else>
-                      {{ _.capitalize(_.startCase(searchParams.length)) }}
+                      {{ _.capitalize(_.startCase(filters.length)) }}
                     </span>
                   </span>
                   <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -185,14 +146,14 @@ const sendProposal = async (id: number) => {
             </div>
           </template>
           <template #content>
-            <Listbox v-model="searchParams.experience_level" class="ring-1 ring-gray-300 rounded-md">
+            <Listbox v-model="filters.experience_level" class="ring-1 ring-gray-300 rounded-md">
               <div class="relative mt-1">
                 <ListboxButton
                   class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                   <span class="block truncate">
-                    <span v-if="!searchParams.experience_level">Select Level</span>
+                    <span v-if="!filters.experience_level">Select Level</span>
                     <span v-else>
-                      {{ _.capitalize(_.startCase(searchParams.experience_level)) }}
+                      {{ _.capitalize(_.startCase(filters.experience_level)) }}
                     </span>
                   </span>
                   <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -235,96 +196,42 @@ const sendProposal = async (id: number) => {
         <div class="grid grid-cols-1 gap-5">
           <div class="border border-gray-300 rounded-lg p-4 flex flex-row items-center gap-2">
             <Icon icon="material-symbols:search" class=" text-xl text-gray-400" />
-            <input v-model="searchParams.search" type="text" placeholder="Search for any jobs"
+            <input v-model="filters.search" type="text" placeholder="Search for any jobs"
               class="w-full outline-none border-none" />
           </div>
 
-          <div>
+          <div class="space-y-5">
             <nav class="flex space-x-4" aria-label="Tabs">
-              <template v-for="tab in tabs" :key="tab.name">
-                <a href="#" @click.prevent="setActiveTab(tab.name)"
-                  :class="tab.current ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
-                  class="px-3 py-2 font-medium text-sm rounded-md">
-                  {{ tab.name }} ({{ tabCount(tab.name) }})
-                </a>
-              </template>
+              <a href="#" @click.prevent="filters.is_saved = false"
+                 :class="!filters.is_saved ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
+                 class="px-3 py-2 font-medium text-sm rounded-md">
+                Latest Jobs {{ totalCount > 0 ? `(${totalCount})` : '' }}
+              </a>
+
+              <a href="#" @click.prevent="filters.is_saved  = true"
+                 :class="filters.is_saved ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
+                 class="px-3 py-2 font-medium text-sm rounded-md">
+                Saved Jobs {{ totalSavedCount > 0 ? `(${totalSavedCount})` : '' }}
+              </a>
             </nav>
 
-            <div v-if="tabs[0].current && allProjects?.meta && allProjects.data" class="flex flex-col gap-4 mt-5">
-              <JobCard @view="viewJob" v-for="job in allProjects.data" :key="job.id" :job="job">
-                <Button @click="sendProposal(job.id)" text="Apply Now" type="button" background="primary" foreground="white" />
-                <div v-if="!job.is_saved" @click="{job.is_saved ? job.is_saved = false : job.is_saved = true;
-                  updateSaveStatus(job.id, false)
-                }"
-                  class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
-                  <Icon icon="mdi:heart" class="text-primary" />
-                  <button class="text-primary">Save</button>
-                </div>
-                <div v-else @click="{job.is_saved ? job.is_saved = false : job.is_saved = true;
-                  updateSaveStatus(job.id, true)
-                }"
-                  class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
-                  <Icon icon="mdi:heart-outline" class="text-primary" />
-                  <button class="text-primary">Unsave</button>
-                </div>
-              </JobCard>
-              <Pagination v-if="!isAllProjectsLoading && allProjects.data.length > 0" :pagination="allProjects.meta"
-                @prev-page="fetchProjects(allProjects.meta.current_page - 1)"
-                @next-page="fetchProjects(allProjects.meta.current_page + 1)" />
-            </div>
-            <div v-if="tabs[0].current && allProjects?.data.length === 0">
-              <p class="text-gray-500">No jobs found. Please adjust your search criteria and try again.</p>
-            </div>
-            <div v-if="tabs[0].current && isAllProjectsLoading && !allProjects" class="flex flex-col gap-4 mt-5">
-              <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl h-60">
-                <div class="rounded-full bg-gray-300 h-12 w-12"></div>
-                <div class="flex-1 space-y-4 py-1">
-                  <div class="h-4 bg-gray-300 rounded w-3/4"></div>
-                  <div class="space-y-2">
-                    <div class="h-4 bg-gray-300 rounded"></div>
-                    <div class="h-4 bg-gray-300 rounded w-5/6"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <div class="space-y-5">
+              <ProjectCard
+                  v-for="project in (projects as ProjectList)?.data ?? []"
+                  :key="project.id"
+                  :project="project"
+                  :show-save-button="true"
+                  @click="viewJob"
+                  @apply="sendProposal"
+                  @save="(projects as ProjectList).meta.total_saved_count++"
+                  @un-save="(projects as ProjectList).meta.total_saved_count--"
+              />
 
-
-            <div v-if="tabs[1].current && savedProjects?.data && savedProjects?.meta" class="flex flex-col gap-4 mt-5">
-              <JobCard @view="viewJob" v-for="job in savedProjects.data" :key="job.id" :job="job">
-                <Button @click="sendProposal(job.id)" text="Apply Now" type="button" background="primary" foreground="white" />
-                <div v-if="!job.is_saved" @click="{job.is_saved ? job.is_saved = false : job.is_saved = true;
-                  updateSaveStatus(job.id, false)
-                }"
-                  class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
-                  <Icon icon="mdi:heart" class="text-primary" />
-                  <button class="text-primary">Save</button>
-                </div>
-                <div v-else @click="{job.is_saved ? job.is_saved = false : job.is_saved = true;
-                  updateSaveStatus(job.id, true)
-                }"
-                  class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
-                  <Icon icon="mdi:heart-outline" class="text-primary" />
-                  <button class="text-primary">Unsave</button>
-                </div>
-              </JobCard>
-              <Pagination v-if="!isAllProjectsLoading && savedProjects.data.length > 0" :pagination="savedProjects.meta"
-                @prev-page="fetchProjects(savedProjects.meta.current_page - 1)"
-                @next-page="fetchProjects(savedProjects.meta.current_page + 1)" />
-            </div>
-            <div v-if="tabs[1].current && savedProjects?.data.length === 0">
-              <p class="text-gray-500">No jobs found. Please adjust your search criteria and try again.</p>
-            </div>
-            <div v-if="tabs[1].current && isSavedProjectsLoading && !savedProjects" class="flex flex-col gap-4 mt-5">
-              <div v-for="n in 5" :key="n" class="animate-pulse flex space-x-4 border p-4 rounded-xl h-60">
-                <div class="rounded-full bg-gray-300 h-12 w-12"></div>
-                <div class="flex-1 space-y-4 py-1">
-                  <div class="h-4 bg-gray-300 rounded w-3/4"></div>
-                  <div class="space-y-2">
-                    <div class="h-4 bg-gray-300 rounded"></div>
-                    <div class="h-4 bg-gray-300 rounded w-5/6"></div>
-                  </div>
-                </div>
-              </div>
+              <Pagination
+                  v-if="!isLoading && (projects as ProjectList)?.data.length > 0"
+                 :pagination="(projects as ProjectList)?.meta"
+                 @prev-page="page = page -1 "
+                 @next-page="page = page + 1" />
             </div>
           </div>
         </div>

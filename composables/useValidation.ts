@@ -1,8 +1,12 @@
 import { useVuelidate } from "@vuelidate/core";
+import type {FormErrorsType} from "~/types/api/response/error";
 
 export function useValidation(formValues: any, validationRules: any) {
   const formRef = ref(formValues);
-  const v$ = useVuelidate(validationRules, formRef);
+  const $externalResults = ref<FormErrorsType>({});
 
-  return { formRef, v$ };
+
+  const v$ = useVuelidate(validationRules, formRef, { $externalResults });
+
+  return { formRef, v$, $externalResults };
 }

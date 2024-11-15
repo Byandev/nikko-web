@@ -2,6 +2,7 @@ import type { Account } from "./Account";
 import type { Language } from "./Language";
 import type { Media } from "./Media";
 import type { Skill } from "./Skill";
+import type { Proposal } from "./Proposal"
 
 export enum Level {
     ANY = 'ANY',
@@ -30,12 +31,30 @@ export interface Project {
     length: Term;
     is_saved: boolean;
     experience_level: Level;
-    status: Status, 
+    status: Status,
     languages: Language[];
     account: Account;
     images: Media[];
     skills: Skill[];
     created_at: string,
     updated_at: string,
+    my_proposal?: Proposal
+    proposals_count?: number
 }
-    
+
+
+
+export const ExperienceLevelToText: Record<Level, string> = {
+    [Level.ANY]: "Any Experience Level",
+    [Level.ENTRY]: "Entry",
+    [Level.INTERMEDIATE]: "Intermediate",
+    [Level.EXPERT]: "Expert",
+};
+
+
+export const ProjectLengthToText: Record<Term, string> = {
+    [Term.SHORT_TERM]: "Under a month",
+    [Term.MEDIUM_TERM]: "1 to 3 months",
+    [Term.LONG_TERM]: "3 to 6 months",
+    [Term.EXTENDED]: "Over 6 months",
+};

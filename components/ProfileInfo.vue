@@ -12,6 +12,7 @@ enum MediaType {
 }
 
 const { user } = storeToRefs(authStore());
+
 const { updateUser } = authStore();
 
 const isAvatarModalOpen = ref(false);
@@ -113,17 +114,17 @@ const uploadImage = async (type: MediaType) => {
 </script>
 
 <template>
-    <div class="text-center relative border border-gray-300 rounded-lg overflow-hidden bg-white p-4">
+    <div class="text-center relative border border-gray-300 rounded-lg overflow-hidden bg-white p-4" v-if="user">
         <div class="relative group">
             <img :src="bannerUrl" alt="Banner" class="w-full h-48 object-cover rounded-t-lg" />
             <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-50"></div>
             <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition duration-300">
-                <label class="cursor-pointer text-white">
+                <div class="cursor-pointer text-white">
                     <div @click="isBannerModalOpen = true"
                         class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
                         <Icon icon="ic:outline-edit" width="24" height="24" class="text-primary" />
                     </div>
-                </label>
+                </div>
             </div>
         </div>
         <div class="relative">
@@ -131,12 +132,12 @@ const uploadImage = async (type: MediaType) => {
                 <img :src="avatarUrl" alt="Avatar" class="w-36 h-36 rounded-full border-4 border-white shadow-lg" />
                 <div
                     class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
-                    <label class="cursor-pointer text-white">
+                    <div class="cursor-pointer text-white">
                         <div @click="isAvatarModalOpen = true"
                             class="bg-white rounded-full p-2 flex items-center justify-center shadow-md">
                             <Icon icon="ic:outline-edit" width="24" height="24" class="text-primary" />
                         </div>
-                    </label>
+                    </div>
                 </div>
             </div>
         </div>

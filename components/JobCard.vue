@@ -2,19 +2,19 @@
 import { type Project } from '~/types/models/Project';
 import _ from 'lodash';
 
-const props = defineProps<{
-    job: Project;
-}>();
+const props = defineProps<{  job: Project; }>();
 
 const emit = defineEmits<{
-    (e: 'view', id: number): void;
+  (e: 'click', id: number): void;
+  (e: 'save', id: number): void;
+  (e: 'un-save', id: number): void;
 }>();
 </script>
 
 <template>
     <div class="job-card bg-white hover:bg-gray-100 p-5 ring-1 ring-gray-300 rounded-md hover:cursor-pointer">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
-            <h2 @click="emit('view', job.id)" class="text-xl font-bold text-gray-800 hover:underline">{{ props.job.title }}</h2>
+            <h2 @click="emit('click', job.id)" class="text-xl font-bold text-gray-800 hover:underline">{{ props.job.title }}</h2>
         </div>
         <p class="text-gray-600 mb-4">{{ props.job.description }}</p>
         <div class="mt-5 flex flex-col sm:flex-row items-start sm:items-center justify-start lg:justify-between gap-3">
@@ -50,5 +50,4 @@ const emit = defineEmits<{
             </div>
         </div>
     </div>
-    
 </template>
