@@ -60,7 +60,7 @@ const handleLogout = async () => {
                 </NuxtLink>
             </div>
 
-            <div class="hidden sm:block relative ml-5 text-sm">
+            <div v-if="account?.type === 'FREELANCER'" class="hidden sm:block relative ml-5 text-sm">
                 <button @click="toggleDropdownMyContract" class="flex items-center space-x-2 text-black">
                     <span>My contract</span>
                     <Icon icon="mdi:chevron-down" width="24" height="24" />

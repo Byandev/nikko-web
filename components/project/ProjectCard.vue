@@ -5,7 +5,7 @@ import type {ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
 import type {Proposal} from "~/types/models/Proposal";
 
-const props = defineProps<{ project: Project; showSaveButton?: boolean, showWithdrawApplication?: boolean }>();
+const props = defineProps<{ project: Project; showSaveButton?: boolean, showWithdrawApplication?: boolean, showApplyButton?: boolean }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'save', id: number): void;
@@ -67,6 +67,7 @@ const withdrawProposal = async (id: number) => {
         <div class="flex items-center gap-2">
           <div class="flex flex-col gap-2">
             <button
+                v-if="showApplyButton"
                 @click="emit('apply', project.id)"
                 :disabled="!!project.my_proposal"
                 class="py-2 px-4 rounded-2xl border border-primary-dark"
