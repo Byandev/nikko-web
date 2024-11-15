@@ -6,6 +6,7 @@ import type { PaginatedList } from '~/types/models/Pagination';
 import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
 import type { Proposal } from '~/types/models/Proposal';
+import type { ClientInvitation } from '~/types/models/ClientInvitation';
 
 const { account } = storeToRefs(accountStore());
 
@@ -38,7 +39,7 @@ const searchParams = ref<SearchParams>({
     page: 1
 });
 
-const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<PaginatedList<Proposal>, ApiErrorResponse>();
+const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<PaginatedList<ClientInvitation>, ApiErrorResponse>();
 const { sendRequest: invite } = useSubmit<{
         project_id: string,
         account_id: string,

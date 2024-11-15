@@ -295,14 +295,14 @@ const router = useRouter();
       </p>
     </div>
 
-    <div class="w-4/12 divide-y p-4 flex flex-col item-center gap-2">
-        <Button text="View Job" background="white" foreground="primary" class="ring-1 ring-primary w-full"
+    <div class="w-4/12 divide-y p-4 flex flex-col item-center gap-2 justify-center">
+        <Button text="View Job" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
             @click="router.push(`/projects/${props.job.id}/details`)" type="button" />
-        <Button text="All Proposal" background="white" foreground="primary" class="ring-1 ring-primary w-full"
+        <Button text="All Proposal" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
             @click="router.push(`/projects/${props.job.id}/proposals`)" type="button" />
-        <Button text="Invite Freelancers" background="white" foreground="primary" class="ring-1 ring-primary w-full"
+        <Button text="Invite Freelancers" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
             @click="router.push(`/projects/${props.job.id}/invite`)" type="button" />
-        <Button text="Hired" background="white" foreground="primary" class="ring-1 ring-primary w-full"
+        <Button text="Hired" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
             @click="router.push(`/projects/${props.job.id}/hires`)" type="button" />
     </div>
   </div>

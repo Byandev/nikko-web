@@ -2,9 +2,6 @@
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Project } from '~/types/models/Project';
 import _ from 'lodash';
-import type {PaginatedList} from "~/types/models/Pagination";
-import type {ProposalInvitation} from "~/types/models/ProposalInvitation";
-import type {Proposal} from "~/types/models/Proposal";
 
 const route = useRoute();
 
@@ -21,15 +18,13 @@ onMounted(() => {
       <div class="bg-white shadow sm:rounded-lg">
         <div class="px-4 py-5 sm:px-6">
           <div class="space-y-5">
-            <div v-if="details">
+            <div v-if="details && !isFetching">
            <ProjectCard
               v-for="detail in details ?? []"
               :key="detail.id"
               :project="detail"
               :show-save-button="false"
               :show-withdraw-application="false"
-              @click=""
-              @apply=""
           />
           </div>
           </div>
