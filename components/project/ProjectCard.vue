@@ -5,13 +5,15 @@ import type {ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
 import type {Proposal} from "~/types/models/Proposal";
 
-const props = defineProps<{ project: Project; showSaveButton?: boolean, showWithdrawApplication?: boolean, showApplyButton?: boolean }>();
+const props = defineProps<{ project: Project; showSaveButton?: boolean, showWithdrawApplication?: boolean, showApplyButton?: boolean, showSubmitProposalButton?: boolean, showRejectButton?: boolean }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'save', id: number): void;
   (e: 'un-save', id: number): void;
   (e: 'apply', id: number): void;
   (e: 'withdraw-proposal', id: number): void;
+  (e: 'submit-proposal', id: number): void;
+  (e: 'reject-proposal', id: number): void;
 }>();
 
 const {project, showSaveButton, showWithdrawApplication} = toRefs(props)
@@ -73,6 +75,22 @@ const withdrawProposal = async (id: number) => {
                 class="py-2 px-4 rounded-2xl border border-primary-dark"
                 :class="!project.my_proposal ? 'bg-white text-primary' : 'bg-primary text-white  cursor-not-allowed'">
               {{ project.my_proposal ? 'Applied' : 'Apply' }}
+            </button>
+
+            <button
+                v-if="showSubmitProposalButton"
+                @click="emit('submit-proposal', project.id)"
+                class="py-2 px-4 rounded-2xl border border-primary-dark bg-primary text-white">
+              Submit Proposal
+            </button>
+
+            <button
+                v-if="showRejectButton"
+                @click="emit('reject-proposal', project.id)"
+                :disabled="!!project.my_proposal"
+                class="py-2 px-4 rounded-2xl border border-primary-dark"
+                :class="!project.my_proposal ? 'bg-white text-primary' : 'bg-primary text-white  cursor-not-allowed'">
+              Reject
             </button>
 
             <button

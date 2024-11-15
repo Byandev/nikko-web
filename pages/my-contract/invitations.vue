@@ -63,7 +63,7 @@ const sendProposal = async (id: number) => {
 
     <div class="bg-white shadow sm:rounded-lg">
       <div class="px-4 py-5 sm:px-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-5">My Proposal</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-5">Invites</h3>
 
         <div class="space-y-5">
           <div v-if="(proposalInvitations as PaginatedList<ProposalInvitation>)?.data.length > 0">
@@ -72,9 +72,11 @@ const sendProposal = async (id: number) => {
                 :key="invitation.id"
                 :project="invitation.project"
                 :show-save-button="false"
-                :show-withdraw-application="true"
+                :show-submit-proposal-button="true"
+                :show-reject-button="true"
+                :show-withdraw-application="false"
                 @click="viewJob"
-                @apply="sendProposal"
+                @submit-proposal="sendProposal"
             />
             <Pagination
                 v-if="!isLoading && (proposalInvitations as PaginatedList<Proposal>)?.data.length > 0"
