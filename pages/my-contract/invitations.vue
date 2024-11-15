@@ -11,6 +11,10 @@ const { account } = storeToRefs(accountStore());
 
 const router = useRouter();
 
+const message = ref('');
+const isMessageModalOpen = ref(false);
+const invitationId = ref<number|null>(null);
+
 const page = ref(1)
 
 const queryString = computed(() => {
@@ -24,6 +28,7 @@ const queryString = computed(() => {
 
 
 const { data: proposalInvitations, fetchData: fetchProposalInvitations, pending: isLoading } = useFetchData<PaginatedList<ProposalInvitation>,ApiErrorResponse>();
+const { sendRequest: rejectClientProposal } = useSubmit<ProposalInvitation, ApiErrorResponse>();
 
 const fetchProposals =  async  () => {
   await fetchProposalInvitations(`/v1/proposals/invitations?${queryString.value}`,{
@@ -45,14 +50,34 @@ watch(
     }, 500)
 );
 
-
-
 const viewJob = async (id: number) => {
   await router.push(`/jobs/${id}`);
 };
 
 const sendProposal = async (id: number) => {
   await router.push(`/submit-proposal/${id}`);
+};
+
+const updateInvatationId = (id: number) => {
+  invitationId.value = id;
+  isMessageModalOpen.value = true;
+}
+
+const rejectProposal = async (id: number | null) => {
+  try{
+    await rejectClientProposal(`/v1/proposals/invitations/${id}`, {
+      method: 'PUT',
+      headers: account?.value?.id ? {
+        'X-ACCOUNT-ID': account.value.id.toString(),
+      } : undefined,
+      body: {
+        status: 'REJECTED',
+        rejection_message: message.value
+      }
+    });
+  }catch (e) {
+    console.log("Failed to reject proposal: ", e.message)
+  }
 };
 
 </script>
@@ -77,6 +102,7 @@ const sendProposal = async (id: number) => {
                 :show-withdraw-application="false"
                 @click="viewJob"
                 @submit-proposal="sendProposal"
+                @reject-proposal="updateInvatationId"
             />
             <Pagination
                 v-if="!isLoading && (proposalInvitations as PaginatedList<Proposal>)?.data.length > 0"
@@ -90,6 +116,17 @@ const sendProposal = async (id: number) => {
           </div>
         </div>
       </div>
+
+      <Modal :modelValue="isMessageModalOpen" @update:modelValue="isMessageModalOpen = $event">
+        <template #title>Rejection message</template>
+        <template #content>
+            <textarea v-model="message" class="w-full h-32 p-2 border rounded" placeholder="Write your message here..."></textarea>
+        </template>
+        <template #actions>
+            <Button text="Cancel" type="button" background="white" foreground="gray" @click="isMessageModalOpen = false" />
+            <Button text="Reject" type="button" background="primary" foreground="white" @click="rejectProposal(invitationId)" />
+        </template>
+    </Modal>
     </div>
   </div>
 </template>
