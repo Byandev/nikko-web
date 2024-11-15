@@ -49,7 +49,7 @@ onMounted(async () => {
 
 const fetchProposals =  async  () => {
     await fetchAllProposals(
-        `v1/client/proposals/invitations?include=${searchParams.value.include}&filter[status]=${searchParams.value.status}&page=${searchParams.value.page}`,
+        `v1/client/proposals/invitations?include=${searchParams.value.include}&filter[project_id]=${searchParams.value.project_id}&filter[account_id]=${searchParams.value.account_id}&filter[status]=${searchParams.value.status}&page=${searchParams.value.page}`,
         {
             headers: account?.value?.id
                 ? {
