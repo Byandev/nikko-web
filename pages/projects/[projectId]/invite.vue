@@ -67,7 +67,7 @@ watch(
 
 const route = useRoute();
 
-const handleInvite = async (msg: string) => {
+const handleInvite = async ({ id, msg }: { id: number, msg: string }) => {
     try{
         await invite(`/v1/client/proposals/invitations`, {
             method: 'POST',
@@ -77,8 +77,8 @@ const handleInvite = async (msg: string) => {
                 }
                 : undefined,
             body: {
-                project_id: route.params.projectId,
-                account_id: account.value?.id,
+                project_id: Number(route.params.projectId),
+                account_id: id,
                 message: msg
             }
         });
@@ -113,7 +113,7 @@ const handleInvite = async (msg: string) => {
                             class="w-full outline-none border-none" />
                         </div>
                         <InviteFreelancerCard v-if="freelancers && !isLoading" v-for="freelancer in freelancers.data" :key="freelancer.id"
-                            :freelancer="freelancer" @invite="handleInvite" />
+                            :freelancer="freelancer" @invite="handleInvite({ id: $event.id, msg: $event.msg })" />
                             <Pagination
                                 v-if="!isLoading && freelancers"
                                 :pagination="freelancers.meta"

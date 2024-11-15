@@ -10,7 +10,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (e: 'invite', msg: string): void;
+  (e: 'invite', payload: { msg: string, id: number }): void;
 }>();
 
 const message = ref('');
@@ -62,7 +62,9 @@ const hasLongDescription = computed(() => props.freelancer.bio && props.freelanc
         </template>
         <template #actions>
             <Button text="Cancel" type="button" background="white" foreground="gray" @click="isMessageModalOpen = false" />
-            <Button text="Invite" type="button" background="primary" foreground="white" @click="() => emit('invite', message)" />
+            <Button text="Invite" type="button" background="primary" foreground="white" @click="{emit('invite', { msg: message, id: props.freelancer.id });
+          isMessageModalOpen = false;
+          }" />
         </template>
     </Modal>
 </template>
