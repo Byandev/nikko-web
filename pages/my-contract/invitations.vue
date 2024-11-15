@@ -5,6 +5,7 @@ import { accountStore } from '~/store/accountStore';
 import _, {omit} from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
 import ContractTabs from "~/components/freelancer/ContractTabs.vue";
+import type {ProposalInvitation} from "~/types/models/ProposalInvitation";
 
 const { account } = storeToRefs(accountStore());
 
@@ -14,7 +15,7 @@ const page = ref(1)
 
 const queryString = computed(() => {
   let params: Record<string, string>  = {
-    include: 'project.account.user,attachments,project.skills',
+    include: 'project.account.user',
     page: page.value.toString()
   }
 
@@ -22,11 +23,10 @@ const queryString = computed(() => {
 })
 
 
-const { data: proposals, fetchData: fetchSubmittedProposals, pending: isLoading } = useFetchData<PaginatedList<Proposal>,ApiErrorResponse>();
-
+const { data: proposalInvitations, fetchData: fetchProposalInvitations, pending: isLoading } = useFetchData<PaginatedList<ProposalInvitation>,ApiErrorResponse>();
 
 const fetchProposals =  async  () => {
-  await fetchSubmittedProposals(`/v1/proposals?${queryString.value}`,{
+  await fetchProposalInvitations(`/v1/proposals/invitations?${queryString.value}`,{
     method: 'GET',
     headers: account?.value?.id ? {
       'X-ACCOUNT-ID': account.value.id.toString(),
@@ -47,8 +47,12 @@ watch(
 
 
 
-const viewProposal = async (id: number) => {
-  await router.push(`/proposal/${id}`);
+const viewJob = async (id: number) => {
+  await router.push(`/jobs/${id}`);
+};
+
+const sendProposal = async (id: number) => {
+  await router.push(`/submit-proposal/${id}`);
 };
 
 </script>
@@ -62,21 +66,20 @@ const viewProposal = async (id: number) => {
         <h3 class="text-lg font-medium text-gray-900 mb-5">My Proposal</h3>
 
         <div class="space-y-5">
-          <div v-if="(proposals as PaginatedList<Proposal>)?.data.length > 0">
+          <div v-if="(proposalInvitations as PaginatedList<ProposalInvitation>)?.data.length > 0">
             <ProjectCard
-                v-for="proposal in (proposals as PaginatedList<Proposal>)?.data ?? []"
-                :key="proposal.id"
-                :project="{...proposal.project, my_proposal: omit(proposal, 'project') }"
+                v-for="invitation in (proposalInvitations as PaginatedList<Proposal>)?.data ?? []"
+                :key="invitation.id"
+                :project="invitation.project"
                 :show-save-button="false"
                 :show-withdraw-application="true"
-                @click="() => viewProposal(proposal.id)"
-                @withdraw-proposal="() => fetchProposals()"
+                @click="viewJob"
+                @apply="sendProposal"
             />
 
-
             <Pagination
-                v-if="!isLoading && (proposals as PaginatedList<Proposal>)?.data.length > 0"
-                :pagination="(proposals as PaginatedList<Proposal>)?.meta"
+                v-if="!isLoading && (proposalInvitations as PaginatedList<Proposal>)?.data.length > 0"
+                :pagination="(proposalInvitations as PaginatedList<Proposal>)?.meta"
                 @prev-page="page = page -1 "
                 @next-page="page = page + 1" />
           </div>

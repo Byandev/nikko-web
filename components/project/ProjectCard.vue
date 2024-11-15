@@ -70,7 +70,7 @@ const withdrawProposal = async (id: number) => {
                 @click="emit('apply', project.id)"
                 :disabled="!!project.my_proposal"
                 class="py-2 px-4 rounded-2xl border border-primary-dark"
-                :class="!project.my_proposal ? 'bg-white text-primary cursor-not-allowed' : 'bg-primary text-white'">
+                :class="!project.my_proposal ? 'bg-white text-primary' : 'bg-primary text-white  cursor-not-allowed'">
               {{ project.my_proposal ? 'Applied' : 'Apply' }}
             </button>
 
