@@ -70,6 +70,10 @@ const handleLogout = async () => {
                         class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                         Submit proposals
                     </NuxtLink>
+                    <NuxtLink to="/my-contract/invitations" @click="closeDropdown"
+                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                        Invitations
+                    </NuxtLink>
                 </div>
             </div>
         </div>

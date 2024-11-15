@@ -101,6 +101,7 @@ const rejectProposal = async (id: number | null) => {
                 :show-submit-proposal-button="true"
                 :show-reject-button="true"
                 :show-withdraw-application="false"
+                class="mb-5"
                 @click="viewJob"
                 @submit-proposal="sendProposal"
                 @reject-proposal="updateInvatationId"
