@@ -221,6 +221,7 @@ const sendProposal = async (id: number) => {
                   :key="project.id"
                   :project="project"
                   :show-save-button="true"
+                  :show-apply-button="true"
                   @click="viewJob"
                   @apply="sendProposal"
                   @save="(projects as ProjectList).meta.total_saved_count++"
