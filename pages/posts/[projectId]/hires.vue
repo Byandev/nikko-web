@@ -4,7 +4,6 @@ import type { Project } from '~/types/models/Project';
 import _ from 'lodash';
 
 const route = useRoute();
-const dropdownOpen = ref(false);
 
 const tabs = [
     { name: 'View Job', href: `/posts/${route.params.projectId}/details`, current: false },

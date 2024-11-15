@@ -76,7 +76,6 @@ const sendProposal = async (id: number) => {
                 @click="viewJob"
                 @apply="sendProposal"
             />
-
             <Pagination
                 v-if="!isLoading && (proposalInvitations as PaginatedList<Proposal>)?.data.length > 0"
                 :pagination="(proposalInvitations as PaginatedList<Proposal>)?.meta"
