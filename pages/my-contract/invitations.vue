@@ -95,6 +95,7 @@ const rejectProposal = async (id: number | null) => {
             <ProjectCard
                 v-for="invitation in (proposalInvitations as PaginatedList<Proposal>)?.data ?? []"
                 :key="invitation.id"
+                :invitation-id="invitation.id"
                 :project="invitation.project"
                 :show-save-button="false"
                 :show-submit-proposal-button="true"
@@ -123,7 +124,10 @@ const rejectProposal = async (id: number | null) => {
             <textarea v-model="message" class="w-full h-32 p-2 border rounded" placeholder="Write your message here..."></textarea>
         </template>
         <template #actions>
-            <Button text="Cancel" type="button" background="white" foreground="gray" @click="isMessageModalOpen = false" />
+            <Button text="Cancel" type="button" background="white" foreground="gray" @click="{isMessageModalOpen = false;
+            message = '';
+            invitationId = null;
+            }" />
             <Button text="Reject" type="button" background="primary" foreground="white" @click="rejectProposal(invitationId)" />
         </template>
     </Modal>
