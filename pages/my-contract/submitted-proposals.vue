@@ -5,6 +5,7 @@ import { accountStore } from '~/store/accountStore';
 import _, {omit} from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
 import ContractTabs from "~/components/freelancer/ContractTabs.vue";
+import type {Project} from "~/types/models/Project";
 
 const { account } = storeToRefs(accountStore());
 
@@ -60,6 +61,10 @@ const viewProposal = async (id: number) => {
   await router.push(`/proposal/${id}`);
 };
 
+const extractProjectData = (proposal: Proposal) => {
+  return {...proposal.project, my_proposal: omit(proposal, 'project') }
+}
+
 </script>
 
 <template>
@@ -74,7 +79,7 @@ const viewProposal = async (id: number) => {
               <ProjectCard
                   v-for="proposal in (proposals as PaginatedList<Proposal>)?.data ?? []"
                   :key="proposal.id"
-                  :project="{...proposal.project, my_proposal: omit(proposal, 'project') }"
+                  :project="extractProjectData(proposal)"
                   :show-save-button="false"
                   :show-withdraw-application="true"
                   @click="() => viewProposal(proposal.id)"
