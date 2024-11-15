@@ -2,7 +2,6 @@
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
-import _, {omit} from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
 import ContractTabs from "~/components/freelancer/ContractTabs.vue";
 import type {Project} from "~/types/models/Project";
@@ -61,8 +60,19 @@ const viewProposal = async (id: number) => {
   await router.push(`/proposal/${id}`);
 };
 
-const extractProjectData = (proposal: Proposal) => {
-  return {...proposal.project, my_proposal: omit(proposal, 'project') }
+const extractProjectData = (proposal: Proposal): Project => {
+  return {...proposal.project, my_proposal: {
+      id: proposal.id,
+      account_id: proposal.account_id,
+      project_id: proposal.project_id,
+      bid: proposal.bid,
+      transaction_fee: proposal.transaction_fee,
+      length: proposal.length,
+      status: proposal.status,
+      cover_letter: proposal.cover_letter,
+      attachments: proposal.attachments,
+      project: proposal.project
+    } }
 }
 
 </script>
