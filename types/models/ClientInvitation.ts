@@ -7,6 +7,12 @@ export enum Status {
     PROPOSAL_SUBMITTED = 'PROPOSAL_SUBMITTED',
 }
 
+export const StatusToText: Record<Status, string> = {
+    [Status.PENDING]: "Pending Approval",
+    [Status.REJECTED]: "Rejected Proposal",
+    [Status.PROPOSAL_SUBMITTED]: "Submitted Proposal",
+};
+
 export interface ClientInvitation {
     id: number;
     account_id: number;

@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue';
 import type { Account } from '~/types/models/Account';
 
 
 const emit = defineEmits<{
-    (e: 'profile', user: Account): void;
-    (e: 'save', id: number): void;
-    (e: 'unsave', id: number): void;
+    (e: 'hire', id: number): void;
 }>();
 
 const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
@@ -16,12 +13,6 @@ const props = defineProps<{
 }>();
 
 const { freelancer } = toRefs(props)
-
-const save = (isSave: boolean) => {
-    freelancer.value.is_saved = isSave;
-    isSave ? emit('save', freelancer.value.id) : emit('unsave', freelancer.value.id)
-}
-
 
 </script>
 
@@ -61,18 +52,8 @@ const save = (isSave: boolean) => {
         </div>
 
         <div class="w-3/12 divide-y p-4 flex flex-col item-center gap-2 justify-center">
-            <Button @click="emit('profile', freelancer)" text="See Profile" type="button" background="primary"
+            <Button @click="emit('hire', freelancer.id)" text="Hire" type="button" background="primary"
                 foreground="white" />
-            <div v-if="!props.freelancer.is_saved" @click="save(true)"
-                class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
-                <Icon icon="mdi:heart" class="text-primary" />
-                <button class="text-primary">Save</button>
-            </div>
-            <div v-else @click="save(false)"
-                class="flex flex-row justify-center items-center border rounded-lg px-2 py-1 gap-2 hover:cursor-pointer">
-                <Icon icon="mdi:heart-outline" class="text-primary" />
-                <button class="text-primary">Unsave</button>
-            </div>
         </div>
     </div>
 </template>
