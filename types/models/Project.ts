@@ -27,7 +27,7 @@ export interface Project {
     id: number;
     title: string;
     description: string;
-    estimated_budget: string;
+    estimated_budget: number;
     length: Term;
     is_saved: boolean;
     experience_level: Level;

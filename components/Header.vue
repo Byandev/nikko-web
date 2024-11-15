@@ -54,13 +54,13 @@ const handleLogout = async () => {
             </NuxtLink>
 
             <div class="hidden sm:block ml-5 border-l-2 pl-5">
-                <NuxtLink :to="account?.type === 'FREELANCER' ? '/find-work' : 'find-freelancer'" @click="closeDropdown"
+                <NuxtLink :to="account?.type === 'FREELANCER' ? '/find-work' : '/find-freelancer'" @click="closeDropdown"
                     class="text-sm text-black">
-                    {{ account?.type === 'FREELANCER' ? 'Find Work' : 'Find Freelancer' }}
+                    {{ account?.type === 'FREELANCER' ? 'Find Work' : 'Browse Freelancer' }}
                 </NuxtLink>
             </div>
 
-            <div class="hidden sm:block relative ml-5 text-sm">
+            <div v-if="account?.type === 'FREELANCER'" class="hidden sm:block relative ml-5 text-sm">
                 <button @click="toggleDropdownMyContract" class="flex items-center space-x-2 text-black">
                     <span>My contract</span>
                     <Icon icon="mdi:chevron-down" width="24" height="24" />

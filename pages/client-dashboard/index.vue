@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { authStore } from '~/store/authStore';
 import { Icon } from '@iconify/vue';
-import { ref, watch, computed, warn } from 'vue';
+import { ref, watch } from 'vue';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Media as MediaResponse } from '~/types/models/Media';
 import { accountStore } from '~/store/accountStore';
