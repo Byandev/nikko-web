@@ -66,7 +66,7 @@ const handleLogout = async () => {
                     <Icon icon="mdi:chevron-down" width="24" height="24" />
                 </button>
                 <div v-if="showDropdownMyContract" class="absolute mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
-                    <NuxtLink to="/my-contract/submit-contract" @click="closeDropdown"
+                    <NuxtLink to="/my-contract/submitted-proposals" @click="closeDropdown"
                         class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                         Submit proposals
                     </NuxtLink>
@@ -131,7 +131,7 @@ const handleLogout = async () => {
                     class="text-black">
                     {{ account?.type === 'FREELANCER' ? 'Find Work' : 'Find Freelancer' }}
                 </NuxtLink>
-                <NuxtLink to="/my-contract/submit-contract" @click="toggleSidebar" class="text-black">
+                <NuxtLink to="/my-contract/submitted-proposals" @click="toggleSidebar" class="text-black">
                     Submit proposals
                 </NuxtLink>
             </div>

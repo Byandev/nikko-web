@@ -43,7 +43,7 @@ const queryString = computed(() => {
     ...(filters.value.length ? {"filter[length]": filters.value.length}: {}),
     ...(filters.value.experience_level ? {"filter[experience_level]": filters.value.experience_level}: {}),
     ...(filters.value.is_saved ? {"filter[is_saved]": "true"}: {}),
-    include: 'account.user,skills',
+    include: 'account.user,skills,myProposal',
     page: page.value.toString()
   }
 
@@ -220,7 +220,9 @@ const sendProposal = async (id: number) => {
                   v-for="project in (projects as ProjectList)?.data ?? []"
                   :key="project.id"
                   :project="project"
+                  :show-save-button="true"
                   @click="viewJob"
+                  @apply="sendProposal"
                   @save="(projects as ProjectList).meta.total_saved_count++"
                   @un-save="(projects as ProjectList).meta.total_saved_count--"
               />

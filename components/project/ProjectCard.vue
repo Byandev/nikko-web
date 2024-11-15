@@ -3,18 +3,27 @@ import {HeartIcon} from '@heroicons/vue/24/outline';
 import {ExperienceLevelToText, type Project, ProjectLengthToText} from "~/types/models/Project";
 import type {ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
+import type {Proposal} from "~/types/models/Proposal";
 
-const props = defineProps<{ project: Project; }>();
+const props = defineProps<{ project: Project; showSaveButton?: boolean, showWithdrawApplication?: boolean }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'save', id: number): void;
   (e: 'un-save', id: number): void;
+  (e: 'apply', id: number): void;
+  (e: 'withdraw-proposal', id: number): void;
 }>();
 
-const {project} = toRefs(props)
+const {project, showSaveButton, showWithdrawApplication} = toRefs(props)
 
 const {account} = storeToRefs(accountStore());
+
 const {sendRequest: toggleSaveProject} = useSubmit<{ data: Project }, ApiErrorResponse>();
+const { sendRequest: sendWithdrawProposal } = useSubmit<Proposal, ApiErrorResponse>();
+
+const requestHeaders = computed<HeadersInit | undefined>(() =>
+    account.value?.id ? { 'X-ACCOUNT-ID' : account.value.id.toString()} : undefined
+);
 
 const showAllDescription = ref(false);
 const hasLongDescription = computed(() => project.value.description.length > 300);
@@ -30,15 +39,22 @@ const toggleSave = async () => {
     await toggleSaveProject(`v1/projects/${project.value.id}/${isSaved ? 'save' : 'un-save'}`,
         {
           method: isSaved ? 'POST' : 'DELETE',
-          headers: account?.value?.id ? {
-            'X-ACCOUNT-ID': account.value.id.toString(),
-          } : undefined,
+          headers: requestHeaders.value,
         }
     );
   } catch (e) {
     console.log("Failed to marked the project: ", e.message)
   }
 }
+
+const withdrawProposal = async (id: number) => {
+  await sendWithdrawProposal(`/v1/proposals/${id}`, {
+    method: 'DELETE',
+    headers: requestHeaders.value
+  });
+
+  emit('withdraw-proposal', id);
+};
 </script>
 
 <template>
@@ -48,10 +64,29 @@ const toggleSave = async () => {
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
         <h2 @click="emit('click', project.id)" class="text-xl font-bold hover:underline">{{ project.title }}</h2>
 
-        <HeartIcon @click="toggleSave"
-           class="w-5 h-5 text-primary-dark cursor-pointer"
-           :class="project.is_saved ? 'fill-primary': ''"
-        />
+        <div class="flex items-center gap-2">
+          <div class="flex flex-col gap-2">
+            <button
+                @click="emit('apply', project.id)"
+                :disabled="!!project.my_proposal"
+                class="py-2 px-4 rounded-2xl border border-primary-dark"
+                :class="!project.my_proposal ? 'bg-white text-primary cursor-not-allowed' : 'bg-primary text-white'">
+              {{ project.my_proposal ? 'Applied' : 'Apply' }}
+            </button>
+
+            <button
+                v-if="project.my_proposal && showWithdrawApplication"
+                @click="withdrawProposal(project.my_proposal.id)"
+                class="py-2 px-4 rounded-2xl border border-primary-dark bg-white text-primary">
+              Withdraw
+            </button>
+          </div>
+
+          <HeartIcon v-if="showSaveButton" @click="toggleSave"
+              class="w-5 h-5 text-primary-dark cursor-pointer"
+              :class="project.is_saved ? 'fill-primary': ''"
+          />
+        </div>
       </div>
 
       <div class="space-y-1" v-if="project.skills && project.skills.length">
