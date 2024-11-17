@@ -125,7 +125,7 @@ const submitForm = async (id: number) => {
             body: body.value,
         });
 
-        router.push('/my-contract/submit-contract');
+        router.push('/my-contract/submitted-proposals');
     } catch (error) {
 
     }

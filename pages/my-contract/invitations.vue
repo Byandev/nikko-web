@@ -75,6 +75,8 @@ const rejectProposal = async (id: number | null) => {
         rejection_message: message.value
       }
     });
+
+    isMessageModalOpen.value = false;
   }catch (e) {
     console.log("Failed to reject proposal: ", e.message)
   }
