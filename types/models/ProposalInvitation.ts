@@ -14,6 +14,6 @@ export interface ProposalInvitation {
     message: number;
     rejection_message: number;
     status: ProposalInvitationStatus;
-    account?: Account;
+    account: Account;
     project?: Project;
 }

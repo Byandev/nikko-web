@@ -4,8 +4,9 @@ import {ExperienceLevelToText, type Project, ProjectLengthToText} from "~/types/
 import type {ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
 import type {Proposal} from "~/types/models/Proposal";
+import { useRouter } from 'vue-router';
 
-const props = defineProps<{ project: Project; invitationId?: number, showSaveButton?: boolean, showWithdrawApplication?: boolean, showApplyButton?: boolean, showSubmitProposalButton?: boolean, showRejectButton?: boolean }>();
+const props = defineProps<{ project: Project; showSaveButton?: boolean, showWithdrawApplication?: boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT' }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'save', id: number): void;
@@ -57,64 +58,44 @@ const withdrawProposal = async (id: number) => {
 
   emit('withdraw-proposal', id);
 };
+
+const router = useRouter();
 </script>
 
 <template>
   <div
-      class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex divide-x text-sm text-gray-800">
+    class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex divide-x text-sm text-gray-800">
     <div class="w-8/12 px-5 py-5 space-y-4">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
         <h2 @click="emit('click', project.id)" class="text-xl font-bold hover:underline">{{ project.title }}</h2>
 
         <div class="flex items-center gap-2">
           <div class="flex flex-col gap-2">
-            <button
-                v-if="showApplyButton"
-                @click="emit('apply', project.id)"
-                :disabled="!!project.my_proposal"
-                class="py-2 px-4 rounded-2xl border border-primary-dark"
-                :class="!project.my_proposal ? 'bg-white text-primary' : 'bg-primary text-white  cursor-not-allowed'">
+            <button v-if="showApplyButton" @click="emit('apply', project.id)" :disabled="!!project.my_proposal"
+              class="py-2 px-4 rounded-2xl border border-primary-dark"
+              :class="!project.my_proposal ? 'bg-white text-primary' : 'bg-primary text-white  cursor-not-allowed'">
               {{ project.my_proposal ? 'Applied' : 'Apply' }}
             </button>
 
-            <button
-                v-if="showSubmitProposalButton"
-                @click="emit('submit-proposal', project.id)"
-                class="py-2 px-4 rounded-2xl border border-primary-dark bg-primary text-white">
-              Submit Proposal
-            </button>
-
-            <button
-                v-if="showRejectButton"
-                @click="emit('reject-proposal', props.invitationId ?? 0)"
-                :disabled="!!project.my_proposal"
-                class="py-2 px-4 rounded-2xl border border-primary-dark"
-                :class="!project.my_proposal ? 'bg-white text-primary' : 'bg-primary text-white  cursor-not-allowed'">
-              Reject
-            </button>
-
-            <button
-                v-if="project.my_proposal && showWithdrawApplication"
-                @click="withdrawProposal(project.my_proposal.id)"
-                class="py-2 px-4 rounded-2xl border border-primary-dark bg-white text-primary">
+            <button v-if="project.my_proposal && showWithdrawApplication"
+              @click="withdrawProposal(project.my_proposal.id)"
+              class="py-2 px-4 rounded-2xl border border-primary-dark bg-white text-primary">
               Withdraw
             </button>
           </div>
 
-          <HeartIcon v-if="showSaveButton" @click="toggleSave"
-              class="w-5 h-5 text-primary-dark cursor-pointer"
-              :class="project.is_saved ? 'fill-primary': ''"
-          />
+          <HeartIcon v-if="showSaveButton" @click="toggleSave" class="w-5 h-5 text-primary-dark cursor-pointer"
+            :class="project.is_saved ? 'fill-primary': ''" />
         </div>
       </div>
 
       <div class="space-y-1" v-if="project.skills && project.skills.length">
         <div class="font-medium">Skills:</div>
         <div class="flex flex-wrap gap-1">
-           <span v-for="(skill, index) in project.skills" :key="index"
-                 class="bg-primary/15 text-primary text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
-              {{ skill.name }}
-           </span>
+          <span v-for="(skill, index) in project.skills" :key="index"
+            class="bg-primary/15 text-primary text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
+            {{ skill.name }}
+          </span>
         </div>
       </div>
 
@@ -126,7 +107,7 @@ const withdrawProposal = async (id: number) => {
       </p>
     </div>
 
-    <div class="w-4/12 divide-y">
+    <div class="w-4/12 divide-y" v-if="props.viewAs === 'FREELANCER'">
       <div class="pt-5 pb-2 space-y-1 px-5">
         <p>Estimated Budget: <span>${{ project.estimated_budget }}</span></p>
         <p>Experience Level: <span>{{ ExperienceLevelToText[project.experience_level] }}</span></p>
@@ -141,6 +122,18 @@ const withdrawProposal = async (id: number) => {
       <div class="pt-2 pb-5 px-5">
         <p>Proposals: <span>{{ project.proposals_count ?? 0 }}</span></p>
       </div>
+    </div>
+
+    <div class="w-4/12 divide-y p-4 flex flex-col item-center gap-2 justify-center" v-if="props.viewAs === 'CLIENT'">
+      <Button text="View Job" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
+        @click="router.push(`/projects/${project.id}/details`)" type="button" />
+      <Button text="All Proposal" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
+        @click="router.push(`/projects/${project.id}/proposals`)" type="button" />
+      <Button text="Invite Freelancers" background="white" foreground="primary"
+        class="ring-1 ring-primary w-full font-base" @click="router.push(`/projects/${project.id}/invite`)"
+        type="button" />
+      <Button text="Hired" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
+        @click="router.push(`/projects/${project.id}/hires`)" type="button" />
     </div>
   </div>
 </template>
