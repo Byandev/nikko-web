@@ -98,14 +98,20 @@ watch(
                     </div>
                     <div v-if="miniTab[0].current" class="flex flex-col gap-5">
                         <div class="flex items-center w-fit rounded-md ring-1 ring-gray-300 px-4 py-2 justify-center">
-                            <Icon icon="tdesign:filter-1"  style="color: black" />
-                            <select id="status" v-model="searchParams.status" @change="fetchProposals" class="block w-full pl-1 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
-                                <option v-for="status in Object.values(ProposalInvitationStatus)" :key="status" :value="status">{{ _.startCase(status.toLowerCase().replace('_', ' ')) }}</option>
+                            <Icon icon="tdesign:filter-1" style="color: black" />
+                            <select id="status" v-model="searchParams.status" @change="fetchProposals"
+                                class="block w-full pl-1 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                                <option v-for="status in Object.values(ProposalInvitationStatus)" :key="status"
+                                    :value="status">{{ _.startCase(status.toLowerCase().replace('_', ' ')) }}</option>
                             </select>
                         </div>
-                        <FreelancerInvitationCard v-if="proposals?.data && !isLoading" v-for="proposal in proposals.data" :key="proposal.id" :freelancer="proposal.account" />
+                        <FreelancerInvitationCard v-if="proposals?.data && !isLoading"
+                            v-for="proposal in proposals.data" :key="proposal.id" :freelancer="proposal.account" />
+                        <Pagination
+                            v-if="!isLoading && proposals?.data && proposals?.data.length > 0"
+                            :pagination="proposals.meta"
+                            @prev-page="searchParams.page = searchParams.page - 1" @next-page="searchParams.page = searchParams.page + 1" />
                     </div>
-
                 </div>
             </div>
         </div>
