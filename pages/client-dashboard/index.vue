@@ -8,7 +8,6 @@ import { accountStore } from '~/store/accountStore';
 import type { PaginatedList } from '~/types/models/Pagination';
 import type { Project } from '~/types/models/Project';
 import { debounce } from '~/utils/debounce';
-import { AccountType } from '~/types/models/Account';
 
 const { sendRequest: sendRequest, pending: isLoading } = useSubmit<{ data: MediaResponse }, ApiErrorResponse>();
 const {data: allProjects, fetchData:fetchAllProjects, pending: isAllProjectsLoading} = useFetchData< PaginatedList<Project>, ApiErrorResponse>();
@@ -275,10 +274,11 @@ onMounted(() => {
                         </div>
                         <div v-if="!isAllProjectsLoading" class="mt-5 flex flex-col gap-5">
                             <div v-for="(job, idx) in allProjects?.data" :key="job.id">
-                                <ProjectCard @submit="fetchProjects(1)" @delete="openDeleteModal" :project="job"
-                                    :options="true" :view-as="AccountType.CLIENT" :show-drop-down-button="true"
-                                    @click="viewJobDetails">
-                                </ProjectCard>
+                                <ClientDashJobCard @submit="fetchProjects(1)" @delete="openDeleteModal" :job="job"
+                                    :options="true">
+                                    <Button @click="viewJobDetails(job.id)" text="View Details" type="button"
+                                        background="primary" foreground="white" />
+                                </ClientDashJobCard>
                             </div>
                         </div>
                         <div v-else>
@@ -311,10 +311,11 @@ onMounted(() => {
                         </div>
                         <div v-if="!isDraftProjectsLoading" class="mt-5 flex flex-col gap-5">
                             <div v-for="(job, idx) in draftProject?.data" :key="job.id">
-                                <ProjectCard @submit="fetchProjects(1)" @delete="deleteAJob" :project="job"
-                                    :view-as="AccountType.CLIENT" :show-drop-down-button="true" @click="viewJobDetails">
-                                    
-                                </ProjectCard>
+                                <ClientDashJobCard @submit="fetchProjects(1)" @delete="deleteAJob" :job="job"
+                                    :options="true">
+                                    <Button @click="viewJobDetails(job.id)" text="View Details" type="button"
+                                        background="primary" foreground="white" />
+                                </ClientDashJobCard>
                             </div>
                         </div>
                         <div v-else>
