@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import _ from 'lodash';
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { Account } from '~/types/models/Account';
 import type { PaginatedList } from '~/types/models/Pagination';
 import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
-import type { Proposal } from '~/types/models/Proposal';
+import { type ProposalInvitation, ProposalInvitationStatus } from '~/types/models/ProposalInvitation';
 
 const { account } = storeToRefs(accountStore());
 
@@ -25,6 +24,7 @@ interface SearchParams {
     include: string;
     project_id: string;
     account_id: number;
+    status: ProposalInvitationStatus.PENDING;
     page: number;
 }
 
@@ -35,59 +35,47 @@ const searchParams = ref<SearchParams>({
     include: 'account.user.avatar,account.user.languages,account.skills,project',
     project_id: route.params.projectId.toString(),
     account_id: account.value?.id ?? 0,
+    status: ProposalInvitationStatus.PENDING,
     page: 1
 });
 
-const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<PaginatedList<Proposal>, ApiErrorResponse>();
-const { sendRequest: invite } = useSubmit<{
-        project_id: string,
-        account_id: string,
-        message: string
-    }, ApiErrorResponse>();
+const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<PaginatedList<ProposalInvitation>, ApiErrorResponse>();
 
-onMounted(async () => {
-    fetchProposals();
+const queryString = computed(() => {
+    let params: Record<string, string> = {
+        include: searchParams.value.include,
+        ...(searchParams.value.project_id && { "filter[project_id]": searchParams.value.project_id }),
+        ...(searchParams.value.account_id && { "filter[account_id]": searchParams.value.account_id.toString() }),
+        ...(searchParams.value.status && { "filter[status]": searchParams.value.status }),
+        page: searchParams.value.page.toString()
+    };
+
+    return new URLSearchParams(params).toString();
 });
 
-const fetchProposals =  async  () => {
+const requestHeaders = computed<HeadersInit | undefined>(() =>
+    account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
+);
+
+const fetchProposals = async () => {
     await fetchAllProposals(
-        `v1/client/proposals/invitations?include=${searchParams.value.include}&page=${searchParams.value.page}`,
+        `v1/client/proposals/invitations?${queryString.value}`,
         {
-            headers: account?.value?.id
-                ? {
-                    'X-ACCOUNT-ID': account.value.id.toString(),
-                }
-                : undefined,
+            headers: requestHeaders.value
         }
     );
-}
+};
+
+onMounted(async () => {
+    await fetchProposals();
+});
 
 watch(
     [() => searchParams.value.project_id, () => searchParams.value.page, () => searchParams.value.account_id],
     debounce(async () => {
-      await fetchProposals();
+        await fetchProposals();
     }, 500)
 );
-
-const handleInvite = async (msg: string) => {
-    try{
-        await invite(`/v1/client/proposals/invitations`, {
-            method: 'POST',
-            headers: account?.value?.id
-                ? {
-                    'X-ACCOUNT-ID': account.value.id.toString(),
-                }
-                : undefined,
-            body: {
-                project_id: route.params.projectId,
-                account_id: account.value?.id,
-                message: msg
-            }
-        });
-    }catch(e){
-        console.log(e);
-    }
-}
 
 </script>
 
@@ -109,9 +97,21 @@ const handleInvite = async (msg: string) => {
                         </nav>
                     </div>
                     <div v-if="miniTab[0].current" class="flex flex-col gap-5">
-                        
+                        <div class="flex items-center w-fit rounded-md ring-1 ring-gray-300 px-4 py-2 justify-center">
+                            <Icon icon="tdesign:filter-1" style="color: black" />
+                            <select id="status" v-model="searchParams.status" @change="fetchProposals"
+                                class="block w-full pl-1 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                                <option v-for="status in Object.values(ProposalInvitationStatus)" :key="status"
+                                    :value="status">{{ _.startCase(status.toLowerCase().replace('_', ' ')) }}</option>
+                            </select>
+                        </div>
+                        <FreelancerInvitationCard v-if="proposals?.data && !isLoading"
+                            v-for="proposal in proposals.data" :key="proposal.id" :freelancer="proposal.account" />
+                        <Pagination
+                            v-if="!isLoading && proposals?.data && proposals?.data.length > 0"
+                            :pagination="proposals.meta"
+                            @prev-page="searchParams.page = searchParams.page - 1" @next-page="searchParams.page = searchParams.page + 1" />
                     </div>
-
                 </div>
             </div>
         </div>

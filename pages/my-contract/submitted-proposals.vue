@@ -5,6 +5,7 @@ import { accountStore } from '~/store/accountStore';
 import type {PaginatedList} from "~/types/models/Pagination";
 import ContractTabs from "~/components/freelancer/ContractTabs.vue";
 import type {Project} from "~/types/models/Project";
+import { AccountType } from '~/types/models/Account';
 
 const { account } = storeToRefs(accountStore());
 
@@ -91,6 +92,7 @@ const extractProjectData = (proposal: Proposal): Project => {
                   :key="proposal.id"
                   :project="extractProjectData(proposal)"
                   :show-save-button="false"
+                  :view-as="AccountType.FREELANCER"
                   :show-withdraw-application="true"
                   @click="() => viewProposal(proposal.id)"
                   @withdraw-proposal="() => fetchProposals()"

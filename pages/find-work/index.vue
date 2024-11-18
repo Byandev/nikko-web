@@ -13,8 +13,9 @@ import {
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 import _ from 'lodash';
 import type {PaginatedList, PaginationMeta} from '~/types/models/Pagination';
+import { AccountType } from '~/types/models/Account';
 
- interface ProjectPaginationMeta extends PaginationMeta {
+interface ProjectPaginationMeta extends PaginationMeta {
   total_count: number;
   total_saved_count: number;
 }
@@ -222,6 +223,7 @@ const sendProposal = async (id: number) => {
                   :project="project"
                   :show-save-button="true"
                   :show-apply-button="true"
+                  :view-as="AccountType.FREELANCER"
                   @click="viewJob"
                   @apply="sendProposal"
                   @save="(projects as ProjectList).meta.total_saved_count++"
