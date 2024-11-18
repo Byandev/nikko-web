@@ -6,6 +6,7 @@ import _, {omit} from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
 import ContractTabs from "~/components/freelancer/ContractTabs.vue";
 import type {ProposalInvitation} from "~/types/models/ProposalInvitation";
+import { AccountType } from '~/types/models/Account';
 
 const { account } = storeToRefs(accountStore());
 
@@ -70,6 +71,7 @@ const sendProposal = async (id: number) => {
             <ProjectCard
                 v-for="invitation in (proposalInvitations as PaginatedList<Proposal>)?.data ?? []"
                 :key="invitation.id"
+                :view-as="AccountType.FREELANCER"
                 :project="invitation.project"
                 :show-save-button="false"
                 :show-withdraw-application="true"

@@ -2,6 +2,7 @@
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Project } from '~/types/models/Project';
 import _ from 'lodash';
+import { AccountType } from '~/types/models/Account';
 
 const route = useRoute();
 
@@ -22,6 +23,7 @@ onMounted(() => {
            <ProjectCard
               v-for="detail in details ?? []"
               :key="detail.id"
+              :view-as="AccountType.FREELANCER"
               :project="detail"
               :show-save-button="false"
               :show-withdraw-application="false"
