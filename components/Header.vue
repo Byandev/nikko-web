@@ -53,7 +53,7 @@ const handleLogout = async () => {
                 <img src="@/assets/icons/artsycrowd.png" alt="Dummy Logo" class="h-10 object-cover rounded-full">
             </NuxtLink>
 
-            <div class="hidden sm:block ml-5 border-l-2 pl-5">
+            <div class="hidden sm:block ml-5 border-l-2 pl-5" v-if="account">
                 <NuxtLink :to="account?.type === 'FREELANCER' ? '/find-work' : '/find-freelancer'" @click="closeDropdown"
                     class="text-sm text-black">
                     {{ account?.type === 'FREELANCER' ? 'Find Work' : 'Browse Freelancer' }}
