@@ -7,6 +7,7 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 const { account } = storeToRefs(accountStore());
 
 const emit = defineEmits<{
+    (e: 'click', id: number): void;
     (e: 'hire', id: number): void;
     (e: 'save', id: number): void;
     (e: 'un-save', id: number): void;
@@ -59,7 +60,7 @@ const toggleSave = async () => {
                     <img :src="props.proposal.project.account.user?.avatar?.original_url || defaultAvatarUrl"
                         alt="profile" class="w-16 h-16 rounded-full">
                     <div class="flex flex-col justify-center">
-                        <div class="flex justify-between">
+                        <div class="flex justify-between" @click="emit('click', proposal.project.account.id)">
                             <span class="text-lg font-bold" v-if="props.proposal.project.account.user">
                                 {{ props.proposal.project.account.user.first_name || 'No name provided' }} {{
                                 props.proposal.project.account.user.last_name || '' }}
