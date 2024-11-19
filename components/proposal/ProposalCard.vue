@@ -56,29 +56,30 @@ const toggleSave = async () => {
         class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex divide-x text-sm text-gray-800">
         <div class="w-9/12 px-5 py-5 space-y-4">
             <div class="flex flex-row justify-between gap-4">
-                <div class="flex flex-row gap-3 items-center">
+                <div class="flex flex-row gap-3 items-center w-full">
                     <img :src="props.proposal.project.account.user?.avatar?.original_url || defaultAvatarUrl"
                         alt="profile" class="w-16 h-16 rounded-full">
-                    <div class="flex flex-col justify-center">
-                        <div class="flex justify-between" @click="emit('click', proposal.project.account.id)">
-                            <span class="text-lg font-bold" v-if="props.proposal.project.account.user">
+                    <div class="flex flex-col justify-center flex-grow w-full">
+                        <div class="flex justify-between">
+                            <span class="text-lg font-bold hover:underline" v-if="props.proposal.project.account.user"
+                                @click="emit('click', proposal.project.account.id)">
                                 {{ props.proposal.project.account.user.first_name || 'No name provided' }} {{
                                 props.proposal.project.account.user.last_name || '' }}
                             </span>
+
+                            <div class="flex items-center gap-2">
+                                <span class="text-xl font-bold text-primary">
+                                    ${{ props?.proposal?.project?.estimated_budget }}
+                                </span>
+                                <HeartIcon v-if="showSaveButton" @click="toggleSave"
+                                    class="w-5 h-5 text-primary-dark cursor-pointer"
+                                    :class="props.proposal.is_saved ? 'fill-primary' : ''" />
+                            </div>
                         </div>
                         <span class="text-sm text-gray-500" v-if="props.proposal.project.account.user">{{
                             props?.proposal?.project?.title
                             }}</span>
                     </div>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <span class="text-xl font-bold text-red-400">
-                        ${{ props?.proposal?.project?.estimated_budget }}
-                    </span>
-                    <HeartIcon v-if="showSaveButton" @click="toggleSave"
-                        class="w-5 h-5 text-primary-dark cursor-pointer"
-                        :class="props.proposal.is_saved ? 'fill-primary' : ''" />
                 </div>
             </div>
             <div v-if="props.proposal.project.account.skills && props.proposal.project.account.skills.length > 0"
