@@ -54,8 +54,8 @@ const handleLogout = async () => {
             </NuxtLink>
 
             <div class="hidden sm:block ml-5 border-l-2 pl-5" v-if="account">
-                <NuxtLink :to="account?.type === 'FREELANCER' ? '/find-work' : '/find-freelancer'" @click="closeDropdown"
-                    class="text-sm text-black">
+                <NuxtLink :to="account?.type === 'FREELANCER' ? '/find-work' : '/find-freelancer'"
+                    @click="closeDropdown" class="text-sm text-black">
                     {{ account?.type === 'FREELANCER' ? 'Find Work' : 'Browse Freelancer' }}
                 </NuxtLink>
             </div>
@@ -73,6 +73,23 @@ const handleLogout = async () => {
                     <NuxtLink to="/my-contract/invitations" @click="closeDropdown"
                         class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                         Invitations
+                    </NuxtLink>
+                </div>
+            </div>
+
+            <div v-if="account?.type === 'CLIENT'" class="hidden sm:block relative ml-5 text-sm">
+                <button @click="toggleDropdownMyContract" class="flex items-center space-x-2 text-black">
+                    <span>My Projects</span>
+                    <Icon icon="mdi:chevron-down" width="24" height="24" />
+                </button>
+                <div v-if="showDropdownMyContract" class="absolute mt-2 w-48 bg-white border rounded-lg shadow-lg z-50">
+                    <NuxtLink to="/client-dashboard" @click="closeDropdown"
+                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                        Job Posted
+                    </NuxtLink>
+                    <NuxtLink to="/my-contract/active-contracts" @click="closeDropdown"
+                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                        All Contracts
                     </NuxtLink>
                 </div>
             </div>
