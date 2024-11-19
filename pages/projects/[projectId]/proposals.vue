@@ -76,6 +76,10 @@ const viewFreelancer = async (id: number) => {
     await router.push(`/freelancer/${id}`);
 };
 
+const hireFreelancer = async (id: number) => {
+    await router.push(`/my-contract/active-contracts/${id}`);
+};
+
 
 const totalCount = computed(() => proposals.value?.meta?.total_count ?? 0);
 const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count ?? 0);
@@ -108,6 +112,7 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                     <div class="space-y-5">
                         <ProposalCard v-if="proposals?.data && !isLoading" v-for="proposal in proposals.data"
                             @click="viewFreelancer"
+                            @hire="hireFreelancer"
                             :key="proposal.id" :proposal="proposal" :show-save-button="true" />
                         <Pagination v-if="!isLoading && proposals?.data && proposals?.data.length > 0"
                             :pagination="proposals.meta" @prev-page="filter.page = filter.page - 1"
