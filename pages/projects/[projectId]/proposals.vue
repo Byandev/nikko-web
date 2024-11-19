@@ -1,54 +1,52 @@
 <script setup lang="ts">
 import _ from 'lodash';
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { PaginatedList } from '~/types/models/Pagination';
+import type { PaginatedList, PaginationMeta } from '~/types/models/Pagination';
 import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
 import type { Proposal } from '~/types/models/Proposal';
 
 const { account } = storeToRefs(accountStore());
 
-const miniTab = ref([
-    { name: 'All Proposals', current: true },
-    { name: 'Messaged', current: false },
-    { name: 'Saved Proposals', current: false }
-]);
-
-const setActiveTab = (tabName: string) => {
-    miniTab.value.forEach(tab => {
-        tab.current = (tab.name === tabName);
-    });
-};
-
-interface SearchParams {
+interface Filter {
+    include: string;
     project_id: number;
-    status: string;
     is_saved: boolean;
     page: number;
+}
+
+interface ProposalPaginationMeta extends PaginationMeta {
+    total_count: number;
+    total_saved_count: number;
+}
+
+interface ProposalList extends PaginatedList<Proposal> {
+    meta: ProposalPaginationMeta
 }
 
 const route = useRoute();
 const page = ref(1);
 
-const searchParams = ref<SearchParams>({
+const filter = ref<Filter>({
+    include: 'project.account.user,attachments,contract',
     project_id: parseInt(route.params.projectId as string),
-    status: 'ACTIVE',
     is_saved: false,
     page: 1
 });
 
-const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<PaginatedList<Proposal>, ApiErrorResponse>();
+const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<ProposalList, ApiErrorResponse>();
 
 const queryString = computed(() => {
     let params: Record<string, string> = {
-        ...(searchParams.value.project_id ? { project_id: searchParams.value.project_id.toString() } : {}),
-        ...(searchParams.value.status ? { status: searchParams.value.status } : {}),
-        ...(searchParams.value.is_saved ? { is_saved: 'true' } : {}),
-        page: searchParams.value.page.toString()
+        include: filter.value.include,
+        ...(filter.value.project_id ? { 'filter[project_id]': filter.value.project_id.toString() } : {}),
+        ...(filter.value.is_saved ? { 'filter[is_saved]': 'true' } : {}),
+        page: filter.value.page.toString()
     };
 
     return new URLSearchParams(params).toString();
 });
+
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
@@ -68,11 +66,14 @@ onMounted(async () => {
 });
 
 watch(
-    [() => searchParams.value.page],
+    [() => filter.value],
     debounce(async () => {
         await fetchProposals();
     }, 500)
 );
+
+const totalCount = computed(() => proposals.value?.meta?.total_count ?? 0);
+const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count ?? 0);
 
 </script>
 
@@ -84,22 +85,27 @@ watch(
                 <div class="space-y-5">
                     <div>
                         <nav class="flex space-x-4" aria-label="Tabs">
-                            <template v-for="tab in miniTab" :key="tab.name">
-                                <a href="#" @click.prevent="setActiveTab(tab.name)"
-                                    :class="tab.current ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
+                            <nav class="flex space-x-4" aria-label="Tabs">
+                                <a href="#" @click.prevent="filter.is_saved = false"
+                                    :class="!filter.is_saved ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
                                     class="px-3 py-2 font-medium text-sm rounded-md">
-                                    {{ tab.name }}
+                                    Latest Jobs {{ totalCount > 0 ? `(${totalCount})` : '' }}
                                 </a>
-                            </template>
+
+                                <a href="#" @click.prevent="filter.is_saved = true"
+                                    :class="filter.is_saved ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
+                                    class="px-3 py-2 font-medium text-sm rounded-md">
+                                    Saved Jobs {{ totalSavedCount > 0 ? `(${totalSavedCount})` : '' }}
+                                </a>
+                            </nav>
                         </nav>
                     </div>
-                    <div v-if="miniTab[0].current" class="flex flex-col gap-5">
-                        <FreelancerInvitationCard v-if="proposals?.data && !isLoading"
-                            v-for="proposal in proposals.data" :key="proposal.id" :proposal="proposal" />
-                        <Pagination
-                            v-if="!isLoading && proposals?.data && proposals?.data.length > 0"
-                            :pagination="proposals.meta"
-                            @prev-page="searchParams.page = searchParams.page - 1" @next-page="searchParams.page = searchParams.page + 1" />
+                    <div class="space-y-5">
+                        <ProposalCard v-if="proposals?.data && !isLoading" v-for="proposal in proposals.data"
+                            :key="proposal.id" :proposal="proposal" :show-save-button="true" />
+                        <Pagination v-if="!isLoading && proposals?.data && proposals?.data.length > 0"
+                            :pagination="proposals.meta" @prev-page="filter.page = filter.page - 1"
+                            @next-page="filter.page = filter.page + 1" />
                     </div>
                 </div>
             </div>
