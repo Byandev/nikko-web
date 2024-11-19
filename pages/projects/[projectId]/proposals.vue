@@ -77,7 +77,7 @@ const viewFreelancer = async (id: number) => {
 };
 
 const hireFreelancer = async (id: number) => {
-    await router.push(`/my-contract/active-contracts/${id}`);
+    await router.push(`/send-offer/${id}`);
 };
 
 
