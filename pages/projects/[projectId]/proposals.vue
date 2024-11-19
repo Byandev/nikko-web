@@ -89,13 +89,13 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                                 <a href="#" @click.prevent="filter.is_saved = false"
                                     :class="!filter.is_saved ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
                                     class="px-3 py-2 font-medium text-sm rounded-md">
-                                    Latest Jobs {{ totalCount > 0 ? `(${totalCount})` : '' }}
+                                    All Proposal {{ totalCount > 0 ? `(${totalCount})` : '' }}
                                 </a>
 
                                 <a href="#" @click.prevent="filter.is_saved = true"
                                     :class="filter.is_saved ? 'bg-primary/30 text-primary' : 'text-gray-500 hover:text-gray-700'"
                                     class="px-3 py-2 font-medium text-sm rounded-md">
-                                    Saved Jobs {{ totalSavedCount > 0 ? `(${totalSavedCount})` : '' }}
+                                    Saved Proposal {{ totalSavedCount > 0 ? `(${totalSavedCount})` : '' }}
                                 </a>
                             </nav>
                         </nav>
