@@ -31,7 +31,7 @@ interface AccountList extends PaginatedList<Account> {
 const router = useRouter();
 const page = ref(1)
 
-const filters = ref<{search: string, skills: number[], countries: ICountry[], is_saved: boolean}>({
+const filters = ref<{search: string, skills: Skill[], countries: ICountry[], is_saved: boolean}>({
   search: "",
   is_saved: false,
   skills: [],
@@ -104,7 +104,7 @@ const removeCountry = (country: ICountry) => {
   <div class="my-8 lg:mx-auto mx-5">
     <ProfileInfo class="max-w-7xl mx-auto " />
     <ProposalInvitationModal
-        :freelancer="selectedFreelancer"
+        :freelancer="selectedFreelancer ?? undefined"
         :is-open="openProposalInvitationModal"
         @toggle-open="(bool) => {
           openProposalInvitationModal = bool
