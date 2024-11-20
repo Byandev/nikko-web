@@ -3,13 +3,21 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Project } from '~/types/models/Project';
 import _ from 'lodash';
 import { AccountType } from '~/types/models/Account';
+import { accountStore } from '~/store/accountStore';
 
 const route = useRoute();
+const { account } = storeToRefs(accountStore());
 
 const { data: details, fetchData: fetchProjectDetails, pending: isFetching } = useFetchData<{ data: Project }, ApiErrorResponse>();
 
+const requestHeaders = computed<HeadersInit | undefined>(() =>
+  account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
+);
+
 onMounted(() => {
-  fetchProjectDetails(`/v1/projects/${route.params.projectId}`);
+  fetchProjectDetails(`/v1/projects/${route.params.projectId}`, {
+    headers: requestHeaders.value
+  });
 });
 </script>
 

@@ -94,11 +94,10 @@ const extractProjectData = (proposal: Proposal): Project => {
                   :show-save-button="false"
                   :view-as="AccountType.FREELANCER"
                   :show-withdraw-application="true"
+                  class="mb-5"
                   @click="() => viewProposal(proposal.id)"
                   @withdraw-proposal="() => fetchProposals()"
               />
-
-
               <Pagination
                   v-if="!isLoading && (proposals as PaginatedList<Proposal>)?.data.length > 0"
                   :pagination="(proposals as PaginatedList<Proposal>)?.meta"

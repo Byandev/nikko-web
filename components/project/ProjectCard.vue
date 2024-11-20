@@ -13,6 +13,8 @@ const emit = defineEmits<{
   (e: 'un-save', id: number): void;
   (e: 'apply', id: number): void;
   (e: 'withdraw-proposal', id: number): void;
+  (e: 'submit-proposal', id: number): void;
+  (e: 'reject-proposal', id: number): void;
 }>();
 
 const {project, showSaveButton, showWithdrawApplication} = toRefs(props)

@@ -9,6 +9,7 @@ export interface Proposal {
     transaction_fee: number;
     length: string;
     status: string;
+    is_saved: boolean;
     cover_letter: string;
     project: Project;
     attachments: Media[];
