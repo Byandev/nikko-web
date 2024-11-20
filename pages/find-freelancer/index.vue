@@ -17,6 +17,7 @@ import type {PaginatedList, PaginationMeta} from '~/types/models/Pagination';
 import type {ApiDataResponse, ApiErrorResponse} from '~/types/api/response/error';
 
 import FreelancerCard from '~/components/account/FreelancerCard.vue'
+import ProposalInvitationModal from "~/components/proposal-invitation/ProposalInvitationModal.vue";
 
 interface AccountPaginationMeta extends PaginationMeta {
   total_count: number;
@@ -40,6 +41,9 @@ const filters = ref<{search: string, skills: number[], countries: ICountry[], is
 const { account } = storeToRefs(accountStore());
 const { data: freelancers, fetchData, pending: isLoading } = useFetchData<AccountList, ApiErrorResponse>();
 const { data: skills, fetchData: fetchSkills } = useFetchData<ApiDataResponse<Skill[]>, ApiErrorResponse>();
+
+const selectedFreelancer = ref<Account | null>(null);
+const openProposalInvitationModal = ref<boolean>(false)
 
 const queryString = computed(() => {
   let params: Record<string, string>  = {
@@ -99,6 +103,16 @@ const removeCountry = (country: ICountry) => {
 <template>
   <div class="my-8 lg:mx-auto mx-5">
     <ProfileInfo class="max-w-7xl mx-auto " />
+    <ProposalInvitationModal
+        :freelancer="selectedFreelancer"
+        :is-open="openProposalInvitationModal"
+        @toggle-open="(bool) => {
+          openProposalInvitationModal = bool
+          if (!bool) {
+            selectedFreelancer = null
+          }
+        }"/>
+
     <div class="max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-4 mt-5 mx-auto ">
 
       <div class="col-span-1 flex flex-col gap-4">
@@ -267,6 +281,10 @@ const removeCountry = (country: ICountry) => {
                   @click="viewFreelancer"
                   @save="(freelancers as AccountList).meta.total_saved_count++"
                   @un-save="unSave"
+                  @hire="() => {
+                    selectedFreelancer = freelancer
+                    openProposalInvitationModal = true
+                  }"
               />
 
               <Pagination

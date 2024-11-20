@@ -8,6 +8,7 @@ import {accountStore} from "~/store/accountStore";
 const props = defineProps<{ freelancer: Account, showSaveButton: boolean }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
+  (e: 'hire', id: number): void;
   (e: 'save', id: number): void;
   (e: 'un-save', id: number): void;
 }>();
@@ -58,8 +59,8 @@ const toggleSave = async () => {
 </script>
 <template>
   <div
-      class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex divide-x text-sm text-gray-800">
-    <div class="w-8/12 px-5 py-5">
+      class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex flex-col lg:flex-row divide-y lg:divide-y-0 divide-x-0 lg:divide-x text-sm text-gray-800">
+    <div class="w-full lg:w-8/12 px-5 py-5">
       <div class="flex space-x-4">
         <img :src="avatarUrl" :alt="name" class="w-16 h-16 rounded-full">
 
@@ -96,13 +97,13 @@ const toggleSave = async () => {
       </div>
     </div>
 
-    <div class="w-4/12 divide-y">
+    <div class="w-full lg:w-4/12 divide-y">
       <div class="pt-5 pb-5 space-y-3 px-8">
         <Button text="View Profile" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
                 @click="emit('click', freelancer.id)" type="button"/>
 
         <Button text="Hire" background="primary" foreground="white" class="ring-1 ring-primary w-full font-base"
-                @click="emit('click', freelancer.id)" type="button"/>
+                @click="emit('hire', freelancer.id)" type="button"/>
       </div>
 
       <div class="py-2 space-y-1 px-5">
