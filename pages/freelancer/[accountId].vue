@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ApiErrorResponse } from '~/types/api/response/error';
+import type {ApiDataResponse, ApiErrorResponse} from '~/types/api/response/error';
 import type { Account } from '~/types/models/Account';
 
 
-const { data: freelancerDetails, fetchData: fetchFreelancerDetails, pending: isLoading } = useFetchData<{ data: Account }, ApiErrorResponse>();
+const { data: freelancerDetails, fetchData: fetchFreelancerDetails, pending: isLoading } = useFetchData<ApiDataResponse<Account>, ApiErrorResponse>();
 
 const route = useRoute();
 

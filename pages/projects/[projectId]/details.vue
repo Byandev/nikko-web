@@ -28,14 +28,12 @@ onMounted(() => {
         <div class="px-4 py-5 sm:px-6">
           <div class="space-y-5">
             <div v-if="details && !isFetching">
-           <ProjectCard
-              v-for="detail in details ?? []"
-              :key="detail.id"
-              :view-as="AccountType.FREELANCER"
-              :project="detail"
-              :show-save-button="false"
-              :show-withdraw-application="false"
-          />
+             <ProjectCard
+                :view-as="AccountType.FREELANCER"
+                :project="details.data"
+                :show-save-button="false"
+                :show-withdraw-application="false"
+            />
           </div>
           </div>
         </div>

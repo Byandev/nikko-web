@@ -11,3 +11,7 @@ export interface ApiErrorResponse extends FetchError {
         errors: FormErrorsType
     }
 }
+
+export interface ApiDataResponse<T> {
+    data: T
+}
