@@ -66,7 +66,7 @@ onMounted(async () => {
 });
 
 watch(
-    [() => filter.value],
+    [() => queryString.value],
     debounce(async () => {
         await fetchProposals();
     }, 500)
@@ -108,7 +108,9 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                     <div class="space-y-5">
                         <ProposalCard v-if="proposals?.data && !isLoading" v-for="proposal in proposals.data"
                             @click="viewFreelancer"
-                            :key="proposal.id" :proposal="proposal" :show-save-button="true" />
+                            :key="proposal.id" :proposal="proposal" :show-save-button="true"
+                            @save="(proposals as ProposalList).meta.total_saved_count++"
+                            @un-save="(proposals as ProposalList).meta.total_saved_count--"/>
                         <Pagination v-if="!isLoading && proposals?.data && proposals?.data.length > 0"
                             :pagination="proposals.meta" @prev-page="filter.page = filter.page - 1"
                             @next-page="filter.page = filter.page + 1" />
