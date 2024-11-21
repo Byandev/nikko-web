@@ -58,12 +58,13 @@ const rules = {
     estimated_budget: { required: props.toEdit === 'estimated_budget' ? helpers.withMessage('Estimated budget is required', required) : {} },
 };
 
-const { formRef, v$ } = useValidation(project,rules);
+const { v$ } = useValidation(project,rules);
 
 const saveProject = () => {
     v$.value.$touch();
+    console.log(v$.value);
     if (v$.value.$invalid) return;
-    
+
     updateProject(`v1/client/projects/${project.value?.id}`, {
         method: "PUT",
         headers: requestHeaders.value,
@@ -90,7 +91,7 @@ const saveProject = () => {
                 <div class="flex flex-col">
                     <div class="my-1 text-sm text-gray-900"
                         v-if="toEdit === 'title' && project?.title || project?.title == ''">
-                        <input v-model="formRef.title" type="text" id="title" name="title"
+                        <input v-model="project.title" type="text" id="title" name="title"
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2" />
                         <span v-if="v$.title.$error" class="text-red-900 text-sm">{{ v$.title.$errors[0].$message
                             }}</span>
