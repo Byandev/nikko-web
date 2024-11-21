@@ -62,10 +62,8 @@ const { formRef, v$ } = useValidation(project,rules);
 
 const saveProject = () => {
     v$.value.$touch();
-    console.log('Errors', v$.value.$errors);
     if (v$.value.$invalid) return;
-
-    console.log("Saving project: ", project.value);
+    
     updateProject(`v1/client/projects/${project.value?.id}`, {
         method: "PUT",
         headers: requestHeaders.value,
@@ -94,8 +92,8 @@ const saveProject = () => {
                         v-if="toEdit === 'title' && project?.title || project?.title == ''">
                         <input v-model="formRef.title" type="text" id="title" name="title"
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2" />
-                        <!-- <span v-if="v$.title.$error" class="text-red-900 text-sm">{{ v$.title.$errors[0].$message
-                            }}</span> -->
+                        <span v-if="v$.title.$error" class="text-red-900 text-sm">{{ v$.title.$errors[0].$message
+                            }}</span>
                     </div>
 
                     <div class="my-1 text-sm text-gray-900"
