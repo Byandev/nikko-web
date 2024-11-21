@@ -76,7 +76,6 @@ const rules = {
 const { formRef, v$ } = useValidation(form, rules);
 
 const languagesName = ref<string[]>(codes.map(code => code.name));
-const selectedLanguageName = ref<string | null>(null);
 
 const languageOptions = computed<string[]>(() => 
     (languagesName.value ?? []).filter(language => 
@@ -84,7 +83,6 @@ const languageOptions = computed<string[]>(() =>
     )
 );
 
-const selectedSkillId = ref<number>(0)
 const skillOptions = computed<Skill[]>(() => (skills.value?.data ?? []).filter(skill => !form.value.skills?.find(i => i.id === skill.id)))
 
 const { data: skills, fetchData: fetchSkills } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
@@ -131,40 +129,12 @@ const handleClick = () => {
     fileInput.click();
 };
 
-const onSelectSkill = () => {
-    if (selectedSkillId.value) {
-        const selectedSkill = skillOptions.value.find(skill => skill.id === selectedSkillId.value)
-
-        if (selectedSkill && !form.value.skills?.find(skill => skill.id === selectedSkillId.value)) {
-            form.value.skills?.push(selectedSkill)
-        }
-        selectedSkillId.value = 0
-    }
-}
-
 const onRemoveSkill = (index: number) => {
     form.value.skills?.splice(index, 1);
 }
 
 const onRemoveLanguage = (index: number) => {
     form.value.languages?.splice(index, 1);
-}
-
-const onSelectedLanguage = () => {
-    if (selectedLanguageName.value) {
-        const selectedLanguage = languageOptions.value.find(language => language === selectedLanguageName.value);
-
-        // Ensure form.value.languages is always an array
-        form.value.languages = form.value.languages ?? [];
-
-        if (selectedLanguage && !form.value.languages.find((lang: { name: string }) => lang.name === selectedLanguageName.value)) {
-            form.value.languages.push({
-                name: selectedLanguage,
-            });
-        }
-
-        selectedLanguageName.value = null;
-    }
 }
 
 const {sendRequest: createJob, pending: isSubmitting} = useSubmit<{ data: Project }, ApiErrorResponse>();

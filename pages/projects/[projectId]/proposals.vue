@@ -76,6 +76,14 @@ const viewFreelancer = async (id: number) => {
     await router.push(`/freelancer/${id}`);
 };
 
+const hireFreelancer = async (id: number) => {
+    await router.push(`/send-offer/${id}`);
+};
+
+const viewContract = async (id: number) => {
+    await router.push(`/contract/${id}`);
+};
+
 
 const totalCount = computed(() => proposals.value?.meta?.total_count ?? 0);
 const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count ?? 0);
@@ -110,7 +118,9 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                             @click="viewFreelancer"
                             :key="proposal.id" :proposal="proposal" :show-save-button="true"
                             @save="(proposals as ProposalList).meta.total_saved_count++"
-                            @un-save="(proposals as ProposalList).meta.total_saved_count--"/>
+                            @un-save="(proposals as ProposalList).meta.total_saved_count--"
+                            @hire="hireFreelancer"
+                            @view="viewContract"/>
                         <Pagination v-if="!isLoading && proposals?.data && proposals?.data.length > 0"
                             :pagination="proposals.meta" @prev-page="filter.page = filter.page - 1"
                             @next-page="filter.page = filter.page + 1" />
