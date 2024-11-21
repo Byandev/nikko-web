@@ -1,5 +1,4 @@
 import type { Account } from "./Account";
-import type { Project } from "./Project";
 import type { Proposal } from "./Proposal";
 
 export interface Contract {

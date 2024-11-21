@@ -100,15 +100,18 @@ const handleDelete = async () => {
     }
 }
 
+const goback = () => {
+    router.push(`/projects/${contract.value?.data.proposal.project.id}/proposals`);
+}
+
 const showDeleteConfirmation = ref(false);
 </script>
 
 <template>
     <DeleteConfirmationModal
-        v-if="showDeleteConfirmation"
         :showModal="showDeleteConfirmation"
         @confirm="handleDelete"
-        @cancel="showDeleteConfirmation = false"
+        @close="showDeleteConfirmation = false"
     />
     <EditProjectModal :project="contract?.data.proposal.project" :header="modalHeader" :isOpen="openEditProjectModal"
         :toEdit="selectedFieldToEdit" @toggle-open="openEditProjectModal = $event" />
@@ -286,7 +289,7 @@ const showDeleteConfirmation = ref(false);
                         <div class="w-full flex justify-end py-5 gap-2 px-4">
                             <Button text="Delete Offer" foreground="red-600" background="red-700" type="button"
                                 @click="showDeleteConfirmation= true" class="ring-1 ring-red-600" />
-                            <Button text="Cancel" foreground="primary" background="white" type="button"
+                            <Button text="Cancel" @click="goback" foreground="primary" background="white" type="button"
                                 class="ring-1 ring-primary" />
                             <Button :isLoading="isSubmitting" text="Update Offer" foreground="white"
                                 background="primary" type="submit" />

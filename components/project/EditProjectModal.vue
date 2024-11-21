@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRefs } from "vue";
+import { toRefs, ref } from "vue";
 import Button from "~/components/ui/Button.vue";
 import type { ApiErrorResponse } from "~/types/api/response/error";
 import { Level, Term, type Project } from "~/types/models/Project";
@@ -13,8 +13,9 @@ import {
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 import type { Skill } from "~/types/models/Skill";
 import codes from 'iso-language-codes';
-import { helpers, required } from "@vuelidate/validators";
+import { helpers, requiredIf } from "@vuelidate/validators";
 import _ from "lodash";
+import type { Language } from "~/types/models/Language";
 
 const props = defineProps<{
     project?: Project;
@@ -33,48 +34,72 @@ const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
 );
 
-const {project} = toRefs(props);
 
 const { sendRequest: updateProject } = useSubmit<{ data: Project }, ApiErrorResponse>();
 const { data: skillOptions, fetchData: fetchSkills } = useFetchData<{ data: Skill[] }, ApiErrorResponse>();
 
 fetchSkills('/v1/skills');
 
+
+const form = reactive({
+    title: "",
+    description: "",
+    skills: [] as Skill[],
+    length: "",
+    experience_level: "",
+    languages: [] as Language[],    
+});
+
+watch(
+    () => props.project,
+    (newProject) => {
+        if (newProject) {
+            form.title = newProject.title;
+            form.description = newProject.description;
+            form.skills = newProject.skills ?? [];
+            form.length = newProject.length;
+            form.experience_level = newProject.experience_level;
+            form.languages = newProject.languages ?? [];
+        }
+    },
+    { immediate: true }
+);
+
+const rules = {
+    title: { required: helpers.withMessage('Title is required', requiredIf(() => props.toEdit === 'title')) },
+    description: { required: helpers.withMessage('Description is required', requiredIf(() => props.toEdit === 'description')) },
+    skills: { required: helpers.withMessage('Skills is required', requiredIf(() => props.toEdit === 'skills')) },
+    length: { required: helpers.withMessage('Length is required', requiredIf(() => props.toEdit === 'length')) },
+    experience_level: { required: helpers.withMessage('Experience level is required', requiredIf(() => props.toEdit === 'experience_level')) },
+    languages: { required: helpers.withMessage('Languages is required', requiredIf(() => props.toEdit === 'languages')) },
+};
+
+const { v$ } = useValidation(form, rules);
+
 const onRemoveSelectedSkill = (idx: number) => {
-    project.value?.skills.splice(idx, 1);
+    if (form?.skills) {
+        form.skills.splice(idx, 1);
+    }
 }
 
 const onRemoveLanguage = (index: number) => {
-    project.value?.languages?.splice(index, 1);
+    form?.languages?.splice(index, 1);
 }
 
-const rules = {
-    title: { required: props.toEdit === 'title' ? helpers.withMessage('Title is required', required) : {} },
-    description: { required: props.toEdit === 'description' ? helpers.withMessage('Description is required', required) : {} },
-    length: { required: props.toEdit === 'length' ? helpers.withMessage('Length is required', required) : {} },
-    experience_level: { required: props.toEdit === 'experience_level' ? helpers.withMessage('Experience level is required', required) : {} },
-    languages: { required: props.toEdit === 'languages' ? helpers.withMessage('Languages is required', required) : {} },
-    skills: { required: props.toEdit === 'skills' ? helpers.withMessage('Skills is required', required) : false },
-    estimated_budget: { required: props.toEdit === 'estimated_budget' ? helpers.withMessage('Estimated budget is required', required) : {} },
-};
-
-const { v$ } = useValidation(project,rules);
-
-const saveProject = () => {
+const saveProject = async () => {
     v$.value.$touch();
-    console.log(v$.value);
     if (v$.value.$invalid) return;
 
-    updateProject(`v1/client/projects/${project.value?.id}`, {
+    await updateProject(`v1/client/projects/${props.project?.id}`, {
         method: "PUT",
         headers: requestHeaders.value,
         body: {
-            title: project.value?.title,
-            description: project.value?.description,
-            skills: project.value?.skills.map((skill) => skill.id),
-            length: project.value?.length,
-            level: project.value?.experience_level,
-            language: project.value?.languages.map((lang) => lang.id),
+            title: form.title,
+            description: form.description,
+            skills: form.skills.map((skill) => skill.id) ?? [],
+            length: form.length,
+            level: form.experience_level,
+            language: form.languages.map((lang) => lang.id) ?? [],
         },
     });
     emit("toggle-open", false);
@@ -90,31 +115,31 @@ const saveProject = () => {
             <div class="space-y-6">
                 <div class="flex flex-col">
                     <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'title' && project?.title || project?.title == ''">
-                        <input v-model="project.title" type="text" id="title" name="title"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2" />
+                        v-if="props.toEdit === 'title' && form?.title || form?.title == ''">
+                        <input v-model="form.title" type="text" id="title" name="title"
+                            class="w-full ring-1 ring-gray-300 rounded-md shadow-sm focus:ring-opacity-50 p-2" />
                         <span v-if="v$.title.$error" class="text-red-900 text-sm">{{ v$.title.$errors[0].$message
                             }}</span>
                     </div>
 
                     <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'description' && project?.description || project?.description == ''">
-                        <textarea v-model="project.description" id="description" name="description"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2" />
+                        v-if="toEdit === 'description' && form?.description">
+                        <textarea v-model="form.description" id="description" name="description"
+                            class="w-full ring-1 ring-gray-300 rounded-md shadow-sm focus:ring-opacity-50 p-2" />
                     </div>
 
                     <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'skills' && project?.skills || project?.skills.length == 0">
+                        v-if="toEdit === 'skills' && form.skills">
                         <div class="mt-2">
-                            <Listbox v-model="project.skills" multiple class="ring-1 ring-gray-300 rounded-md">
+                            <Listbox v-model="form.skills" multiple class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
                                     <ListboxButton
                                         class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                                         <span class="block truncate">
-                                            <span v-if="project.skills.length === 0">Select Skill</span>
+                                            <span v-if="(form.skills ?? []).length === 0">Select Skill</span>
                                             <span v-else>
-                                                <span v-for="(skill, index) in project.skills" :key="index">
-                                                    {{ skill.name }}<span v-if="index < project.skills.length - 1">,
+                                                <span v-for="(skill, index) in form.skills" :key="index">
+                                                    {{ skill.name }}<span v-if="form.skills && index < form.skills.length - 1">,
                                                     </span>
                                                 </span>
                                             </span>
@@ -149,7 +174,7 @@ const saveProject = () => {
                             </Listbox>
                             <div class="mt-4">
                                 <div class="flex flex-wrap mt-2">
-                                    <div v-for="(skill, idx) in project.skills" :key="`selected-skill-${skill.id}`"
+                                    <div v-for="(skill, idx) in form.skills" :key="`selected-skill-${skill.id}`"
                                         class="mr-2 my-1">
                                         <span
                                             class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
@@ -171,17 +196,17 @@ const saveProject = () => {
                     </div>
 
                     <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'length' && project?.length || project?.length.length == 0">
+                        v-if="toEdit === 'length' && form?.length">
                         <div class="mt-2">
-                            <Listbox v-model="project.length" class="ring-1 ring-gray-300 rounded-md">
+                            <Listbox v-model="form.length" class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
                                     <ListboxButton
                                         class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                                         <span class="block truncate">
-                                            <span v-if="!project.length">Project Length</span>
+                                            <span v-if="!form.length">Project Length</span>
                                             <span v-else>
                                                 <span>
-                                                    {{_.capitalize(_.startCase(project.length))}}
+                                                    {{_.capitalize(_.startCase(form.length))}}
                                                 </span>
                                             </span>
                                         </span>
@@ -217,17 +242,17 @@ const saveProject = () => {
                     </div>
 
                     <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'experience_level' && project?.experience_level">
+                        v-if="toEdit === 'experience_level' && form?.experience_level">
                         <div class="mt-2">
-                            <Listbox v-model="project.experience_level" class="ring-1 ring-gray-300 rounded-md">
+                            <Listbox v-model="form.experience_level" class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
                                     <ListboxButton
                                         class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                                         <span class="block truncate">
-                                            <span v-if="!project.length">Experience Level</span>
+                                            <span v-if="!form.length">Experience Level</span>
                                             <span v-else>
                                                 <span>
-                                                    {{ _.capitalize(_.startCase(project.experience_level)) }}
+                                                    {{ _.capitalize(_.startCase(form.experience_level)) }}
                                                 </span>
                                             </span>
                                         </span>
@@ -263,17 +288,17 @@ const saveProject = () => {
                     </div>
 
                     <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'languages' && project?.languages || project?.languages.length == 0">
+                        v-if="toEdit === 'languages' && form.languages">
                         <div class="mt-2">
-                            <Listbox v-model="project.languages" multiple class="ring-1 ring-gray-300 rounded-md">
+                            <Listbox v-model="form.languages" multiple class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
                                     <ListboxButton
                                         class="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left focus:outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300 sm:text-sm">
                                         <span class="block truncate">
-                                            <span v-if="project.languages.length === 0">Select Language</span>
+                                            <span v-if="(form.languages ?? []).length === 0">Select Language</span>
                                             <span v-else>
-                                                <span v-for="(language, index) in project.languages" :key="index">
-                                                    {{ language.name }}<span v-if="index < project.skills.length - 1">,
+                                                <span v-for="(language, index) in form.languages" :key="index">
+                                                    {{ language.name }}<span v-if="index < (form.skills ?? []).length - 1">,
                                                     </span>
                                                 </span>
                                             </span>
@@ -309,7 +334,7 @@ const saveProject = () => {
                             </Listbox>
                             <div class="mt-4">
                                 <div class="flex flex-wrap mt-2">
-                                    <div v-for="(language, idx) in project.languages"
+                                    <div v-for="(language, idx) in form.languages"
                                         :key="`selected-language-${language.id}`" class="mr-2 my-1">
                                         <span
                                             class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
