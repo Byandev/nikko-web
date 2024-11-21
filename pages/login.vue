@@ -9,7 +9,9 @@ definePageMeta({
 </script>
 
 <template>
-    <div class="h-full">
-        <LoginForm />
-    </div>
+    <ClientOnly>
+        <div class="h-full">
+            <LoginForm />
+        </div>
+    </ClientOnly>
 </template>

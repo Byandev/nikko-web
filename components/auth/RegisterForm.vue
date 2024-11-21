@@ -92,7 +92,7 @@ const submitForm = async () => {
       <div class="mx-auto w-full h-full lg:h-[700px] max-w-4xl bg-white rounded-2xl border-2 border-gray-200">
         <div class="flex flex-col lg:flex-row h-full">
           <!-- Left Image Section -->
-          <Transition name="slide-fade">
+          <Transition name="slide-fade" appear>
             <div class="relative hidden lg:flex items-center justify-center w-full mb-4 lg:mb-0 h-full ">
               <img
                 src="https://img.freepik.com/free-vector/abstract-paper-style-background_23-2150744372.jpg?t=st=1728313230~exp=1728316830~hmac=316229e5374994fe112e4883f479fc29b623d4a231fb6305c6534814b7f3e76e&w=996"
@@ -110,7 +110,7 @@ const submitForm = async () => {
           </Transition>
 
           <!-- Right Form Section -->
-          <Transition name="slide-fade">
+          <Transition name="slide-fade" appear>
             <div class="flex flex-col px-4 py-7 sm:px-10 justify-center w-full lg:w-5/6 h-full">
               <!-- Tabs Navigation for Mobile -->
               <div class="block lg:hidden mb-4">
@@ -166,8 +166,8 @@ const submitForm = async () => {
                                     <li
                                       :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
                                       <span :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
-                                          useCapitalize(account)
-                                      }}</span>
+                                        useCapitalize(account)
+                                        }}</span>
                                       <span v-if="selected"
                                         class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
                                         <CheckIcon class="h-5 w-5" aria-hidden="true" />
