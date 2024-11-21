@@ -49,7 +49,7 @@ const queryString = computed(() => {
   let params: Record<string, string>  = {
     ...(filters.value.search ? {"filter[search]": filters.value.search}: {}),
     ...(filters.value.countries.length ? {"filter[user_countries]": filters.value.countries.map(c => c.isoCode).join(',')}: {}),
-    ...(filters.value.skills.length ? {"filter[skills]": filters.value.skills.join(',')}: {}),
+    ...(filters.value.skills.length ? { "filter[skills]": filters.value.skills.map(skill => skill.id).join(',') } : {}),
     ...(filters.value.is_saved ? {"filter[is_saved]": "true"}: {}),
     include: 'user.avatar,skills',
     type: AccountType.FREELANCER,
