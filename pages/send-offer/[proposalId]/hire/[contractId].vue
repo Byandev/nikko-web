@@ -40,7 +40,7 @@ onMounted(async () => {
 });
 
 const handlePayNow = async () => {
-    await router.push(`/projects/${proposal.value?.data.project.title}/proposals`);
+    await router.push(`/projects/${proposal.value?.data.project.id}/proposals`);
 };
 
 </script>
