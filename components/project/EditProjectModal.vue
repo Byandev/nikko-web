@@ -333,9 +333,7 @@ const saveProject = () => {
             </div>
         </template>
         <template #actions>
-            <Button text="Cancel" type="button" background="white" foreground="gray"
-                @click="emit('toggle-open', false)" />
-            <Button text="Save" type="button" background="primary" foreground="white" @click="saveProject" />
+            <Button text="Close" type="button" background="primary" foreground="white" @click="saveProject" />
         </template>
     </Modal>
 </template>
