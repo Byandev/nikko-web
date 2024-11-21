@@ -118,18 +118,19 @@ const saveProject = async () => {
                         v-if="props.toEdit === 'title' && form?.title || form?.title == ''">
                         <input v-model="form.title" type="text" id="title" name="title"
                             class="w-full ring-1 ring-gray-300 rounded-md shadow-sm focus:ring-opacity-50 p-2" />
-                        <span v-if="v$.title.$error" class="text-red-900 text-sm">{{ v$.title.$errors[0].$message
+                        <span v-if="v$.title.$error" class="text-red-900 text-sm mt-3">{{ v$.title.$errors[0].$message
                             }}</span>
                     </div>
 
-                    <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'description' && form?.description">
+                    <div class="my-1 text-sm text-gray-900" v-if="toEdit === 'description' && form?.description || form?.description == ''">
                         <textarea v-model="form.description" id="description" name="description"
                             class="w-full ring-1 ring-gray-300 rounded-md shadow-sm focus:ring-opacity-50 p-2" />
+                        <span v-if="v$.description.$error" class="text-red-900 text-sm mt-3">{{
+                            v$.description.$errors[0].$message
+                            }}</span>
                     </div>
 
-                    <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'skills' && form.skills">
+                    <div class="my-1 text-sm text-gray-900" v-if="toEdit === 'skills' && form.skills || form.skills.length == 0">
                         <div class="mt-2">
                             <Listbox v-model="form.skills" multiple class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
@@ -139,7 +140,8 @@ const saveProject = async () => {
                                             <span v-if="(form.skills ?? []).length === 0">Select Skill</span>
                                             <span v-else>
                                                 <span v-for="(skill, index) in form.skills" :key="index">
-                                                    {{ skill.name }}<span v-if="form.skills && index < form.skills.length - 1">,
+                                                    {{ skill.name }}<span
+                                                        v-if="form.skills && index < form.skills.length - 1">,
                                                     </span>
                                                 </span>
                                             </span>
@@ -172,6 +174,9 @@ const saveProject = async () => {
                                     </transition>
                                 </div>
                             </Listbox>
+                            <span v-if="v$.skills.$error" class="text-red-900 text-sm mt-3">{{
+                                v$.skills.$errors[0].$message
+                                }}</span>
                             <div class="mt-4">
                                 <div class="flex flex-wrap mt-2">
                                     <div v-for="(skill, idx) in form.skills" :key="`selected-skill-${skill.id}`"
@@ -195,8 +200,7 @@ const saveProject = async () => {
                         </div>
                     </div>
 
-                    <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'length' && form?.length">
+                    <div class="my-1 text-sm text-gray-900" v-if="toEdit === 'length' && form?.length || form?.length.length == 0">
                         <div class="mt-2">
                             <Listbox v-model="form.length" class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
@@ -238,6 +242,9 @@ const saveProject = async () => {
                                     </transition>
                                 </div>
                             </Listbox>
+                            <span v-if="v$.length.$error" class="text-red-900 text-sm mt-3">{{
+                                v$.length.$errors[0].$message
+                                }}</span>
                         </div>
                     </div>
 
@@ -284,11 +291,13 @@ const saveProject = async () => {
                                     </transition>
                                 </div>
                             </Listbox>
+                            <span v-if="v$.experience_level.$error" class="text-red-900 text-sm mt-3">{{
+                                v$.experience_level.$errors[0].$message
+                                }}</span>
                         </div>
                     </div>
 
-                    <div class="my-1 text-sm text-gray-900"
-                        v-if="toEdit === 'languages' && form.languages">
+                    <div class="my-1 text-sm text-gray-900" v-if="toEdit === 'languages' && form.languages || form.languages.length == 0">
                         <div class="mt-2">
                             <Listbox v-model="form.languages" multiple class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
@@ -298,7 +307,8 @@ const saveProject = async () => {
                                             <span v-if="(form.languages ?? []).length === 0">Select Language</span>
                                             <span v-else>
                                                 <span v-for="(language, index) in form.languages" :key="index">
-                                                    {{ language.name }}<span v-if="index < (form.skills ?? []).length - 1">,
+                                                    {{ language.name }}<span
+                                                        v-if="index < (form.skills ?? []).length - 1">,
                                                     </span>
                                                 </span>
                                             </span>
@@ -332,6 +342,9 @@ const saveProject = async () => {
                                     </transition>
                                 </div>
                             </Listbox>
+                            <span v-if="v$.languages.$error" class="text-red-900 text-sm mt-3">{{
+                                v$.languages.$errors[0].$message
+                                }}</span>
                             <div class="mt-4">
                                 <div class="flex flex-wrap mt-2">
                                     <div v-for="(language, idx) in form.languages"
