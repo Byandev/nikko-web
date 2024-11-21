@@ -56,10 +56,10 @@ watch(
         if (newProject) {
             form.title = newProject.title;
             form.description = newProject.description;
-            form.skills = newProject.skills ?? [];
+            form.skills = newProject.skills ? [...newProject.skills] : [];
             form.length = newProject.length;
             form.experience_level = newProject.experience_level;
-            form.languages = newProject.languages ?? [];
+            form.languages = newProject.languages ? [...newProject.languages] : [];
         }
     },
     { immediate: true }
@@ -99,7 +99,7 @@ const saveProject = async () => {
             skills: form.skills.map((skill) => skill.id) ?? [],
             length: form.length,
             level: form.experience_level,
-            language: form.languages.map((lang) => lang.id) ?? [],
+            languages: form.languages.map((lang) => ({ name: lang.name })) ?? [],
         },
     });
     emit("toggle-open", false);
