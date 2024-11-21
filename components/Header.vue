@@ -40,10 +40,14 @@ const handleLogout = async () => {
     });
     await navigateTo("/login", { external: true });
 };
+
+defineProps({
+  class: String
+})
 </script>
 
 <template>
-    <header
+    <header :class="class"
         class="flex flex-row justify-between items-center border-b-2 border-gray-200 text-white py-2 px-4 sm:px-16 bg-white">
         <div class="flex items-center">
             <button @click="toggleSidebar" class="sm:hidden">
