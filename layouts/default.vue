@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const {status} = useAuth()
-console.log(status.value)
 </script>
 
 <template>
