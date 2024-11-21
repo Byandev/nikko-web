@@ -23,7 +23,7 @@ const avatarUrl = computed(
 
 const name = computed(
     () => proposal.value?.data.project.account.user.first_name && proposal.value?.data.project.account.user.last_name ?
-        `${proposal.value?.data.project.account.user.first_name} ${proposal.value?.data.project.account.user.first_name}` :
+        `${proposal.value?.data.project.account.user.first_name} ${proposal.value?.data.project.account.user.last_name}` :
         'No name provided'
 );
 
