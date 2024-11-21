@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<{
 <template>
     <button :type="props.type" :class="[
         `flex justify-center items-center gap-3 rounded-lg bg-${props.background} px-5 py-2 text-sm font-base text-${props.foreground}`,
-        `hover:bg-${props.background}-500`,
+        `hover:bg-${props.background}`,
         `${props.isWide ? 'w-full' : ''}`,
         props.isLoading ? 'opacity-50 cursor-not-allowed' : ''
     ]" :disabled="props.isLoading">

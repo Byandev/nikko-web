@@ -1,3 +1,6 @@
+import type { Account } from "./Account";
+import type { Project } from "./Project";
+import type { Proposal } from "./Proposal";
 
 export interface Contract {
   id: number;
@@ -9,6 +12,8 @@ export interface Contract {
   total_amount: number;
   end_date: string;
   status: string;
+  account: Account;
+  proposal: Proposal;
   created_at: string;
   updated_at: string;
 }

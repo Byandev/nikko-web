@@ -12,8 +12,9 @@ import {
 } from '@headlessui/vue';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
 import type { Skill } from "~/types/models/Skill";
-import _ from "lodash";
 import codes from 'iso-language-codes';
+import { helpers, required } from "@vuelidate/validators";
+import _ from "lodash";
 
 const props = defineProps<{
     project?: Project;
@@ -43,7 +44,27 @@ const onRemoveSelectedSkill = (idx: number) => {
     project.value?.skills.splice(idx, 1);
 }
 
+const onRemoveLanguage = (index: number) => {
+    project.value?.languages?.splice(index, 1);
+}
+
+const rules = {
+    title: { required: props.toEdit === 'title' ? helpers.withMessage('Title is required', required) : {} },
+    description: { required: props.toEdit === 'description' ? helpers.withMessage('Description is required', required) : {} },
+    length: { required: props.toEdit === 'length' ? helpers.withMessage('Length is required', required) : {} },
+    experience_level: { required: props.toEdit === 'experience_level' ? helpers.withMessage('Experience level is required', required) : {} },
+    languages: { required: props.toEdit === 'languages' ? helpers.withMessage('Languages is required', required) : {} },
+    skills: { required: props.toEdit === 'skills' ? helpers.withMessage('Skills is required', required) : false },
+    estimated_budget: { required: props.toEdit === 'estimated_budget' ? helpers.withMessage('Estimated budget is required', required) : {} },
+};
+
+const { formRef, v$ } = useValidation(project,rules);
+
 const saveProject = () => {
+    v$.value.$touch();
+    console.log('Errors', v$.value.$errors);
+    if (v$.value.$invalid) return;
+
     console.log("Saving project: ", project.value);
     updateProject(`v1/client/projects/${project.value?.id}`, {
         method: "PUT",
@@ -69,17 +90,22 @@ const saveProject = () => {
         <template #content>
             <div class="space-y-6">
                 <div class="flex flex-col">
-                    <div class="my-1 text-sm text-gray-900" v-if="toEdit === 'title' && project?.title">
-                        <input v-model="project.title" type="text" id="title" name="title"
+                    <div class="my-1 text-sm text-gray-900"
+                        v-if="toEdit === 'title' && project?.title || project?.title == ''">
+                        <input v-model="formRef.title" type="text" id="title" name="title"
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2" />
+                        <!-- <span v-if="v$.title.$error" class="text-red-900 text-sm">{{ v$.title.$errors[0].$message
+                            }}</span> -->
                     </div>
-                    
-                    <div class="my-1 text-sm text-gray-900" v-if="toEdit === 'description' && project?.description">
+
+                    <div class="my-1 text-sm text-gray-900"
+                        v-if="toEdit === 'description' && project?.description || project?.description == ''">
                         <textarea v-model="project.description" id="description" name="description"
                             class="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 p-2" />
                     </div>
 
-                    <div class="my-1 text-sm text-gray-900" v-if="toEdit === 'skills' && project?.skills">
+                    <div class="my-1 text-sm text-gray-900"
+                        v-if="toEdit === 'skills' && project?.skills || project?.skills.length == 0">
                         <div class="mt-2">
                             <Listbox v-model="project.skills" multiple class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
@@ -145,7 +171,8 @@ const saveProject = () => {
                         </div>
                     </div>
 
-                    <div class="my-1 text-sm text-gray-900" v-if="toEdit === 'length' && project?.length">
+                    <div class="my-1 text-sm text-gray-900"
+                        v-if="toEdit === 'length' && project?.length || project?.length.length == 0">
                         <div class="mt-2">
                             <Listbox v-model="project.length" class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
@@ -236,7 +263,8 @@ const saveProject = () => {
                         </div>
                     </div>
 
-                    <div class="my-1 text-sm text-gray-900" v-if="toEdit === 'languages' && project?.languages">
+                    <div class="my-1 text-sm text-gray-900"
+                        v-if="toEdit === 'languages' && project?.languages || project?.languages.length == 0">
                         <div class="mt-2">
                             <Listbox v-model="project.languages" multiple class="ring-1 ring-gray-300 rounded-md">
                                 <div class="relative mt-1">
@@ -262,12 +290,13 @@ const saveProject = () => {
                                         <ListboxOptions
                                             class="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base ring-1 ring-primary ring-opacity-5 focus:outline-none sm:text-sm z-50">
                                             <ListboxOption v-for="(language, index) in codes"
-                                                v-slot="{ active, selected }" :key="index" :value="language" as="template">
+                                                v-slot="{ active, selected }" :key="index" :value="language"
+                                                as="template">
                                                 <li
                                                     :class="[active ? 'bg-primary/10 text-primary' : 'text-gray-900', 'relative cursor-default select-none py-2 pl-10 pr-4']">
                                                     <span
                                                         :class="[selected ? 'font-medium' : 'font-normal', 'block truncate']">{{
-                                                            language.name
+                                                        language.name
                                                         }}</span>
                                                     <span v-if="selected"
                                                         class="absolute inset-y-0 left-0 flex items-center pl-3 text-primary">
@@ -281,12 +310,12 @@ const saveProject = () => {
                             </Listbox>
                             <div class="mt-4">
                                 <div class="flex flex-wrap mt-2">
-                                    <div v-for="(language, idx) in project.languages" :key="`selected-language-${language.id}`"
-                                        class="mr-2 my-1">
+                                    <div v-for="(language, idx) in project.languages"
+                                        :key="`selected-language-${language.id}`" class="mr-2 my-1">
                                         <span
                                             class="inline-flex items-center gap-x-0.5 rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                                             {{ language.name }}
-                                            <button @click="onRemoveSelectedSkill(idx)" type="button"
+                                            <button @click="onRemoveLanguage(idx)" type="button"
                                                 class="group relative -mr-1 h-3.5 w-3.5 rounded-sm hover:bg-green-600/20">
                                                 <span class="sr-only">Remove</span>
                                                 <svg viewBox="0 0 14 14"

@@ -3,7 +3,6 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
-import { routerKey } from 'vue-router';
 
 const { account } = storeToRefs(accountStore());
 const { data: proposal, fetchData: fetchProposal, pending: isLoading } = useFetchData<{ data: Proposal }, ApiErrorResponse>();
@@ -41,7 +40,7 @@ onMounted(async () => {
 });
 
 const handlePayNow = async () => {
-    await router.push(`/projects/${proposal.value?.data.project.id}/proposals`);
+    await router.push(`/projects/${proposal.value?.data.project.title}/proposals`);
 };
 
 </script>

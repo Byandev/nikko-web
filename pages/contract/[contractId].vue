@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
 import { Icon } from '@iconify/vue';
@@ -9,44 +8,46 @@ import type { Contract } from '~/types/models/Contract';
 
 const { account } = storeToRefs(accountStore());
 const route = useRoute();
-const { data: proposal, fetchData: fetchProposal, pending: isLoading } = useFetchData<{ data: Proposal }, ApiErrorResponse>();
-const { sendRequest: sendOffer, pending: isSubmitting } = useSubmit<{ data: Contract }, ApiErrorResponse>();
+const { data: contract, fetchData: fetchContract, pending: isLoading } = useFetchData<{ data: Contract }, ApiErrorResponse>();
+const { sendRequest: updateOffer, pending: isSubmitting } = useSubmit<{ data: Contract }, ApiErrorResponse>();
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
 );
 
+onMounted(async () => {
+    await fetchContract(`v1/client/contracts/${route.params.contractId}`, {
+        headers: requestHeaders.value
+    });
+    console.log(contract.value)
+});
+
+
 const avatarUrl = computed(
-    () => proposal.value?.data.project.account.user?.avatar?.original_url ??
+    () => contract.value?.data.account.user?.avatar?.original_url ??
         'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
 );
 
 const name = computed(
-    () => proposal.value?.data.project.account.user.first_name && proposal.value?.data.project.account.user.last_name ?
-        `${proposal.value?.data.project.account.user.first_name} ${proposal.value?.data.project.account.user.first_name}` :
+    () => contract.value?.data.account.user.first_name && contract.value?.data.account.user.last_name ?
+        `${contract.value?.data.account.user.first_name} ${contract.value?.data.account.user.first_name}` :
         'No name provided'
 );
 
 const location = computed(
-    () => proposal.value?.data.project.account.user.country_code ?? 'No location provided'
+    () => contract.value?.data.account.user.country_code ?? 'No location provided'
 );
 
 const bio = computed(
-    () => proposal.value?.data.project.account.bio ?? 'No bio provided'
+    () => contract.value?.data.account.bio ?? 'No bio provided'
 );
 
 const showAllDescription = ref(false);
-const hasLongDescription = computed(() => (proposal.value?.data.project.description?.length ?? 0) > 300);
+const hasLongDescription = computed(() => (contract.value?.data.proposal.project.description?.length ?? 0) > 300);
 
 const openEditProjectModal = ref<boolean>(false)
 const selectedFieldToEdit = ref<string>('')
 const modalHeader = ref<string>('')
-
-onMounted(async () => {
-    await fetchProposal(`v1/client/proposals/${route.params.proposalId}`, {
-        headers: requestHeaders.value
-    });
-});
 
 const form = ref<{ amount: number | null; end_date: string }>({
     amount: null,
@@ -62,36 +63,59 @@ const { v$ } = useValidation(form, rules);
 
 
 const router = useRouter();
-const submitOffer = async () => {
+
+const handleUpdate = async () => {
     v$.value.$touch();
     if (v$.value.$invalid) return;
 
     try {
-        const response = await sendOffer(!proposal.value?.data.contract ? `/v1/client/contracts` : `/v1/client/contracts/${proposal.value.data.contract.id}`, {
-            method: !proposal.value?.data.contract ? 'POST' : 'PUT',
+        await updateOffer(`/v1/client/contracts/${contract?.value?.data.id}`, {
+            method: 'PUT',
             headers: requestHeaders.value,
             body: {
-                proposal_id: proposal.value?.data.id,
+                proposal_id: contract.value?.data.id,
                 amount: form.value.amount,
                 end_date: form.value.end_date
             }
         });
 
-        await router.push(`/send-offer/${proposal.value?.data.id}/hire/${response.data.id}`); 
+        await router.push(`/projects/${contract.value?.data.proposal.project.id}/proposals`);
 
-    }catch (error) {
+    } catch (error) {
         console.error(error);
     }
 }
+
+const handleDelete = async () => {
+    try {
+        await updateOffer(`/v1/client/contracts/${contract?.value?.data.id}`, {
+            method: 'DELETE',
+            headers: requestHeaders.value
+        });
+
+        await router.push(`/projects/${contract.value?.data.proposal.project.id}/proposals`);
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+const showDeleteConfirmation = ref(false);
 </script>
 
 <template>
-    <EditProjectModal :project="proposal?.data.project" :header="modalHeader" :isOpen="openEditProjectModal"
+    <DeleteConfirmationModal
+        v-if="showDeleteConfirmation"
+        :showModal="showDeleteConfirmation"
+        @confirm="handleDelete"
+        @cancel="showDeleteConfirmation = false"
+    />
+    <EditProjectModal :project="contract?.data.proposal.project" :header="modalHeader" :isOpen="openEditProjectModal"
         :toEdit="selectedFieldToEdit" @toggle-open="openEditProjectModal = $event" />
     <div class="my-8 lg:mx-auto mx-5">
         <div class="max-w-6xl grid grid-cols-1 gap-4 mt-5 mx-auto">
             <div class="w-full justify-between flex-row flex">
-                <h1 class="text-4xl font-medium whitespace-nowrap">Send a offer</h1>
+                <h1 class="text-4xl font-medium whitespace-nowrap">Update offer</h1>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="pb-6 md:pb-8 ring-1 ring-gray-300 p-4 rounded-md flex flex-col items-center h-fit">
@@ -102,9 +126,9 @@ const submitOffer = async () => {
                 </div>
 
                 <div class="col-span-1 md:col-span-3 ring-1 ring-gray-300 rounded-md">
-                    <div class="pt-5 pb-5 px-5 border-b-2" v-if="proposal?.data.project.title && !isLoading">
+                    <div class="pt-5 pb-5 px-5 border-b-2" v-if="contract?.data.proposal.project.title && !isLoading">
                         <div class="flex items-center justify-between">
-                            <p class="text-xl font-bold">{{ proposal?.data.project.title }}</p>
+                            <p class="text-xl font-bold">{{ contract?.data.proposal.project.title }}</p>
                             <Icon icon="akar-icons:edit" class="text-gray-500 text-xl hover:cursor-pointer" @click="{
                                 openEditProjectModal = true;
                                 selectedFieldToEdit = 'title';
@@ -119,7 +143,7 @@ const submitOffer = async () => {
                         </div>
                     </div>
 
-                    <div class="py-5 px-5 border-b-2" v-if="proposal?.data.project.description">
+                    <div class="py-5 px-5 border-b-2" v-if="contract?.data.proposal.project.description">
                         <div class="flex items-center justify-between">
                             <h4 class="font-semibold">Description:</h4>
                             <Icon icon="akar-icons:edit" class="text-gray-500 text-xl hover:cursor-pointer" @click="{
@@ -129,8 +153,8 @@ const submitOffer = async () => {
                             }" />
                         </div>
                         <p class="">
-                            {{ hasLongDescription && showAllDescription ? proposal.data.project.description :
-                            proposal.data.project.description?.slice(0, 300) }}
+                            {{ hasLongDescription && showAllDescription ? contract.data.proposal.project.description :
+                            contract.data.proposal.project.description?.slice(0, 300) }}
                         </p>
                         <p class="underline text-primary" v-if="hasLongDescription"
                             @click="showAllDescription = !showAllDescription">
@@ -146,7 +170,7 @@ const submitOffer = async () => {
                     </div>
 
                     <div class="py-5 px-5 border-b-2 space-y-5">
-                        <div v-if="proposal?.data.project.skills && proposal?.data.project.skills.length">
+                        <div v-if="contract?.data.proposal.project.skills && contract?.data.proposal.project.skills.length">
                             <div class="flex items-center justify-between">
                                 <div class="font-medium">Skills:</div>
                                 <Icon icon="akar-icons:edit" class="text-gray-500 text-xl hover:cursor-pointer" @click="{
@@ -156,7 +180,7 @@ const submitOffer = async () => {
                                 }" />
                             </div>
                             <div class="flex flex-wrap gap-1">
-                                <span v-for="(skill, index) in proposal?.data.project.skills" :key="index"
+                                <span v-for="(skill, index) in contract?.data.proposal.project.skills" :key="index"
                                     class="bg-primary/15 text-primary text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
                                     {{ skill.name }}
                                 </span>
@@ -170,16 +194,16 @@ const submitOffer = async () => {
                             </div>
                         </div>
 
-                        <div v-if="proposal?.data.project.length">
+                        <div v-if="contract?.data.proposal.project.length">
                             <div class="flex items-center justify-between">
                                 <h4 class="font-semibold">Project length:</h4>
                                 <Icon icon="akar-icons:edit" class="text-gray-500 text-xl hover:cursor-pointer" @click="{
                                     openEditProjectModal = true;
                                     selectedFieldToEdit = 'length';
-                                    modalHeader = 'Project length';
+                                    modalHeader = 'proposal.Project length';
                                 }" />
                             </div>
-                            <p>{{ _.capitalize(_.startCase(proposal?.data.project.length)) }}</p>
+                            <p>{{ _.capitalize(_.startCase(contract?.data.proposal.project.length)) }}</p>
                         </div>
 
                         <div v-else>
@@ -189,7 +213,7 @@ const submitOffer = async () => {
                             </div>
                         </div>
 
-                        <div v-if="proposal?.data.project.experience_level">
+                        <div v-if="contract?.data.proposal.project.experience_level">
                             <div class="flex items-center justify-between">
                                 <h4 class="font-semibold">Experience Level:</h4>
                                 <Icon icon="akar-icons:edit" class="text-gray-500 text-xl hover:cursor-pointer" @click="{
@@ -198,7 +222,7 @@ const submitOffer = async () => {
                                     modalHeader = 'Experience Level';
                                 }" />
                             </div>
-                            <p>{{ _.capitalize(_.startCase(proposal?.data.project.experience_level)) }}</p>
+                            <p>{{ _.capitalize(_.startCase(contract?.data.proposal.project.experience_level)) }}</p>
                         </div>
 
                         <div v-else>
@@ -209,7 +233,7 @@ const submitOffer = async () => {
                         </div>
                     </div>
                     <div class="py-5 px-5 border-b-2 space-y-5">
-                        <div v-if="proposal?.data.project.languages && proposal?.data.project.languages.length">
+                        <div v-if="contract?.data.proposal.project.languages && contract?.data.proposal.project.languages.length">
                             <div class="flex items-center justify-between">
                                 <h4 class="font-semibold">Language:</h4>
                                 <Icon icon="akar-icons:edit" class="text-gray-500 text-xl hover:cursor-pointer" @click="{
@@ -219,7 +243,7 @@ const submitOffer = async () => {
                                 }" />
                             </div>
                             <div class="flex flex-wrap gap-1">
-                                <span v-for="(skill, index) in proposal?.data.project.languages" :key="index"
+                                <span v-for="(skill, index) in contract?.data.proposal.project.languages" :key="index"
                                     class="bg-primary/15 text-primary text-xs font-medium mr-2 px-2.5 py-0.5 rounded">
                                     {{ skill.name }}
                                 </span>
@@ -233,7 +257,7 @@ const submitOffer = async () => {
                             </div>
                         </div>
                     </div>
-                    <form @submit.prevent="submitOffer">
+                    <form @submit.prevent="handleUpdate">
                         <div class="py-5 px-5 space-y-5">
                             <div class="flex flex-col gap-5">
                                 <div>
@@ -254,15 +278,18 @@ const submitOffer = async () => {
                                         class="w-full mt-2 p-2 border rounded-md" />
                                     <span v-if="v$.end_date.$error" class="text-red-900 text-sm">{{
                                         v$.end_date.$errors[0].$message
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="w-full flex justify-end py-5 gap-2 px-4">
+                            <Button text="Delete Offer" foreground="red-600" background="red-700" type="button"
+                                @click="showDeleteConfirmation= true" class="ring-1 ring-red-600" />
                             <Button text="Cancel" foreground="primary" background="white" type="button"
                                 class="ring-1 ring-primary" />
-                            <Button :isLoading="isSubmitting" text="Send Offer" foreground="white" background="primary" type="submit" />
+                            <Button :isLoading="isSubmitting" text="Update Offer" foreground="white"
+                                background="primary" type="submit" />
                         </div>
                     </form>
                 </div>

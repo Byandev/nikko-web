@@ -9,16 +9,21 @@ const { account } = storeToRefs(accountStore());
 const emit = defineEmits<{
     (e: 'click', id: number): void;
     (e: 'hire', id: number): void;
+    (e: 'view', id: number): void;
     (e: 'save', id: number): void;
     (e: 'un-save', id: number): void;
 }>();
 
-const defaultAvatarUrl = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
 
 const props = defineProps<{
     proposal: Proposal;
     showSaveButton?: boolean;
 }>();
+
+const avatarUrl = computed(
+    () => props.proposal.project.account.user?.avatar?.original_url ??
+        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+);
 
 const { proposal, showSaveButton } = toRefs(props)
 
@@ -57,7 +62,7 @@ const toggleSave = async () => {
         <div class="w-9/12 px-5 py-5 space-y-4">
             <div class="flex flex-row justify-between gap-4">
                 <div class="flex flex-row gap-3 items-center w-full">
-                    <img :src="props.proposal.project.account.user?.avatar?.original_url || defaultAvatarUrl"
+                    <img :src="avatarUrl"
                         alt="profile" class="w-16 h-16 rounded-full">
                     <div class="flex flex-col justify-center flex-grow w-full">
                         <div class="flex justify-between">
@@ -105,8 +110,8 @@ const toggleSave = async () => {
         </div>
 
         <div class="w-3/12 divide-y p-4 flex flex-col item-center gap-2 justify-center">
-            <Button @click="emit('hire', proposal.id)" text="Hire" type="button" background="primary"
-                foreground="white" />
+            <Button @click="!proposal.contract ? emit('hire', proposal.id) : emit('view', proposal.contract.id)" :text="!proposal.contract ? `Hire`: `View Contract`" type="button" :background="!proposal.contract ? `white` : `primary`"
+                :foreground="!proposal.contract ? `primary` : `white`" class="ring-1 ring-primary" />
 
         </div>
     </div>
