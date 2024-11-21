@@ -83,6 +83,10 @@ const submitOffer = async () => {
         console.error(error);
     }
 }
+
+const goback = () => {
+    router.push(`/projects/${proposal.value?.data.project.id}/proposals`);
+}
 </script>
 
 <template>
@@ -260,7 +264,7 @@ const submitOffer = async () => {
                         </div>
 
                         <div class="w-full flex justify-end py-5 gap-2 px-4">
-                            <Button text="Cancel" foreground="primary" background="white" type="button"
+                            <Button text="Cancel" @click="goback" foreground="primary" background="white" type="button"
                                 class="ring-1 ring-primary" />
                             <Button :isLoading="isSubmitting" text="Send Offer" foreground="white" background="primary" type="submit" />
                         </div>
