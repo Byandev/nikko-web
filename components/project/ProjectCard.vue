@@ -6,7 +6,7 @@ import {accountStore} from "~/store/accountStore";
 import type {Proposal} from "~/types/models/Proposal";
 import { useRouter } from 'vue-router';
 
-const props = defineProps<{ project: Project; showSaveButton?: boolean, showWithdrawApplication?: boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT' }>();
+const props = defineProps<{ project: Project; showSaveButton?: boolean, showWithdrawApplication?: boolean, showRejectButton:boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT' }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'save', id: number): void;
@@ -81,6 +81,12 @@ const router = useRouter();
               @click="withdrawProposal(project.my_proposal.id)"
               class="py-2 px-4 rounded-2xl border border-primary-dark bg-white text-primary">
               Withdraw
+            </button>
+
+            <button v-if="project.my_proposal && showRejectButton"
+              @click="withdrawProposal(project.my_proposal.id)"
+              class="py-2 px-4 rounded-2xl border border-primary-dark bg-white text-primary">
+              Reject
             </button>
           </div>
 
