@@ -42,6 +42,11 @@ onMounted(async () => {
 const handlePayNow = async () => {
     await router.push(`/projects/${proposal.value?.data.project.id}/proposals`);
 };
+
+const platformFee = computed(() => 
+{
+    return (proposal.value?.data.contract?.amount ?? 0) * (proposal.value?.data.contract?.platform_fee_percentage ?? 0);
+});
 </script>
 
 <template>
@@ -68,8 +73,8 @@ const handlePayNow = async () => {
                                         <p class="text-lg font-medium">${{ proposal?.data.contract?.amount }}</p>
                                     </div>
                                     <div class="flex flex-row justify-between">
-                                        <p class="text-sm text-gray-500">Platform Fee Percentage</p>
-                                        <p class="text-lg font-medium">${{ proposal?.data.contract.platform_fee_percentage }}</p>
+                                        <p class="text-sm text-gray-500">Platform Fee</p>
+                                        <p class="text-lg font-medium">${{ platformFee }}</p>
                                     </div>
                                 </div>
                             </div>
