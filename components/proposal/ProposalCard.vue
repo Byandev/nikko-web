@@ -58,10 +58,10 @@ const toggleSave = async () => {
 
 <template>
     <div
-        class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex divide-x text-sm text-gray-800">
-        <div class="w-9/12 px-5 py-5 space-y-4">
-            <div class="flex flex-row justify-between gap-4">
-                <div class="flex flex-row gap-3 items-center w-full">
+        class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex flex-col md:flex-row divide-y md:divide-x text-sm text-gray-800">
+        <div class="w-full md:w-9/12 px-5 py-5 space-y-4">
+            <div class="flex flex-col md:flex-row justify-between gap-4">
+                <div class="flex flex-col md:flex-row gap-3 items-center w-full">
                     <img :src="avatarUrl"
                         alt="profile" class="w-16 h-16 rounded-full">
                     <div class="flex flex-col justify-center flex-grow w-full">
@@ -109,7 +109,7 @@ const toggleSave = async () => {
             </p>
         </div>
 
-        <div class="w-3/12 divide-y p-4 flex flex-col item-center gap-2 justify-center">
+        <div class="w-full md:w-3/12 divide-y p-4 flex flex-col item-center gap-2 justify-center">
             <Button @click="!proposal.contract ? emit('hire', proposal.id) : emit('view', proposal.contract.id)" :text="!proposal.contract ? `Hire`: `View Contract`" type="button" :background="!proposal.contract ? `white` : `primary`"
                 :foreground="!proposal.contract ? `primary` : `white`" class="ring-1 ring-primary" />
 
