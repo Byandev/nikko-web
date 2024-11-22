@@ -6,20 +6,18 @@ import _ from 'lodash';
 import { Icon } from '@iconify/vue';
 import { helpers, required } from '@vuelidate/validators';
 import type { Contract } from '~/types/models/Contract';
+import type { Account } from '~/types/models/Account';
 
 const { account } = storeToRefs(accountStore());
 const route = useRoute();
 const { data: proposal, fetchData: fetchProposal, pending: isLoading } = useFetchData<{ data: Proposal }, ApiErrorResponse>();
 const { sendRequest: sendOffer, pending: isSubmitting } = useSubmit<{ data: Contract }, ApiErrorResponse>();
+const { data: accountDetails, fetchData: fetchAccountDetails } = useFetchData<{ data: Account }, ApiErrorResponse>();
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
 );
 
-const avatarUrl = computed(
-    () => proposal.value?.data.project.account.user?.avatar?.original_url ??
-        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
-);
 
 const name = computed(
     () => proposal.value?.data.project.account.user.first_name && proposal.value?.data.project.account.user.last_name ?
@@ -46,6 +44,10 @@ onMounted(async () => {
     await fetchProposal(`v1/client/proposals/${route.params.proposalId}`, {
         headers: requestHeaders.value
     });
+
+    await fetchAccountDetails(`v1/accounts/${proposal.value?.data.account_id}`, {
+        headers: requestHeaders.value
+    });
 });
 
 const form = ref<{ amount: number | null; end_date: string }>({
@@ -58,8 +60,29 @@ const rules = {
     end_date: { required: helpers.withMessage('End date is required', required) },
 };
 
-const { v$ } = useValidation(form, rules);
+const accountName = computed(() => {
+    return accountDetails.value?.data.user.first_name + ' ' + accountDetails.value?.data.user.last_name;
+});
 
+const accountAvatar = computed(() => {
+    return accountDetails.value?.data.user.avatar?.original_url;
+});
+
+const accountBio = computed(() => {
+    return accountDetails.value?.data.bio;
+});
+
+const accountLocation = computed(() => {
+    return accountDetails.value?.data.user.country_code;
+});
+
+const avatarUrl = computed(
+    () => accountAvatar ??
+        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+);
+
+
+const { v$ } = useValidation(form, rules);
 
 const router = useRouter();
 const submitOffer = async () => {
@@ -99,10 +122,10 @@ const goback = () => {
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="pb-6 md:pb-8 ring-1 ring-gray-300 p-4 rounded-md flex flex-col items-center h-fit">
-                    <img :src="avatarUrl" :alt="name" class="w-16 h-16 rounded-full">
-                    <h2 class="text-lg font-medium mt-4">{{ name }}</h2>
-                    <p v-if="bio" class="text-sm text-gray-500 mt-1">{{ bio }}</p>
-                    <p v-if="location" class="text-sm text-gray-500 mt-1">Location: {{ location }}</p>
+                    <img :src="avatarUrl.value" :alt="accountName" class="w-16 h-16 rounded-full">
+                    <h2 class="text-lg font-medium mt-4">{{ accountName }}</h2>
+                    <p v-if="bio" class="text-sm text-gray-500 mt-1">{{ accountBio }}</p>
+                    <p v-if="location" class="text-sm text-gray-500 mt-1">Location: {{ accountLocation }}</p>
                 </div>
 
                 <div class="col-span-1 md:col-span-3 ring-1 ring-gray-300 rounded-md">
