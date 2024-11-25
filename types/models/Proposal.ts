@@ -1,3 +1,4 @@
+import type { Account } from "./Account";
 import type { Contract } from "./Contract";
 import type { Media } from "./Media";
 import type { Project } from "./Project";
@@ -13,6 +14,7 @@ export interface Proposal {
     is_saved: boolean;
     cover_letter: string;
     project: Project;
+    account: Account;
     contract: Contract;
     attachments: Media[];
 }

@@ -27,7 +27,7 @@ const showAllBio = ref(false);
 const hasLongBio = computed(() => props.proposal.cover_letter.length > 300);
 
 const { sendRequest: toggleSaveProposal } = useSubmit<{ data: Proposal }, ApiErrorResponse>();
-const { data: accountDetails, fetchData: fetchAccountDetails } = useFetchData<{ data: Account }, ApiErrorResponse>();
+const { data: accountDetails, fetchData: fetchAccountDetails, pending: isLoading } = useFetchData<{ data: Account }, ApiErrorResponse>();
 
 onMounted(async () => {
     if (props.proposal.account_id) {
@@ -36,7 +36,9 @@ onMounted(async () => {
 });
 
 const accountName = computed(() => {
-    return accountDetails.value?.data.user.first_name + ' ' + accountDetails.value?.data.user.last_name;
+    const firstName = accountDetails.value?.data.user.first_name ?? '';
+    const lastName = accountDetails.value?.data.user.last_name ?? '';
+    return `${firstName} ${lastName}`.trim();
 });
 
 const accountAvatar = computed(() => {
@@ -86,15 +88,18 @@ const toggleSave = async () => {
         <div class="w-full md:w-9/12 px-5 py-5 space-y-4">
             <div class="flex flex-col md:flex-row justify-between gap-4">
                 <div class="flex flex-col md:flex-row gap-3 items-center w-full">
-                    <img :src="avatarUrl"
-                        alt="profile" class="w-16 h-16 rounded-full">
+                    <img v-if="accountAvatar" :src="avatarUrl.value"
+                        alt="profile" class="w-16 h-16 rounded-full"/>
+                    <div v-else class="w-16 h-16 rounded-full bg-gray-200 animate-pulse"></div>
                     <div class="flex flex-col justify-center flex-grow w-full">
                         <div class="flex justify-between">
-                            <span class="text-lg font-bold hover:underline" v-if="props.proposal.account_id"
-                                @click="emit('click', proposal.id)">
-                                {{ accountName }}
+                            <span class="text-lg font-bold hover:underline" v-if="accountName"
+                                @click="emit('click', accountDetails?.data.id ?? 0)">
+                                {{ accountName || 'Loading...' }}
                             </span>
-
+                            <span v-else>
+                                <div class="h-6 w-32 bg-gray-200 animate-pulse"></div>
+                            </span>
                             <div class="flex items-center gap-2">
                                 <span class="text-xl font-bold text-primary">
                                     ${{ props?.proposal?.project?.estimated_budget }}
@@ -104,9 +109,8 @@ const toggleSave = async () => {
                                     :class="props.proposal.is_saved ? 'fill-primary' : ''" />
                             </div>
                         </div>
-                        <span class="text-sm text-gray-500" v-if="props.proposal.project.account.user">{{
-                            acountBio
-                            }}</span>
+                        <span class="text-sm text-gray-500" v-if="acountBio">{{ acountBio }}</span>
+                        <span v-else class="h-4 w-48 bg-gray-200 animate-pulse"></span>
                     </div>
                 </div>
             </div>
@@ -124,7 +128,11 @@ const toggleSave = async () => {
                     </div>
                 </div>
             </div>
-            <p class="">
+            <div v-else class="mt-4 w-full">
+                <div class="h-4 w-32 bg-gray-200 animate-pulse mb-2"></div>
+                <div class="h-4 w-24 bg-gray-200 animate-pulse"></div>
+            </div>
+            <p v-if="proposal.cover_letter">
                 {{ hasLongBio && showAllBio ? proposal.cover_letter : proposal.cover_letter.slice(0, 300) }}
             </p>
             <p class="underline text-primary" v-if="hasLongBio" @click="showAllBio = !showAllBio">
@@ -133,6 +141,9 @@ const toggleSave = async () => {
         </div>
 
         <div class="w-full md:w-3/12 divide-y p-4 flex flex-col item-center gap-2 justify-center">
+            <Button text="View Profile" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
+                @click="emit('click', accountDetails?.data.id ?? 0)" type="button"/>
+
             <Button @click="!proposal.contract ? emit('hire', proposal.id) : emit('view', proposal.contract.id)" :text="!proposal.contract ? `Hire`: `View Contract`" type="button" :background="!proposal.contract ? `white` : `primary`"
                 :foreground="!proposal.contract ? `primary` : `white`" class="ring-1 ring-primary" />
 

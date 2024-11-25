@@ -6,7 +6,7 @@ import {accountStore} from "~/store/accountStore";
 import { useRouter } from 'vue-router';
 import type { Proposal } from '~/types/models/Proposal';
 
-const props = defineProps<{ project: Project; proposalId?: number, showSaveButton?: boolean, showProposeButton?: boolean, showWithdrawApplication?: boolean, showRejectButton:boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT' }>();
+const props = defineProps<{ project: Project; proposalId?: number, showSaveButton?: boolean, showProposeButton?: boolean, showWithdrawApplication?: boolean, showRejectButton?:boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT' }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'save', id: number): void;
@@ -64,7 +64,7 @@ const router = useRouter();
 </script>
 
 <template>
-  <RejectionModal :proposal-id="proposalId ?? undefined" :isOpen="isRejectModalOpen"
+  <RejectionModal :proposal-id="proposalId ?? 0" :isOpen="isRejectModalOpen"
     @toggle-open="isRejectModalOpen = $event" />
   <div
     class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex flex-col sm:flex-row divide-y sm:divide-x text-sm text-gray-800">
