@@ -100,7 +100,7 @@ const rejectProposal = async (id: number | null) => {
                 :key="invitation.id"
                 :view-as="AccountType.FREELANCER"
                 :project="invitation.project"
-                :proposal-id="invitation.id"
+                :proposal="invitation"
                 :show-save-button="false"
                 :show-propose-button="true"
                 :show-submit-proposal-button="true"
@@ -119,7 +119,7 @@ const rejectProposal = async (id: number | null) => {
           </div>
 
           <div v-else>
-            <p class="text-gray-600 text-base tracking-wider text-center">You have no submitted proposals yet.</p>
+            <p class="text-gray-600 text-base tracking-wider text-center">You have no pending contract yet.</p>
           </div>
         </div>
       </div>
