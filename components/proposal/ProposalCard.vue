@@ -135,7 +135,7 @@ const toggleSave = async () => {
 
         <div class="w-full md:w-3/12 divide-y p-4 flex flex-col item-center gap-2 justify-center">
             <Button text="View Profile" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
-                @click="emit('click', proposal.id ?? 0)" type="button"/>
+                @click="emit('click', proposal.account.id ?? 0)" type="button"/>
 
             <Button @click="!proposal.contract ? emit('hire', proposal.id) : emit('view', proposal.contract.id)" :text="!proposal.contract ? `Hire`: `View Contract`" type="button" :background="!proposal.contract ? `white` : `primary`"
                 :foreground="!proposal.contract ? `primary` : `white`" class="ring-1 ring-primary" />
