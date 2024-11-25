@@ -5,6 +5,7 @@ import type { PaginatedList, PaginationMeta } from '~/types/models/Pagination';
 import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
 import type { Proposal } from '~/types/models/Proposal';
+import type { Account } from '~/types/models/Account';
 
 const { account } = storeToRefs(accountStore());
 

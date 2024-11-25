@@ -15,13 +15,6 @@ const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
 );
 
-onMounted(async () => {
-    await fetchContract(`v1/client/contracts/${route.params.contractId}`, {
-        headers: requestHeaders.value
-    });
-    console.log(contract.value)
-});
-
 
 const avatarUrl = computed(
     () => contract.value?.data.account.user?.avatar?.original_url ??
@@ -30,7 +23,7 @@ const avatarUrl = computed(
 
 const name = computed(
     () => contract.value?.data.account.user.first_name && contract.value?.data.account.user.last_name ?
-        `${contract.value?.data.account.user.first_name} ${contract.value?.data.account.user.first_name}` :
+        `${contract.value?.data.account.user.first_name} ${contract.value?.data.account.user.last_name}` :
         'No name provided'
 );
 
@@ -103,6 +96,14 @@ const handleDelete = async () => {
 const goback = () => {
     router.push(`/projects/${contract.value?.data.proposal.project.id}/proposals`);
 }
+
+onMounted(async () => {
+    await fetchContract(`v1/client/contracts/${route.params.contractId}`, {
+        headers: requestHeaders.value
+    });
+    form.value.amount = contract.value?.data.amount ?? null;
+    form.value.end_date = contract.value?.data.end_date ?? '';
+});
 
 const showDeleteConfirmation = ref(false);
 </script>
