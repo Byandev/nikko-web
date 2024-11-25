@@ -87,7 +87,7 @@ const toggleSave = async () => {
                     <div class="flex flex-col justify-center flex-grow w-full">
                         <div class="flex justify-between">
                             <span class="text-lg font-bold hover:underline" v-if="accountName"
-                                @click="emit('click', proposal.id ?? 0)">
+                                @click="emit('click', proposal.account.id ?? 0)">
                                 {{ accountName || 'Loading...' }}
                             </span>
                             <span v-else>
