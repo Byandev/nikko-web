@@ -28,13 +28,16 @@ onMounted(() => {
         <div class="px-4 py-5 sm:px-6">
           <div class="space-y-5">
             <div v-if="details && !isFetching">
-             <ProjectCard
+              <ProjectCard
                 :view-as="AccountType.FREELANCER"
                 :project="details.data"
                 :show-save-button="false"
                 :show-withdraw-application="false"
-            />
-          </div>
+              />
+            </div>
+            <div v-else class="animate-pulse space-y-4">
+              <div class="h-40 bg-gray-200 rounded w-full"></div>
+            </div>
           </div>
         </div>
       </div>
