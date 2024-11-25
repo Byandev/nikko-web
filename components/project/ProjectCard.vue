@@ -67,12 +67,12 @@ const router = useRouter();
   <RejectionModal :proposal-id="proposalId ?? undefined" :isOpen="isRejectModalOpen"
     @toggle-open="isRejectModalOpen = $event" />
   <div
-    class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex divide-x text-sm text-gray-800">
-    <div class="w-8/12 px-5 py-5 space-y-4">
+    class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex flex-col sm:flex-row divide-y sm:divide-x text-sm text-gray-800">
+    <div class="w-full sm:w-8/12 px-5 py-5 space-y-4">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between">
         <h2 @click="emit('click', project.id)" class="text-xl font-bold hover:underline">{{ project.title }}</h2>
 
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 mt-4 sm:mt-0">
           <div class="flex flex-col gap-2">
             <button v-if="showApplyButton" @click="emit('apply', project.id)" :disabled="!!project.my_proposal"
               class="py-2 px-4 rounded-2xl border border-primary-dark"
@@ -122,7 +122,7 @@ const router = useRouter();
       </p>
     </div>
 
-    <div class="w-4/12 divide-y" v-if="props.viewAs === 'FREELANCER'">
+    <div class="w-full sm:w-4/12 divide-y" v-if="props.viewAs === 'FREELANCER'">
       <div class="pt-5 pb-2 space-y-1 px-5">
         <p>Estimated Budget: <span>${{ project.estimated_budget }}</span></p>
         <p>Experience Level: <span>{{ ExperienceLevelToText[project.experience_level] }}</span></p>
@@ -139,7 +139,7 @@ const router = useRouter();
       </div>
     </div>
 
-    <div class="w-4/12 divide-y p-4 flex flex-col item-center gap-2 justify-center" v-if="props.viewAs === 'CLIENT'">
+    <div class="w-full sm:w-4/12 divide-y p-4 flex flex-col items-center gap-2 justify-center" v-if="props.viewAs === 'CLIENT'">
       <Button text="View Job" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
         @click="router.push(`/projects/${project.id}/details`)" type="button" />
       <Button text="All Proposal" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
