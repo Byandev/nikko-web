@@ -29,7 +29,7 @@ const route = useRoute();
 const router = useRouter();
 
 const filter = ref<Filter>({
-    include: 'project.account.user,attachments,contract',
+    include: 'project.account.user,attachments,contract,account.user.avatar,account.skills',
     project_id: parseInt(route.params.projectId as string),
     is_saved: false,
     page: 1
