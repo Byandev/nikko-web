@@ -3,17 +3,14 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
+import type { Account } from '~/types/models/Account';
 
 const { account } = storeToRefs(accountStore());
 const { data: proposal, fetchData: fetchProposal, pending: isLoading } = useFetchData<{ data: Proposal }, ApiErrorResponse>();
+const { data: accountDetails, fetchData: fetchAccountDetails } = useFetchData<{ data: Account }, ApiErrorResponse>();
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
-);
-
-const avatarUrl = computed(
-    () => proposal.value?.data.project.account.user?.avatar?.original_url ??
-        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
 );
 
 const name = computed(
@@ -30,6 +27,28 @@ const bio = computed(
     () => proposal.value?.data.project.account.bio ?? 'No bio provided'
 );
 
+const accountName = computed(() => {
+    return accountDetails.value?.data.user.first_name + ' ' + accountDetails.value?.data.user.last_name;
+});
+
+const accountAvatar = computed(() => {
+    return accountDetails.value?.data.user.avatar?.original_url;
+});
+
+const accountBio = computed(() => {
+    return accountDetails.value?.data.bio;
+});
+
+const accountLocation = computed(() => {
+    return accountDetails.value?.data.user.country_code;
+});
+
+const avatarUrl = computed(
+    () => accountAvatar ??
+        'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+);
+
+
 const route = useRoute();
 const router = useRouter();
 
@@ -37,11 +56,20 @@ onMounted(async () => {
     await fetchProposal(`v1/client/proposals/${route.params.proposalId}`, {
         headers: requestHeaders.value
     });
+    if (proposal.value?.data.account_id) {
+        await fetchAccountDetails(`v1/accounts/${proposal.value?.data.account_id}`);
+    }
 });
 
 const handlePayNow = async () => {
     await router.push(`/projects/${proposal.value?.data.project.id}/proposals`);
 };
+
+const platformFee = computed(() => {
+    const amount = proposal.value?.data.contract?.amount ?? 0;
+    const feePercentage = proposal.value?.data.contract?.platform_fee_percentage ?? 0;
+    return (amount * feePercentage).toFixed(2);
+});
 </script>
 
 <template>
@@ -55,10 +83,10 @@ const handlePayNow = async () => {
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <div class="ring-1 ring-gray-300 rounded-md h-fit">
                             <div class="flex flex-col items-center border-b-2 py-4">
-                                <img :src="avatarUrl" :alt="name" class="w-16 h-16 rounded-full">
-                                <h2 class="text-lg font-medium mt-4">{{ name }}</h2>
-                                <p v-if="bio" class="text-sm text-gray-500 mt-1">{{ bio }}</p>
-                                <p v-if="location" class="text-sm text-gray-500 mt-1">Location: {{ location }}</p>
+                                <img :src="avatarUrl.value" :alt="name" class="w-16 h-16 rounded-full">
+                                <h2 class="text-lg font-medium mt-4">{{ accountName }}</h2>
+                                <p v-if="bio" class="text-sm text-gray-500 mt-1">{{ accountBio }}</p>
+                                <p v-if="location" class="text-sm text-gray-500 mt-1">Location: {{ accountLocation }}</p>
                             </div>
                             <div class="py-4 px-4 border-b-2">
                                 <h3 class="text-lg font-medium">Payment Summary</h3>
@@ -68,8 +96,8 @@ const handlePayNow = async () => {
                                         <p class="text-lg font-medium">${{ proposal?.data.contract?.amount }}</p>
                                     </div>
                                     <div class="flex flex-row justify-between">
-                                        <p class="text-sm text-gray-500">Platform Fee Percentage</p>
-                                        <p class="text-lg font-medium">${{ proposal?.data.contract.platform_fee_percentage }}</p>
+                                        <p class="text-sm text-gray-500">Platform Fee</p>
+                                        <p class="text-lg font-medium">${{ platformFee }}</p>
                                     </div>
                                 </div>
                             </div>
