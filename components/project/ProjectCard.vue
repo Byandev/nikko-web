@@ -3,10 +3,10 @@ import {HeartIcon} from '@heroicons/vue/24/outline';
 import {ExperienceLevelToText, type Project, ProjectLengthToText} from "~/types/models/Project";
 import type {ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
-import type {Proposal} from "~/types/models/Proposal";
 import { useRouter } from 'vue-router';
+import type { Proposal } from '~/types/models/Proposal';
 
-const props = defineProps<{ project: Project; showSaveButton?: boolean, showWithdrawApplication?: boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT' }>();
+const props = defineProps<{ project: Project; proposalId?: number, showSaveButton?: boolean, showProposeButton?: boolean, showWithdrawApplication?: boolean, showRejectButton:boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT' }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'save', id: number): void;
@@ -30,6 +30,7 @@ const requestHeaders = computed<HeadersInit | undefined>(() =>
 
 const showAllDescription = ref(false);
 const hasLongDescription = computed(() => project.value.description.length > 300);
+const isRejectModalOpen = ref(false);
 
 const toggleSave = async () => {
   const isSaved = !project.value.is_saved;
@@ -63,6 +64,8 @@ const router = useRouter();
 </script>
 
 <template>
+  <RejectionModal :proposal-id="proposalId ?? undefined" :isOpen="isRejectModalOpen"
+    @toggle-open="isRejectModalOpen = $event" />
   <div
     class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex divide-x text-sm text-gray-800">
     <div class="w-8/12 px-5 py-5 space-y-4">
@@ -82,6 +85,18 @@ const router = useRouter();
               class="py-2 px-4 rounded-2xl border border-primary-dark bg-white text-primary">
               Withdraw
             </button>
+
+            <div class="flex gap-2 flex-row">
+              <button v-if="showProposeButton" @click="emit('submit-proposal', project.id)"
+                class="py-2 px-4 rounded-2xl border border-primary-dark bg-primary text-white">
+                Propose              
+              </button>
+
+              <button v-if="showRejectButton && project.id" @click="isRejectModalOpen = true"
+                class="py-2 px-4 rounded-2xl border border-primary-dark bg-white text-primary">
+                Reject
+              </button>
+            </div>
           </div>
 
           <HeartIcon v-if="showSaveButton" @click="toggleSave" class="w-5 h-5 text-primary-dark cursor-pointer"
