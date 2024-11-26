@@ -3,6 +3,8 @@ export interface PaginationMeta {
     last_page: number;
     per_page: number;
     total: number;
+    to: number;
+    from: number
   }
   
   export interface PaginatedList<T> {
@@ -17,6 +19,8 @@ export interface PaginationMeta {
       last_page: 0,
       per_page: 0,
       total: 0,
+      to: 0,
+      from: 0
     },
   };
   
