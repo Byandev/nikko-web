@@ -8,7 +8,7 @@ import type { Proposal } from '~/types/models/Proposal';
 import type { Partial } from 'lodash';
 import type { Contract } from '~/types/models/Contract';
 
-const props = defineProps<{ project: Project; contract?: Contract, showSaveButton?: boolean, showProposeButton?: boolean, showAcceptButton?: boolean, showWithdrawApplication?: boolean, showRejectButton?:boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT', showContractDetails?: boolean }>();
+const props = defineProps<{ project: Project; contract?: Contract, showSaveButton?: boolean, showProposeButton?: boolean, showAcceptButton?: boolean, showWithdrawApplication?: boolean, showRejectButton?: boolean, showApplyButton?: boolean, showCompleteButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT', showContractDetails?: boolean }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'save', id: number): void;
@@ -19,6 +19,7 @@ const emit = defineEmits<{
   (e: 'reject-proposal', id: number): void;
   (e: 'accept-contract', id: number): void;
   (e: 'reject-contract', id: number): void;
+  (e: 'complete-contract', id: number): void;
 }>();
 
 const {project, showSaveButton, showWithdrawApplication, contract} = toRefs(props)
@@ -93,15 +94,21 @@ const router = useRouter();
             <div class="flex gap-2 flex-row">
               <button v-if="showProposeButton" @click="emit('submit-proposal', project.id)"
                 class="py-2 px-4 rounded-2xl border border-primary-dark bg-primary text-white">
-                Propose              
+                Propose
               </button>
 
               <button v-if="showAcceptButton" @click="emit('accept-contract', contract?.id ?? 0)"
                 class="py-2 px-4 rounded-2xl border border-primary-dark bg-primary text-white">
-                Accept              
+                Accept
               </button>
 
-              <button v-if="showRejectButton && project.id" @click="showAcceptButton? emit('reject-contract', contract?.id ?? 0) : isRejectModalOpen = true"
+              <button v-if="showCompleteButton" @click="emit('complete-contract', contract?.id ?? 0)"
+                class="py-2 px-4 rounded-2xl border border-primary-dark bg-primary text-white">
+                Mark as Complete
+              </button>
+
+              <button v-if="showRejectButton && project.id"
+                @click="showAcceptButton? emit('reject-contract', contract?.id ?? 0) : isRejectModalOpen = true"
                 class="py-2 px-4 rounded-2xl border border-primary-dark bg-white text-primary">
                 Reject
               </button>
@@ -147,12 +154,13 @@ const router = useRouter();
         <p v-if="!showContractDetails">Proposals: <span>{{ project.proposals_count ?? 0 }}</span></p>
         <div v-else>
           <p>Amount: <span>{{ contract?.amount ?? 0 }}</span></p>
-          <p>End Date: <span>{{ contract?.end_date ?? 0  }}</span></p>
+          <p>End Date: <span>{{ contract?.end_date ?? 0 }}</span></p>
         </div>
       </div>
     </div>
 
-    <div class="w-full sm:w-4/12 divide-y p-4 flex flex-col items-center gap-2 justify-center" v-if="props.viewAs === 'CLIENT'">
+    <div class="w-full sm:w-4/12 divide-y p-4 flex flex-col items-center gap-2 justify-center"
+      v-if="props.viewAs === 'CLIENT'">
       <Button text="View Job" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
         @click="router.push(`/projects/${project.id}/details`)" type="button" />
       <Button text="All Proposal" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
