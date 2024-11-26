@@ -14,7 +14,7 @@ const page = ref(1)
 
 const queryString = computed(() => {
     let params: Record<string, string> = {
-        'filter[status]': 'ACTIVE',
+        'filter[status]': 'COMPLETED',
         include: 'account.user.avatar,proposal.project.account.user,proposal.project.languages,proposal.project.skills,proposal.project.images,proposal.attachments',
         page: page.value.toString()
     }
@@ -54,7 +54,7 @@ const viewJob = async (id: number) => {
         <ClientContractTabs />
         <div class="bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:px-6">
-                <h3 class="text-lg font-medium text-gray-900 mb-5">Active Contracts</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-5">Completed Contracts</h3>
 
                 <div class="space-y-5">
                     <div v-if="pendingContracts && pendingContracts?.data.length > 0">
@@ -67,7 +67,7 @@ const viewJob = async (id: number) => {
                     </div>
 
                     <div v-else>
-                        <p class="text-gray-600 text-base tracking-wider text-center">You have no active contract yet.
+                        <p class="text-gray-600 text-base tracking-wider text-center">You have no completed contract yet.
                         </p>
                     </div>
                 </div>
