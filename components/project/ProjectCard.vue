@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router';
 import type { Proposal } from '~/types/models/Proposal';
 import type { Partial } from 'lodash';
 import type { Contract } from '~/types/models/Contract';
+import currencyFormatter from '~/utils/currencyFormatter';
 
 const props = defineProps<{ project: Project; contract?: Contract, showSaveButton?: boolean, showProposeButton?: boolean, showAcceptButton?: boolean, showWithdrawApplication?: boolean, showRejectButton?: boolean, showApplyButton?: boolean, showCompleteButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT', showContractDetails?: boolean }>();
 const emit = defineEmits<{
@@ -153,7 +154,7 @@ const router = useRouter();
       <div class="pt-2 pb-5 px-5">
         <p v-if="!showContractDetails">Proposals: <span>{{ project.proposals_count ?? 0 }}</span></p>
         <div v-else>
-          <p>Amount: <span>{{ contract?.amount ?? 0 }}</span></p>
+          <p>Amount: <span>{{ currencyFormatter(contract?.amount ?? 0) }}</span></p>
           <p>End Date: <span>{{ contract?.end_date ?? 0 }}</span></p>
         </div>
       </div>

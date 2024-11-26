@@ -4,6 +4,7 @@ import type {Account} from "~/types/models/Account";
 import type {ApiDataResponse, ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
 import type { Contract } from '~/types/models/Contract';
+import currencyFormatter from '~/utils/currencyFormatter';
 
 const props = defineProps<{ freelancer: Account, contract?: Contract, showSaveButton: boolean, hasProposalDetails?: boolean, hasContractDetails?: boolean, hasHireButton?: boolean, hasViewContractButton?: boolean, hasFavoriteButton?: boolean }>();
 const emit = defineEmits<{
@@ -115,7 +116,7 @@ const toggleSave = async () => {
       </div>
 
       <div v-if="hasContractDetails" class="py-2 space-y-1 px-5">
-        <p>Amount: <span>{{ contract?.amount ?? 0 }}</span></p>
+        <p>Amount: <span>{{ currencyFormatter(contract?.amount ?? 0) }}</span></p>
         <p>End Date: <span>{{ contract?.end_date ?? 0 }}</span></p>
       </div>
 
