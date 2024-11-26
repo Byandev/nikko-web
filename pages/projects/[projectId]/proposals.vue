@@ -3,9 +3,7 @@ import _ from 'lodash';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { PaginatedList, PaginationMeta } from '~/types/models/Pagination';
 import { accountStore } from '~/store/accountStore';
-import { Icon } from '@iconify/vue';
 import type { Proposal } from '~/types/models/Proposal';
-import type { Account } from '~/types/models/Account';
 
 const { account } = storeToRefs(accountStore());
 
@@ -115,7 +113,7 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                         </nav>
                     </div>
                     <div class="space-y-5">
-                        <ProposalCard v-if="proposals?.data && !isLoading" v-for="proposal in proposals.data"
+                        <ContractCard v-if="proposals?.data && !isLoading" v-for="proposal in proposals.data"
                             @click="viewFreelancer"
                             :key="proposal.id" :proposal="proposal" :show-save-button="true"
                             @save="(proposals as ProposalList).meta.total_saved_count++"
