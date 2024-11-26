@@ -1,22 +1,13 @@
 <script setup lang="ts">
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
 import ContractTabs from "~/components/freelancer/ContractTabs.vue";
-import type {ProposalInvitation} from "~/types/models/ProposalInvitation";
 import { AccountType } from '~/types/models/Account';
 import type { Contract } from '~/types/models/Contract';
 
 const { account } = storeToRefs(accountStore());
-
-const router = useRouter();
-
-const message = ref('');
-const isMessageModalOpen = ref(false);
-const invitationId = ref<number|null>(null);
-
 const page = ref(1)
 
 const queryString = computed(() => {
@@ -29,9 +20,7 @@ const queryString = computed(() => {
   return new URLSearchParams(params).toString();
 })
 
-
 const { data: pendingContracts, fetchData: fetchContract, pending: isLoading } = useFetchData<PaginatedList<Contract>,ApiErrorResponse>();
-const { sendRequest: rejectClientProposal } = useSubmit<ProposalInvitation, ApiErrorResponse>();
 
 const fetchProposals =  async  () => {
   await fetchContract(`/v1/contracts?${queryString.value}`,{
@@ -52,21 +41,6 @@ watch(
       await fetchProposals();
     }, 500)
 );
-
-const viewJob = async (id: number) => {
-  await router.push(`/jobs/${id}`);
-};
-
-const sendProposal = async (id: number) => {
-  await router.push(`/submit-proposal/${id}`);
-};
-
-const updateInvatationId = (id: number) => {
-  invitationId.value = id;
-  isMessageModalOpen.value = true;
-}
-
-
 </script>
 
 <template>
