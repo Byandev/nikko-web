@@ -76,7 +76,7 @@ const viewJob = async (id: number) => {
           </div>
 
           <div v-else>
-            <p class="text-gray-600 text-base tracking-wider text-center">You have no active job yet.</p>
+            <p class="text-gray-600 text-base tracking-wider text-center">You have no active jobs yet.</p>
           </div>
         </div>
       </div>

@@ -119,7 +119,7 @@ const rejectProposal = async (id: number | null) => {
           </div>
 
           <div v-else>
-            <p class="text-gray-600 text-base tracking-wider text-center">You have no pending contract yet.</p>
+            <p class="text-gray-600 text-base tracking-wider text-center">You have no pending invites yet.</p>
           </div>
         </div>
       </div>

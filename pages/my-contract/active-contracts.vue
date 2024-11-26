@@ -87,7 +87,7 @@ const updateContractStatus = async (id: number | null) => {
                     </div>
 
                     <div v-else>
-                        <p class="text-gray-600 text-base tracking-wider text-center">You have no active contract yet.
+                        <p class="text-gray-600 text-base tracking-wider text-center">You have no active contracts yet.
                         </p>
                     </div>
                 </div>

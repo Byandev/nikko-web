@@ -84,7 +84,7 @@ const rejectContract = (id: number | null) => updateContractStatus(id, 'REJECTED
           </div>
 
           <div v-else>
-            <p class="text-gray-600 text-base tracking-wider text-center">You have no submitted proposals yet.</p>
+            <p class="text-gray-600 text-base tracking-wider text-center">You have no pending offers yet.</p>
           </div>
         </div>
       </div>
