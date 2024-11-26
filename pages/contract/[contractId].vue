@@ -116,7 +116,7 @@ const showDeleteConfirmation = ref(false);
     <div class="my-8 lg:mx-auto mx-5">
         <div class="max-w-6xl grid grid-cols-1 gap-4 mt-5 mx-auto">
             <div class="w-full justify-between flex-row flex">
-                <h1 class="text-4xl font-medium whitespace-nowrap">Update offer</h1>
+                <h1 class="text-4xl font-medium whitespace-nowrap">{{ contract?.data.status === 'COMPLETED'? 'View Contract' : 'Update Contract' }}</h1>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="pb-6 md:pb-8 ring-1 ring-gray-300 p-4 rounded-md flex flex-col items-center h-fit">
