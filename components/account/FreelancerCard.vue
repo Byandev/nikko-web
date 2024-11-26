@@ -1,16 +1,17 @@
 <script lang="ts" setup>
 import {HeartIcon} from '@heroicons/vue/24/outline';
-
 import type {Account} from "~/types/models/Account";
 import type {ApiDataResponse, ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
+import type { Contract } from '~/types/models/Contract';
 
-const props = defineProps<{ freelancer: Account, showSaveButton: boolean, hasProposalDetails?: boolean, hasHireButton?: boolean, hasViewContractButton?: boolean }>();
+const props = defineProps<{ freelancer: Account, contract?: Contract, showSaveButton: boolean, hasProposalDetails?: boolean, hasContractDetails?: boolean, hasHireButton?: boolean, hasViewContractButton?: boolean, hasFavoriteButton?: boolean }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'hire', id: number): void;
   (e: 'save', id: number): void;
   (e: 'un-save', id: number): void;
+  (e: 'view-contract', id: number): void;
 }>();
 
 const {account} = storeToRefs(accountStore());
@@ -68,7 +69,7 @@ const toggleSave = async () => {
           <div class="flex justify-between">
             <h2 @click="emit('click', freelancer.id)" class="text-xl font-bold hover:underline">{{ name }}</h2>
 
-            <div class="flex items-center gap-2">
+            <div v-if="hasFavoriteButton" class="flex items-center gap-2">
               <HeartIcon v-if="showSaveButton" @click="toggleSave" class="w-5 h-5 text-primary-dark cursor-pointer"
                 :class="freelancer.is_saved ? 'fill-primary': ''" />
             </div>
@@ -104,13 +105,20 @@ const toggleSave = async () => {
           class="ring-1 ring-primary w-full font-base" @click="emit('hire', freelancer.id)" type="button" />
 
         <Button v-if="hasViewContractButton" text="View Contract" background="primary" foreground="white"
-          class="ring-1 ring-primary w-full font-base" @click="emit('hire', freelancer.id)" type="button" />
+          class="ring-1 ring-primary w-full font-base" @click="emit('view-contract', contract?.id ?? 0)"
+          type="button" />
       </div>
 
       <div v-if="hasProposalDetails" class="py-2 space-y-1 px-5">
         <p>Total earning: <span>$0</span></p>
         <p v-if="freelancer.user.country_code">Location: <span>{{ freelancer.user.country_code }}</span></p>
       </div>
+
+      <div v-if="hasContractDetails" class="py-2 space-y-1 px-5">
+        <p>Amount: <span>{{ contract?.amount ?? 0 }}</span></p>
+        <p>End Date: <span>{{ contract?.end_date ?? 0 }}</span></p>
+      </div>
+
     </div>
   </div>
 </template>

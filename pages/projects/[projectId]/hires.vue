@@ -87,7 +87,9 @@ const viewContract = async (id: number) => {
                     <div v-if="contracts && contracts?.data.length > 0">
                         <FreelancerCard v-for="contract in contracts.data ?? []"
                             :key="contract.id" :contract="contract" :show-save-button="true"
-                            :has-view-contract-button="true"
+                            :has-view-contract-button="true" 
+                            :has-contract-details="true"
+                            @view-contract="viewContract"
                             :freelancer="contract.account" @click="viewFreelancer"
                             />
                         <Pagination v-if="!isLoading && contracts.data.length > 0" :pagination="contracts?.meta"

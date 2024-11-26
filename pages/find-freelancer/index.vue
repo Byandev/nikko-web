@@ -280,6 +280,7 @@ const removeCountry = (country: ICountry) => {
                   :show-save-button="true"
                   :has-proposal-details="true"
                   :has-hire-button="true"
+                  :has-favorite-button="true"
                   @click="viewFreelancer"
                   @save="(freelancers as AccountList).meta.total_saved_count++"
                   @un-save="unSave"
