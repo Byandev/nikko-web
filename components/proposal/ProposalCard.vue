@@ -27,30 +27,23 @@ const showAllBio = ref(false);
 const hasLongBio = computed(() => props.proposal.cover_letter.length > 300);
 
 const { sendRequest: toggleSaveProposal } = useSubmit<{ data: Proposal }, ApiErrorResponse>();
-const { data: accountDetails, fetchData: fetchAccountDetails, pending: isLoading } = useFetchData<{ data: Account }, ApiErrorResponse>();
-
-onMounted(async () => {
-    if (props.proposal.account_id) {
-        await fetchAccountDetails(`v1/accounts/${props.proposal.account_id}`);
-    }
-});
 
 const accountName = computed(() => {
-    const firstName = accountDetails.value?.data.user.first_name ?? '';
-    const lastName = accountDetails.value?.data.user.last_name ?? '';
+    const firstName = proposal.value?.account.user.first_name ?? '';
+    const lastName = proposal.value?.account.user.last_name ?? '';
     return `${firstName} ${lastName}`.trim();
 });
 
 const accountAvatar = computed(() => {
-    return accountDetails.value?.data.user.avatar?.original_url;
+    return proposal.value?.account.user.avatar?.original_url;
 });
 
 const acountBio = computed(() => {
-    return accountDetails.value?.data.bio;
+    return proposal.value?.account.bio;
 });
 
 const accountSkills = computed(() => {
-    return accountDetails.value?.data.skills;
+    return proposal.value?.account.skills;
 });
 
 const avatarUrl = computed(
@@ -94,7 +87,7 @@ const toggleSave = async () => {
                     <div class="flex flex-col justify-center flex-grow w-full">
                         <div class="flex justify-between">
                             <span class="text-lg font-bold hover:underline" v-if="accountName"
-                                @click="emit('click', accountDetails?.data.id ?? 0)">
+                                @click="emit('click', proposal.account.id ?? 0)">
                                 {{ accountName || 'Loading...' }}
                             </span>
                             <span v-else>
@@ -142,7 +135,7 @@ const toggleSave = async () => {
 
         <div class="w-full md:w-3/12 divide-y p-4 flex flex-col item-center gap-2 justify-center">
             <Button text="View Profile" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
-                @click="emit('click', accountDetails?.data.id ?? 0)" type="button"/>
+                @click="emit('click', proposal.account.id ?? 0)" type="button"/>
 
             <Button @click="!proposal.contract ? emit('hire', proposal.id) : emit('view', proposal.contract.id)" :text="!proposal.contract ? `Hire`: `View Contract`" type="button" :background="!proposal.contract ? `white` : `primary`"
                 :foreground="!proposal.contract ? `primary` : `white`" class="ring-1 ring-primary" />
