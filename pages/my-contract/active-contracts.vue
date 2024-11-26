@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
 import ContractTabs from "~/components/freelancer/ContractTabs.vue";
-import type {ProposalInvitation} from "~/types/models/ProposalInvitation";
 import { AccountType } from '~/types/models/Account';
 import type { Contract } from '~/types/models/Contract';
 
@@ -47,10 +45,6 @@ watch(
 
 const viewJob = async (id: number) => {
   await router.push(`/jobs/${id}`);
-};
-
-const sendProposal = async (id: number) => {
-  await router.push(`/submit-proposal/${id}`);
 };
 
 </script>

@@ -66,24 +66,6 @@ const updateInvatationId = (id: number) => {
   isMessageModalOpen.value = true;
 }
 
-const rejectProposal = async (id: number | null) => {
-  try{
-    await rejectClientProposal(`/v1/proposals/invitations/${id}`, {
-      method: 'PUT',
-      headers: account?.value?.id ? {
-        'X-ACCOUNT-ID': account.value.id.toString(),
-      } : undefined,
-      body: {
-        status: 'REJECTED',
-        rejection_message: message.value
-      }
-    });
-
-    isMessageModalOpen.value = false;
-  }catch (e) {
-    console.log("Failed to reject proposal: ", e.message)
-  }
-};
 
 </script>
 
@@ -105,9 +87,6 @@ const rejectProposal = async (id: number | null) => {
                 :contract="contract"
                 :show-contract-details="true"
                 class="mb-5"
-                @click="viewJob"
-                @submit-proposal="sendProposal"
-                @reject-proposal="updateInvatationId"
             />
             <Pagination
                 v-if="!isLoading && pendingContracts.data.length > 0"
@@ -121,20 +100,6 @@ const rejectProposal = async (id: number | null) => {
           </div>
         </div>
       </div>
-
-      <Modal :modelValue="isMessageModalOpen" @update:modelValue="isMessageModalOpen = $event">
-        <template #title>Rejection message</template>
-        <template #content>
-            <textarea v-model="message" class="w-full h-32 p-2 border rounded" placeholder="Write your message here..."></textarea>
-        </template>
-        <template #actions>
-            <Button text="Cancel" type="button" background="white" foreground="gray" @click="{isMessageModalOpen = false;
-            message = '';
-            invitationId = null;
-            }" />
-            <Button text="Reject" type="button" background="primary" foreground="white" @click="rejectProposal(invitationId)" />
-        </template>
-    </Modal>
     </div>
   </div>
 </template>
