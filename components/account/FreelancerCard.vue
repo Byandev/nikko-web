@@ -4,7 +4,7 @@ import type {Account} from "~/types/models/Account";
 import type {ApiDataResponse, ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
 import type { Contract } from '~/types/models/Contract';
-import currencyFormatter from '~/utils/currencyFormatter';
+import currencyFormatter from '~/utils/formatter';
 
 const props = defineProps<{ freelancer: Account, contract?: Contract, showSaveButton: boolean, hasProposalDetails?: boolean, hasContractDetails?: boolean, hasHireButton?: boolean, hasViewContractButton?: boolean, hasFavoriteButton?: boolean }>();
 const emit = defineEmits<{
