@@ -12,25 +12,9 @@ const { account } = storeToRefs(accountStore());
 const route = useRoute();
 const { data: proposal, fetchData: fetchProposal, pending: isLoading } = useFetchData<{ data: Proposal }, ApiErrorResponse>();
 const { sendRequest: sendOffer, pending: isSubmitting } = useSubmit<{ data: Contract }, ApiErrorResponse>();
-const { data: accountDetails, fetchData: fetchAccountDetails } = useFetchData<{ data: Account }, ApiErrorResponse>();
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
-);
-
-
-const name = computed(
-    () => proposal.value?.data.project.account.user.first_name && proposal.value?.data.project.account.user.last_name ?
-        `${proposal.value?.data.project.account.user.first_name} ${proposal.value?.data.project.account.user.last_name}` :
-        'No name provided'
-);
-
-const location = computed(
-    () => proposal.value?.data.project.account.user.country_code ?? 'No location provided'
-);
-
-const bio = computed(
-    () => proposal.value?.data.project.account.bio ?? 'No bio provided'
 );
 
 const showAllDescription = ref(false);
@@ -42,10 +26,6 @@ const modalHeader = ref<string>('')
 
 onMounted(async () => {
     await fetchProposal(`v1/client/proposals/${route.params.proposalId}`, {
-        headers: requestHeaders.value
-    });
-
-    await fetchAccountDetails(`v1/accounts/${proposal.value?.data.account_id}`, {
         headers: requestHeaders.value
     });
 });
@@ -61,19 +41,19 @@ const rules = {
 };
 
 const accountName = computed(() => {
-    return accountDetails.value?.data.user.first_name + ' ' + accountDetails.value?.data.user.last_name;
+    return proposal.value?.data.account.user.first_name + ' ' + proposal.value?.data.account.user.last_name;
 });
 
 const accountAvatar = computed(() => {
-    return accountDetails.value?.data.user.avatar?.original_url;
+    return proposal.value?.data.account.user.avatar?.original_url;
 });
 
 const accountBio = computed(() => {
-    return accountDetails.value?.data.bio;
+    return proposal.value?.data.account.bio;
 });
 
 const accountLocation = computed(() => {
-    return accountDetails.value?.data.user.country_code;
+    return proposal.value?.data.account.user.country_code;
 });
 
 const avatarUrl = computed(
@@ -122,10 +102,17 @@ const goback = () => {
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="pb-6 md:pb-8 ring-1 ring-gray-300 p-4 rounded-md flex flex-col items-center h-fit">
-                    <img :src="avatarUrl.value" :alt="accountName" class="w-16 h-16 rounded-full">
-                    <h2 class="text-lg font-medium mt-4">{{ accountName }}</h2>
-                    <p v-if="bio" class="text-sm text-gray-500 mt-1">{{ accountBio }}</p>
-                    <p v-if="location" class="text-sm text-gray-500 mt-1">Location: {{ accountLocation }}</p>
+                    <img v-if="avatarUrl && !isLoading" :src="avatarUrl.value" :alt="accountName" class="w-16 h-16 rounded-full">
+                    <div v-else class="w-16 h-16 bg-gray-300 rounded-full"></div>
+
+                    <h2 v-if="accountName && !isLoading" class="text-lg font-medium mt-4">{{ accountName }}</h2>
+                    <div v-else class="h-6 bg-gray-300 rounded w-32 mt-4"></div>
+
+                    <p v-if="accountBio && !isLoading" class="text-sm text-gray-500 mt-1">{{ accountBio }}</p>
+                    <div v-else class="h-4 bg-gray-300 rounded w-48 mt-1"></div>
+
+                    <p v-if="accountLocation && !isLoading" class="text-sm text-gray-500 mt-1">Location: {{ accountLocation }}</p>
+                    <div v-else class="h-4 bg-gray-300 rounded w-40 mt-1"></div>
                 </div>
 
                 <div class="col-span-1 md:col-span-3 ring-1 ring-gray-300 rounded-md">

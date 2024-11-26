@@ -54,7 +54,7 @@ const queryString = computed(() => {
     include: 'user.avatar,skills',
     type: AccountType.FREELANCER,
     page: page.value.toString(),
-    per_page: '100'
+    per_page: '10'
   }
 
   return new URLSearchParams(params).toString();
