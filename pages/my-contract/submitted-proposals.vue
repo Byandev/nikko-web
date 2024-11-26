@@ -9,15 +9,6 @@ import { AccountType } from '~/types/models/Account';
 
 const { account } = storeToRefs(accountStore());
 
-const tabs = [
-  { name: 'Submitted Proposals', href: '/my-contract/submitted-proposals', current: true },
-  { name: 'Invites', href: '#', current: false },
-  { name: 'Active Proposals', href: '#', current: false },
-  { name: 'Pending Offers', href: '#', current: false },
-  { name: 'Active Jobs', href: '#', current: false },
-  { name: 'Completed Jobs', href: '#', current: false },
-];
-
 const router = useRouter();
 
 const page = ref(1)

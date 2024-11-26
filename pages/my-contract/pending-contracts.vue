@@ -45,37 +45,24 @@ watch(
     }, 500)
 );
 
-const acceptContract = async (id: number | null) => {
-  try{
+const updateContractStatus = async (id: number | null, status: 'ACTIVE' | 'REJECTED') => {
+  try {
     await updateStatus(`/v1/contracts/${id}`, {
       method: 'PUT',
       headers: account?.value?.id ? {
         'X-ACCOUNT-ID': account.value.id.toString(),
       } : undefined,
       body: {
-        status: 'ACTIVE',
+        status: status,
       }
     });
-  }catch (e) {
-    console.log("Failed to reject proposal: ", e.message)
+  } catch (e) {
+    console.log(`Failed to update contract status to ${status}: `, e.message);
   }
 };
 
-const rejectContract = async (id: number | null) => {
-  try{
-    await updateStatus(`/v1/contracts/${id}`, {
-      method: 'PUT',
-      headers: account?.value?.id ? {
-        'X-ACCOUNT-ID': account.value.id.toString(),
-      } : undefined,
-      body: {
-        status: 'REJECTED',
-      }
-    });
-  }catch (e) {
-    console.log("Failed to reject proposal: ", e.message)
-  }
-};
+const acceptContract = (id: number | null) => updateContractStatus(id, 'ACTIVE');
+const rejectContract = (id: number | null) => updateContractStatus(id, 'REJECTED');
 
 </script>
 
