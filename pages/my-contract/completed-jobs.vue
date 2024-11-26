@@ -1,22 +1,13 @@
 <script setup lang="ts">
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
-import ContractTabs from "~/components/freelancer/ContractTabs.vue";
-import type {ProposalInvitation} from "~/types/models/ProposalInvitation";
+import ContractTabs from "~/components/freelancer/FreelancerContractTabs.vue";
 import { AccountType } from '~/types/models/Account';
 import type { Contract } from '~/types/models/Contract';
 
 const { account } = storeToRefs(accountStore());
-
-const router = useRouter();
-
-const message = ref('');
-const isMessageModalOpen = ref(false);
-const invitationId = ref<number|null>(null);
-
 const page = ref(1)
 
 const queryString = computed(() => {
@@ -29,9 +20,7 @@ const queryString = computed(() => {
   return new URLSearchParams(params).toString();
 })
 
-
 const { data: pendingContracts, fetchData: fetchContract, pending: isLoading } = useFetchData<PaginatedList<Contract>,ApiErrorResponse>();
-const { sendRequest: rejectClientProposal } = useSubmit<ProposalInvitation, ApiErrorResponse>();
 
 const fetchProposals =  async  () => {
   await fetchContract(`/v1/contracts?${queryString.value}`,{
@@ -52,48 +41,14 @@ watch(
       await fetchProposals();
     }, 500)
 );
-
-const viewJob = async (id: number) => {
-  await router.push(`/jobs/${id}`);
-};
-
-const sendProposal = async (id: number) => {
-  await router.push(`/submit-proposal/${id}`);
-};
-
-const updateInvatationId = (id: number) => {
-  invitationId.value = id;
-  isMessageModalOpen.value = true;
-}
-
-const rejectProposal = async (id: number | null) => {
-  try{
-    await rejectClientProposal(`/v1/proposals/invitations/${id}`, {
-      method: 'PUT',
-      headers: account?.value?.id ? {
-        'X-ACCOUNT-ID': account.value.id.toString(),
-      } : undefined,
-      body: {
-        status: 'REJECTED',
-        rejection_message: message.value
-      }
-    });
-
-    isMessageModalOpen.value = false;
-  }catch (e) {
-    console.log("Failed to reject proposal: ", e.message)
-  }
-};
-
 </script>
 
 <template>
   <div class="max-w-6xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
-    <ContractTabs/>
-
+    <FreelancerContractTabs/>
     <div class="bg-white shadow sm:rounded-lg">
       <div class="px-4 py-5 sm:px-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-5">Active Jobs</h3>
+        <h3 class="text-lg font-medium text-gray-900 mb-5">Completed Jobs</h3>
 
         <div class="space-y-5">
           <div v-if="pendingContracts && pendingContracts?.data.length > 0">
@@ -105,9 +60,6 @@ const rejectProposal = async (id: number | null) => {
                 :contract="contract"
                 :show-contract-details="true"
                 class="mb-5"
-                @click="viewJob"
-                @submit-proposal="sendProposal"
-                @reject-proposal="updateInvatationId"
             />
             <Pagination
                 v-if="!isLoading && pendingContracts.data.length > 0"
@@ -121,20 +73,6 @@ const rejectProposal = async (id: number | null) => {
           </div>
         </div>
       </div>
-
-      <Modal :modelValue="isMessageModalOpen" @update:modelValue="isMessageModalOpen = $event">
-        <template #title>Rejection message</template>
-        <template #content>
-            <textarea v-model="message" class="w-full h-32 p-2 border rounded" placeholder="Write your message here..."></textarea>
-        </template>
-        <template #actions>
-            <Button text="Cancel" type="button" background="white" foreground="gray" @click="{isMessageModalOpen = false;
-            message = '';
-            invitationId = null;
-            }" />
-            <Button text="Reject" type="button" background="primary" foreground="white" @click="rejectProposal(invitationId)" />
-        </template>
-    </Modal>
     </div>
   </div>
 </template>

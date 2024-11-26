@@ -4,7 +4,7 @@ import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import _, {omit} from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
-import ContractTabs from "~/components/freelancer/ContractTabs.vue";
+import ContractTabs from "~/components/freelancer/FreelancerContractTabs.vue";
 import type {ProposalInvitation} from "~/types/models/ProposalInvitation";
 import { AccountType } from '~/types/models/Account';
 
