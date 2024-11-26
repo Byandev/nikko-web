@@ -98,7 +98,7 @@ const goback = () => {
 }
 
 onMounted(async () => {
-    await fetchContract(`v1/client/contracts/${route.params.contractId}`, {
+    await fetchContract(`v1/client/contracts/${route.params.contractId}?include=account.user.avatar`, {
         headers: requestHeaders.value
     });
     form.value.amount = contract.value?.data.amount ?? null;
@@ -109,11 +109,8 @@ const showDeleteConfirmation = ref(false);
 </script>
 
 <template>
-    <DeleteConfirmationModal
-        :showModal="showDeleteConfirmation"
-        @confirm="handleDelete"
-        @close="showDeleteConfirmation = false"
-    />
+    <DeleteConfirmationModal :showModal="showDeleteConfirmation" @confirm="handleDelete"
+        @close="showDeleteConfirmation = false" />
     <EditProjectModal :project="contract?.data.proposal.project" :header="modalHeader" :isOpen="openEditProjectModal"
         :toEdit="selectedFieldToEdit" @toggle-open="openEditProjectModal = $event" />
     <div class="my-8 lg:mx-auto mx-5">
@@ -174,7 +171,8 @@ const showDeleteConfirmation = ref(false);
                     </div>
 
                     <div class="py-5 px-5 border-b-2 space-y-5">
-                        <div v-if="contract?.data.proposal.project.skills && contract?.data.proposal.project.skills.length">
+                        <div
+                            v-if="contract?.data.proposal.project.skills && contract?.data.proposal.project.skills.length">
                             <div class="flex items-center justify-between">
                                 <div class="font-medium">Skills:</div>
                                 <Icon icon="akar-icons:edit" class="text-gray-500 text-xl hover:cursor-pointer" @click="{
@@ -237,7 +235,8 @@ const showDeleteConfirmation = ref(false);
                         </div>
                     </div>
                     <div class="py-5 px-5 border-b-2 space-y-5">
-                        <div v-if="contract?.data.proposal.project.languages && contract?.data.proposal.project.languages.length">
+                        <div
+                            v-if="contract?.data.proposal.project.languages && contract?.data.proposal.project.languages.length">
                             <div class="flex items-center justify-between">
                                 <h4 class="font-semibold">Language:</h4>
                                 <Icon icon="akar-icons:edit" class="text-gray-500 text-xl hover:cursor-pointer" @click="{
@@ -268,7 +267,9 @@ const showDeleteConfirmation = ref(false);
                                     <div class="flex items-center justify-between">
                                         <h4 class="font-semibold">Amount:</h4>
                                     </div>
-                                    <input v-model="form.amount" type="number" class="w-full mt-2 p-2 border rounded-md"
+                                    <input
+                                        :disabled="contract?.data.status === 'ACTIVE' || contract?.data.status === 'COMPLETED'"
+                                        v-model="form.amount" type="number" class="w-full mt-2 p-2 border rounded-md"
                                         placeholder="Enter amount" />
                                     <span v-if="v$.amount.$error" class="text-red-900 text-sm">{{
                                         v$.amount.$errors[0].$message
@@ -278,8 +279,8 @@ const showDeleteConfirmation = ref(false);
                                     <div class="flex items-center justify-between">
                                         <h4 class="font-semibold">End Date:</h4>
                                     </div>
-                                    <input v-model="form.end_date" type="date"
-                                        class="w-full mt-2 p-2 border rounded-md" />
+                                    <input :disabled="contract?.data.status === 'COMPLETED'" v-model="form.end_date"
+                                        type="date" class="w-full mt-2 p-2 border rounded-md" />
                                     <span v-if="v$.end_date.$error" class="text-red-900 text-sm">{{
                                         v$.end_date.$errors[0].$message
                                         }}</span>
@@ -288,12 +289,13 @@ const showDeleteConfirmation = ref(false);
                         </div>
 
                         <div class="w-full flex justify-end py-5 gap-2 px-4">
-                            <Button text="Delete Offer" foreground="red-600" background="red-700" type="button"
-                                @click="showDeleteConfirmation= true" class="ring-1 ring-red-600" />
-                            <Button text="Cancel" @click="goback" foreground="primary" background="white" type="button"
-                                class="ring-1 ring-primary" />
-                            <Button :isLoading="isSubmitting" text="Update Offer" foreground="white"
-                                background="primary" type="submit" />
+                            <Button v-if="contract?.data.status === 'PENDING'" text="Delete Offer" foreground="red-600"
+                                background="red-700" type="button" @click="showDeleteConfirmation= true"
+                                class="ring-1 ring-red-600" />
+                            <Button :text="contract?.data.status === 'COMPLETED' ? 'Close': 'Cancel'" @click="goback"
+                                foreground="primary" background="white" type="button" class="ring-1 ring-primary" />
+                            <Button v-if="contract?.data.status !== 'COMPLETED'" :isLoading="isSubmitting"
+                                text="Update Offer" foreground="white" background="primary" type="submit" />
                         </div>
                     </form>
                 </div>
