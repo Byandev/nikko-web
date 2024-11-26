@@ -22,7 +22,7 @@ const queryString = computed(() => {
     return new URLSearchParams(params).toString();
 })
 
-const { data: pendingContracts, fetchData: fetchContract, pending: isLoading } = useFetchData<PaginatedList<Contract>, ApiErrorResponse>();
+const { data: contracts, fetchData: fetchContract, pending: isLoading } = useFetchData<PaginatedList<Contract>, ApiErrorResponse>();
 const { sendRequest: updateStatus } = useSubmit<ProposalInvitation, ApiErrorResponse>();
 
 const fetchProposals = async () => {
@@ -65,6 +65,15 @@ const updateContractStatus = async (id: number | null) => {
     }
 };
 
+const viewFreelancer = async (id: number) => {
+    await router.push(`/freelancer/${id}`);
+};
+
+const viewContract = async (id: number) => {
+    await router.push(`/contract/${id}`);
+};
+
+
 </script>
 
 <template>
@@ -75,14 +84,13 @@ const updateContractStatus = async (id: number | null) => {
                 <h3 class="text-lg font-medium text-gray-900 mb-5">Hired Freelancer</h3>
 
                 <div class="space-y-5">
-                    <div v-if="pendingContracts && pendingContracts?.data.length > 0">
-                        <ProjectCard v-for="contract in pendingContracts?.data ?? []" :key="contract.id"
-                            :view-as="AccountType.FREELANCER" :project="contract.proposal.project" :contract="contract"
-                            :show-contract-details="true" class="mb-5" @click="viewJob" :show-complete-button="true"
-                            @complete-contract="updateContractStatus" />
-                        <Pagination v-if="!isLoading && pendingContracts.data.length > 0"
-                            :pagination="pendingContracts?.meta" @prev-page="page = page - 1"
-                            @next-page="page = page + 1" />
+                    <div v-if="contracts && contracts?.data.length > 0">
+                        <FreelancerCard v-for="contract in contracts.data ?? []"
+                            :key="contract.id" :contract="contract" :show-save-button="true"
+                            :freelancer="contract.account" @click="viewFreelancer"
+                            />
+                        <Pagination v-if="!isLoading && contracts.data.length > 0" :pagination="contracts?.meta"
+                            @prev-page="page = page - 1" @next-page="page = page + 1" />
                     </div>
 
                     <div v-else>
