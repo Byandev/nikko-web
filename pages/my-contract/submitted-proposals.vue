@@ -3,7 +3,7 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import type {PaginatedList} from "~/types/models/Pagination";
-import ContractTabs from "~/components/freelancer/ContractTabs.vue";
+import ContractTabs from "~/components/freelancer/FreelancerContractTabs.vue";
 import type {Project} from "~/types/models/Project";
 import { AccountType } from '~/types/models/Account';
 

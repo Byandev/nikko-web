@@ -3,7 +3,7 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
-import ContractTabs from "~/components/freelancer/ContractTabs.vue";
+import ContractTabs from "~/components/freelancer/FreelancerContractTabs.vue";
 import { AccountType } from '~/types/models/Account';
 import type { Contract } from '~/types/models/Contract';
 
@@ -45,8 +45,7 @@ watch(
 
 <template>
   <div class="max-w-6xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
-    <ContractTabs/>
-
+    <FreelancerContractTabs/>
     <div class="bg-white shadow sm:rounded-lg">
       <div class="px-4 py-5 sm:px-6">
         <h3 class="text-lg font-medium text-gray-900 mb-5">Completed Jobs</h3>

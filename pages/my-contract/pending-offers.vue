@@ -3,7 +3,7 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
 import type {PaginatedList} from "~/types/models/Pagination";
-import ContractTabs from "~/components/freelancer/ContractTabs.vue";
+import ContractTabs from "~/components/freelancer/FreelancerContractTabs.vue";
 import type {ProposalInvitation} from "~/types/models/ProposalInvitation";
 import { AccountType } from '~/types/models/Account';
 import type { Contract } from '~/types/models/Contract';
@@ -68,33 +68,19 @@ const rejectContract = (id: number | null) => updateContractStatus(id, 'REJECTED
 
 <template>
   <div class="max-w-6xl mx-auto mt-12 px-4 sm:px-6 lg:px-8">
-    <ContractTabs/>
-
+    <FreelancerContractTabs />
     <div class="bg-white shadow sm:rounded-lg">
       <div class="px-4 py-5 sm:px-6">
         <h3 class="text-lg font-medium text-gray-900 mb-5">Pending Offers</h3>
 
         <div class="space-y-5">
           <div v-if="pendingContracts && pendingContracts?.data.length > 0">
-            <ProjectCard
-                v-for="contract in pendingContracts?.data ?? []"
-                :key="contract.id"
-                :view-as="AccountType.FREELANCER"
-                :project="contract.proposal.project"
-                :contract="contract"
-                :show-reject-button="true"
-                :show-accept-button="true"
-                :show-contract-details="true"
-                class="mb-5"
-                @accept-contract="acceptContract($event)"
-                @reject-contract="rejectContract($event)"
-
-            />
-            <Pagination
-                v-if="!isLoading && pendingContracts.data.length > 0"
-                :pagination="pendingContracts?.meta"
-                @prev-page="page = page -1 "
-                @next-page="page = page + 1" />
+            <ProjectCard v-for="contract in pendingContracts?.data ?? []" :key="contract.id"
+              :view-as="AccountType.FREELANCER" :project="contract.proposal.project" :contract="contract"
+              :show-reject-button="true" :show-accept-button="true" :show-contract-details="true" class="mb-5"
+              @accept-contract="acceptContract($event)" @reject-contract="rejectContract($event)" />
+            <Pagination v-if="!isLoading && pendingContracts.data.length > 0" :pagination="pendingContracts?.meta"
+              @prev-page="page = page -1 " @next-page="page = page + 1" />
           </div>
 
           <div v-else>
