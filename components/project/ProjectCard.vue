@@ -5,8 +5,10 @@ import type {ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
 import { useRouter } from 'vue-router';
 import type { Proposal } from '~/types/models/Proposal';
+import type { Partial } from 'lodash';
+import type { Contract } from '~/types/models/Contract';
 
-const props = defineProps<{ project: Project; proposalId?: number, showSaveButton?: boolean, showProposeButton?: boolean, showWithdrawApplication?: boolean, showRejectButton?:boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT' }>();
+const props = defineProps<{ project: Project; contract?: Contract, showSaveButton?: boolean, showProposeButton?: boolean, showAcceptButton?: boolean, showWithdrawApplication?: boolean, showRejectButton?:boolean, showApplyButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT', showContractDetails?: boolean }>();
 const emit = defineEmits<{
   (e: 'click', id: number): void;
   (e: 'save', id: number): void;
@@ -15,9 +17,11 @@ const emit = defineEmits<{
   (e: 'withdraw-proposal', id: number): void;
   (e: 'submit-proposal', id: number): void;
   (e: 'reject-proposal', id: number): void;
+  (e: 'accept-contract', id: number): void;
+  (e: 'reject-contract', id: number): void;
 }>();
 
-const {project, showSaveButton, showWithdrawApplication} = toRefs(props)
+const {project, showSaveButton, showWithdrawApplication, contract} = toRefs(props)
 
 const {account} = storeToRefs(accountStore());
 
@@ -64,7 +68,7 @@ const router = useRouter();
 </script>
 
 <template>
-  <RejectionModal :proposal-id="proposalId ?? 0" :isOpen="isRejectModalOpen"
+  <RejectionModal :proposal-id="contract?.proposal.id ?? 0" :isOpen="isRejectModalOpen"
     @toggle-open="isRejectModalOpen = $event" />
   <div
     class="bg-white hover:bg-gray-100 ring-1 ring-gray-300 rounded-md hover:cursor-pointer flex flex-col sm:flex-row divide-y sm:divide-x text-sm text-gray-800">
@@ -92,7 +96,12 @@ const router = useRouter();
                 Propose              
               </button>
 
-              <button v-if="showRejectButton && project.id" @click="isRejectModalOpen = true"
+              <button v-if="showAcceptButton" @click="emit('accept-contract', contract?.id ?? 0)"
+                class="py-2 px-4 rounded-2xl border border-primary-dark bg-primary text-white">
+                Accept              
+              </button>
+
+              <button v-if="showRejectButton && project.id" @click="showAcceptButton? emit('reject-contract', contract?.id ?? 0) : isRejectModalOpen = true"
                 class="py-2 px-4 rounded-2xl border border-primary-dark bg-white text-primary">
                 Reject
               </button>
@@ -135,7 +144,11 @@ const router = useRouter();
       </div>
 
       <div class="pt-2 pb-5 px-5">
-        <p>Proposals: <span>{{ project.proposals_count ?? 0 }}</span></p>
+        <p v-if="!showContractDetails">Proposals: <span>{{ project.proposals_count ?? 0 }}</span></p>
+        <div v-else>
+          <p>Amount: <span>{{ contract?.amount ?? 0 }}</span></p>
+          <p>End Date: <span>{{ contract?.end_date ?? 0  }}</span></p>
+        </div>
       </div>
     </div>
 
