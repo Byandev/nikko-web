@@ -3,10 +3,7 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import { accountStore } from '~/store/accountStore';
 import _ from 'lodash';
 import type { PaginatedList } from "~/types/models/Pagination";
-import ContractTabs from "~/components/freelancer/FreelancerContractTabs.vue";
-import { AccountType } from '~/types/models/Account';
 import type { Contract } from '~/types/models/Contract';
-import type { ProposalInvitation } from '~/types/models/ProposalInvitation';
 
 const { account } = storeToRefs(accountStore());
 
@@ -23,7 +20,6 @@ const queryString = computed(() => {
 })
 
 const { data: contracts, fetchData: fetchContract, pending: isLoading } = useFetchData<PaginatedList<Contract>, ApiErrorResponse>();
-const { sendRequest: updateStatus } = useSubmit<ProposalInvitation, ApiErrorResponse>();
 
 const fetchProposals = async () => {
     await fetchContract(`/v1/client/contracts?${queryString.value}`, {
@@ -45,26 +41,6 @@ watch(
     }, 500)
 );
 
-const viewJob = async (id: number) => {
-    await router.push(`/jobs/${id}`);
-};
-
-const updateContractStatus = async (id: number | null) => {
-    try {
-        await updateStatus(`/v1/client/contracts/${id}`, {
-            method: 'PUT',
-            headers: account?.value?.id ? {
-                'X-ACCOUNT-ID': account.value.id.toString(),
-            } : undefined,
-            body: {
-                status: 'COMPLETED',
-            }
-        });
-    } catch (e) {
-        console.log(`Failed to update contract status to ${status}: `, e.message);
-    }
-};
-
 const viewFreelancer = async (id: number) => {
     await router.push(`/freelancer/${id}`);
 };
@@ -72,7 +48,6 @@ const viewFreelancer = async (id: number) => {
 const viewContract = async (id: number) => {
     await router.push(`/contract/${id}`);
 };
-
 
 </script>
 
