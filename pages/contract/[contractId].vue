@@ -72,7 +72,7 @@ const handleUpdate = async () => {
             }
         });
 
-        await router.push(`/projects/${contract.value?.data.proposal.project.id}/proposals`);
+        await router.push(`/projects/${contract.value?.data.proposal.project.id}/${contract.value?.data.status === 'PENDING' ? 'proposals' : 'hires'}`);
 
     } catch (error) {
         console.error(error);
@@ -94,7 +94,7 @@ const handleDelete = async () => {
 }
 
 const goback = () => {
-    router.push(`/projects/${contract.value?.data.proposal.project.id}/proposals`);
+    router.push(`/projects/${contract.value?.data.proposal.project.id}/${contract.value?.data.status === 'PENDING' ? 'proposals' : 'hires'}`);
 }
 
 onMounted(async () => {
