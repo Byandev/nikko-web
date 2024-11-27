@@ -12,6 +12,7 @@ interface Filter {
     project_id: number;
     is_saved: boolean;
     page: number;
+    status: string;
 }
 
 interface ProposalPaginationMeta extends PaginationMeta {
@@ -30,7 +31,8 @@ const filter = ref<Filter>({
     include: 'project.account.user,attachments,contract,account.user.avatar,account.skills',
     project_id: parseInt(route.params.projectId as string),
     is_saved: false,
-    page: 1
+    page: 1,
+    status: 'SUBMITTED'
 });
 
 const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<ProposalList, ApiErrorResponse>();
@@ -40,6 +42,7 @@ const queryString = computed(() => {
         include: filter.value.include,
         ...(filter.value.project_id ? { 'filter[project_id]': filter.value.project_id.toString() } : {}),
         ...(filter.value.is_saved ? { 'filter[is_saved]': 'true' } : {}),
+        ...(filter.value.status ? { 'filter[status]': filter.value.status } : {}),
         page: filter.value.page.toString()
     };
 

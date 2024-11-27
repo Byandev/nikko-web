@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { ref, watch } from 'vue';
 
 const props = defineProps({
     modelValue: {

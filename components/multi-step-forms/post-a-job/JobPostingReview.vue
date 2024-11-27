@@ -17,7 +17,6 @@ import {
     ListboxOption,
 } from '@headlessui/vue';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/vue/20/solid';
-import type { Language } from '~/types/models/Language';
 
 const emits = defineEmits<{ (e: 'submit'): void; (e: 'back'): void; }>();
 

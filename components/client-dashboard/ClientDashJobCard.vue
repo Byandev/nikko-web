@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {Term, type Project, Level, ExperienceLevelToText, ProjectLengthToText} from '~/types/models/Project';
+import {Term, type Project, Level} from '~/types/models/Project';
 import { Icon } from '@iconify/vue';
 import type { Skill } from '~/types/models/Skill';
 import { helpers, required } from '@vuelidate/validators';
