@@ -16,7 +16,8 @@ const page = ref(1)
 const queryString = computed(() => {
   let params: Record<string, string>  = {
     include: 'project.account.user,attachments,project.skills',
-    page: page.value.toString()
+    page: page.value.toString(),
+    'filter[status]': 'PENDING',
   }
 
   return new URLSearchParams(params).toString();

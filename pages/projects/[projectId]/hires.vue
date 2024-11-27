@@ -9,10 +9,12 @@ const { account } = storeToRefs(accountStore());
 
 const router = useRouter();
 const page = ref(1)
+const route = useRoute();
 
 const queryString = computed(() => {
     let params: Record<string, string> = {
         'filter[status]': 'ACTIVE,COMPLETED',
+        'filter[project_id]': route.params.projectId as string,
         include: 'account.user.avatar,proposal.project.account.user,proposal.project.languages,proposal.project.skills,proposal.project.images,proposal.attachments',
         page: page.value.toString()
     }
