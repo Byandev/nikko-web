@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
 import type { PaginationMeta } from '~/types/models/Pagination';
 
 const props = defineProps<{

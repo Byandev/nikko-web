@@ -3,9 +3,7 @@ import _ from 'lodash';
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { PaginatedList, PaginationMeta } from '~/types/models/Pagination';
 import { accountStore } from '~/store/accountStore';
-import { Icon } from '@iconify/vue';
 import type { Proposal } from '~/types/models/Proposal';
-import type { Account } from '~/types/models/Account';
 
 const { account } = storeToRefs(accountStore());
 
@@ -14,6 +12,7 @@ interface Filter {
     project_id: number;
     is_saved: boolean;
     page: number;
+    status: string;
 }
 
 interface ProposalPaginationMeta extends PaginationMeta {
@@ -32,7 +31,8 @@ const filter = ref<Filter>({
     include: 'project.account.user,attachments,contract,account.user.avatar,account.skills',
     project_id: parseInt(route.params.projectId as string),
     is_saved: false,
-    page: 1
+    page: 1,
+    status: 'SUBMITTED'
 });
 
 const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<ProposalList, ApiErrorResponse>();
@@ -42,6 +42,7 @@ const queryString = computed(() => {
         include: filter.value.include,
         ...(filter.value.project_id ? { 'filter[project_id]': filter.value.project_id.toString() } : {}),
         ...(filter.value.is_saved ? { 'filter[is_saved]': 'true' } : {}),
+        ...(filter.value.status ? { 'filter[status]': filter.value.status } : {}),
         page: filter.value.page.toString()
     };
 
@@ -115,7 +116,7 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                         </nav>
                     </div>
                     <div class="space-y-5">
-                        <ProposalCard v-if="proposals?.data && !isLoading" v-for="proposal in proposals.data"
+                        <ContractCard v-if="proposals?.data && !isLoading" v-for="proposal in proposals.data"
                             @click="viewFreelancer"
                             :key="proposal.id" :proposal="proposal" :show-save-button="true"
                             @save="(proposals as ProposalList).meta.total_saved_count++"
@@ -124,7 +125,7 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                             @view="viewContract"/>
                         <div v-else class="animate-pulse space-y-4">
                             <div class=" h-40 bg-gray-200 rounded w-full"></div>
-                        </div>
+                    </div>
                         <Pagination v-if="!isLoading && proposals?.data && proposals?.data.length > 0"
                             :pagination="proposals.meta" @prev-page="filter.page = filter.page - 1"
                             @next-page="filter.page = filter.page + 1" />

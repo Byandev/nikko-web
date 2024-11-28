@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { toRefs, ref } from "vue";
 import Button from "~/components/ui/Button.vue";
 import type { ApiErrorResponse } from "~/types/api/response/error";
 import { Level, Term, type Project } from "~/types/models/Project";

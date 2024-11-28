@@ -67,7 +67,7 @@ const viewJob = async (id: number) => {
                     </div>
 
                     <div v-else>
-                        <p class="text-gray-600 text-base tracking-wider text-center">You have no pending contract yet.
+                        <p class="text-gray-600 text-base tracking-wider text-center">You have no pending contracts yet.
                         </p>
                     </div>
                 </div>

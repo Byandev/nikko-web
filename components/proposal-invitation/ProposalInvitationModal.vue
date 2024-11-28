@@ -5,7 +5,7 @@ import type {PaginatedList} from "~/types/models/Pagination";
 import type {Project} from "~/types/models/Project";
 import type {ApiDataResponse, ApiErrorResponse} from "~/types/api/response/error";
 import {accountStore} from "~/store/accountStore";
-import {email, helpers, required} from "@vuelidate/validators";
+import {helpers, required} from "@vuelidate/validators";
 import type {ProposalInvitation} from "~/types/models/ProposalInvitation";
 
 const {freelancer, isOpen} = defineProps<{ freelancer?: Account, isOpen: boolean }>();
