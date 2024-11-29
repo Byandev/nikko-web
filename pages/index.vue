@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Dialog, DialogPanel } from '@headlessui/vue'
+import { accountStore } from '~/store/accountStore';
 
-const mobileMenuOpen = ref(false)
+const { account } = storeToRefs(accountStore());
 
 definePageMeta({
   auth: {
     unauthenticatedOnly: true,
-    navigateAuthenticatedTo: '/find-work',
+    navigateAuthenticatedTo: `${account.value?.type === 'FREELANCER' ? '/find-work' : '/find-freelancer'}`,
     navigateUnauthenticatedTo: '/register',
   },
 });
