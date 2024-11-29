@@ -56,6 +56,7 @@ const updateContractStatus = async (id: number | null, status: 'ACTIVE' | 'REJEC
         status: status,
       }
     });
+    await fetchProposals();
   } catch (e) {
     console.log(`Failed to update contract status to ${status}: `, e.message);
   }
