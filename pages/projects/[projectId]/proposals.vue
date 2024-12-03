@@ -151,7 +151,7 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
             </template>
             <template #content>
                 <div class="flex flex-col gap-2">
-                    <span class="border-b-2 p-2 w-full text-left"> To: {{ receiverName }}</span>
+                    <span class="border-b-2 p-2 w-full text-left border-t-2 py-4"> To: <span class="ml-2 ring-1 rounded-md p-2 ring-gray-200 text-primary">{{ receiverName }}</span></span>
                     <textarea v-model="message"
                         class="ring-0 ring-gray-300 w-full p-2 rounded-md placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none"
                         placeholder="Type your message here"></textarea>
