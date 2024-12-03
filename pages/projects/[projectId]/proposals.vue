@@ -5,6 +5,7 @@ import type { PaginatedList, PaginationMeta } from '~/types/models/Pagination';
 import { accountStore } from '~/store/accountStore';
 import type { Proposal } from '~/types/models/Proposal';
 import type { Channel } from '~/types/models/Channel';
+import type { Message } from '~/types/models/Message';
 
 const { account } = storeToRefs(accountStore());
 
@@ -30,6 +31,7 @@ const router = useRouter();
 const receiverName = ref('');
 const message = ref('');
 const isMessageModalOpen = ref(false);
+const current_proposal_id = ref<number | null>(null);
 
 const filter = ref<Filter>({
     include: 'project.account.user,attachments,contract,account.user.avatar,account.skills,chat_channel',
@@ -40,7 +42,8 @@ const filter = ref<Filter>({
 });
 
 const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<ProposalList, ApiErrorResponse>();
-const { data: channels, fetchData: fetchChannels } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
+const { sendRequest: createChannel } = useSubmit<{ data: Channel }, ApiErrorResponse>();
+const { sendRequest: sendMessage } = useSubmit<{ data: Message }, ApiErrorResponse>();
 
 const queryString = computed(() => {
     let params: Record<string, string> = {
@@ -70,8 +73,6 @@ const fetchProposals = async () => {
 
 onMounted(async () => {
     await fetchProposals();
-    await fetchChannels('v1/chat/channels', { headers: requestHeaders.value });
-    console.log('channels', channels.value);
 });
 
 watch(
@@ -93,19 +94,41 @@ const viewContract = async (id: number) => {
     await router.push(`/contract/${id}`);
 };
 
-const handleChat = async ({ proposal_id, accountName, channel_id }:{proposal_id?: number | null, accountName?: string | null, channel_id?: number | null}) => 
+const handModal = async ({ proposal_id, accountName, channel_id }:{proposal_id?: number | null, accountName?: string | null, channel_id?: number | null}) => 
 {
-    console.log('proposal_id', proposal_id);
-    console.log('accountName', accountName);
-    console.log('channel_id', channel_id);
     if (proposal_id && accountName) {
         receiverName.value = accountName;
         isMessageModalOpen.value = true;
+        current_proposal_id.value = proposal_id;
     }
     else{
         await router.push(`/messages/${channel_id}`);
     }
     // You can use the accountName as needed in your modal or other logic
+};
+
+const handleSubmit = async () => {
+    try {
+        const response = await createChannel('v1/chat/channels', {
+            method: 'POST',
+            headers: requestHeaders.value,
+            body: JSON.stringify({
+                subject_proposal_id: current_proposal_id.value
+            })
+        });
+
+        await sendMessage(`v1/chat/channels/${response.data.id}/messages`, {
+            method: 'POST',
+            headers: requestHeaders.value,
+            body: JSON.stringify({
+                content: message.value
+            })
+        });
+
+        await router.push(`/messages/${response.data.id}`);
+    } catch (error) {
+        console.error(error);
+    }
 };
 
 const totalCount = computed(() => proposals.value?.meta?.total_count ?? 0);
@@ -141,7 +164,7 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                             @click="viewFreelancer" :key="proposal.id" :proposal="proposal" :show-save-button="true"
                             @save="(proposals as ProposalList).meta.total_saved_count++"
                             @un-save="(proposals as ProposalList).meta.total_saved_count--" @hire="hireFreelancer"
-                            @view="viewContract" @message="handleChat({proposal_id: $event.proposal_id, accountName: $event.sender, channel_id: $event.channel_id})" />
+                            @view="viewContract" @message="handModal({proposal_id: $event.proposal_id, accountName: $event.sender, channel_id: $event.channel_id})" />
                         <div v-else class="animate-pulse space-y-4">
                             <div class=" h-40 bg-gray-200 rounded w-full"></div>
                         </div>
@@ -172,7 +195,7 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
             <template #actions>
                 <Button @click="isMessageModalOpen = false" text="Cancel" type="button" background="white"
                     foreground="primary" />
-                <Button @click="" text="Send" type="button" background="primary" foreground="white" />
+                <Button @click="handleSubmit" text="Send" type="button" background="primary" foreground="white" />
             </template>
         </Modal>
     </div>
