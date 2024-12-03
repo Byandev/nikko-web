@@ -1,6 +1,6 @@
 <template>
-    <div class="my-8 lg:mx-auto mx-5 max-w-7xl ring-1 ring-gray-300 rounded-md p-4 h-full">
-        <div class="flex flex-col lg:flex-row gap-4 h-full">
+    <div class="my-8 lg:mx-auto mx-5 max-w-7xl ring-1 ring-gray-300 rounded-md h-full">
+        <div class="flex flex-col lg:flex-row h-full">
             <!-- Sidebar -->
             <div class="w-full lg:w-1/3 flex flex-col gap-4 h-full">
                 <!-- Search Bar -->
@@ -24,7 +24,7 @@
             </div>
 
             <!-- Chat Section -->
-            <div class="w-full lg:w-2/3 bg-gray-50 flex flex-col h-full">
+            <div class="w-full lg:w-2/3 bg-gray-50 flex flex-col h-full border-l-2 border-r-2">
                 <div v-if="selectedChat" class="flex flex-col flex-grow h-full">
                     <!-- Chat Header -->
                     <div class="flex items-center p-4 bg-gray-200 border-b">
@@ -71,6 +71,19 @@
                 </div>
                 <div v-else class="flex items-center justify-center flex-grow">
                     <p class="text-gray-500">Select a chat to start messaging</p>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4 border-l">
+                <div v-if="selectedChat" class="flex flex-col items-center">
+                    <img :src="selectedChat.image" alt="User" class="w-24 h-24 rounded-full mb-4" />
+                    <div class="text-lg font-semibold">{{ selectedChat.name }}</div>
+                    <div class="text-sm text-gray-600 mb-4">Online</div>
+                    <div class="text-sm text-gray-600">{{ selectedChat.preview }}</div>
+                </div>
+                <div v-else class="flex items-center justify-center flex-grow">
+                    <p class="text-gray-500">Select a chat to view profile</p>
                 </div>
             </div>
         </div>
