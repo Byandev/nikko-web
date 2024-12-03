@@ -52,16 +52,16 @@ const viewProfile = async (id: number) => {
     <div class="my-8 lg:mx-auto mx-5 max-w-7xl ring-1 ring-gray-300 rounded-md h-[80vh]">
         <div class="flex flex-col lg:flex-row h-full">
             <!-- Sidebar -->
-            <div class="w-full lg:w-1/3 flex flex-col gap-4 h-full">
+            <div class="w-full lg:w-1/3 flex flex-col h-full">
                 <!-- Search Bar -->
-                <div class="p-4 bg-gray-50 border-b">
-                    <input type="text" placeholder="Search or start new chat"
-                        class="w-full p-2 border rounded-lg focus:outline-none focus:ring focus:ring-green-400" />
+                <div class="border border-gray-300 rounded-2xl p-2 flex flex-row items-center gap-2 m-4">
+                    <Icon icon="material-symbols:search" class=" text-xl text-gray-400" />
+                    <input type="text" placeholder="Search chat" class="w-full outline-none border-none" />
                 </div>
 
                 <!-- Chat List -->
                 <div class="overflow-y-auto flex-grow">
-                    <div v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)"
+                    <div v-if="chats && !isLoading" v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)"
                         :class="['flex items-center p-4 border-b cursor-pointer', chat.id == Number(route.params.channelId as string)? 'bg-gray-200': 'bg-white']">
                         <img :src="chat.members[1].avatar.original_url" alt="User"
                             class="w-12 h-12 rounded-full mr-4" />
@@ -72,27 +72,36 @@ const viewProfile = async (id: number) => {
                         </div>
                         <div class="text-xs text-gray-500">{{ timeAgo(chat.created_at) }}</div>
                     </div>
+                    <div v-else>
+                        <div v-if="isLoading" class="animate-pulse space-y-2">
+                            <div class="h-16 bg-gray-200 rounded w-full"></div>
+                            <div class="h-16 bg-gray-200 rounded w-full"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Chat Section -->
             <div class="w-full lg:w-2/3 bg-white flex flex-col h-full border-l-2 border-r-2">
-                <div v-if="message && !isLoading" class="flex flex-col flex-grow h-full">
-                    <!-- Chat Header -->
-                    <div v-if="message.length > 0" class="flex items-center p-4 bg-gray-50 border-b">
-                        <img :src="message[0].sender.avatar.original_url" alt="User"
-                            class="w-10 h-10 rounded-full mr-4" />
-                        <div class="flex-1">
-                            <div class="text-lg font-semibold">{{ message[0].sender.first_name }} {{
-                                message[0].sender.last_name }}</div>
-                            <!-- <div class="text-sm text-gray-600">Online</div> -->
-                        </div>
-                        <!-- <div class="space-x-2">
-                            <button class="p-2 rounded hover:bg-gray-300">Search</button>
-                            <button class="p-2 rounded hover:bg-gray-300">Menu</button>
-                        </div> -->
+                
+                <!-- Chat Header -->
+                <div class="flex items-center p-4 bg-gray-50 border-b">
+                    <img v-if="message && message[0] && !isLoading" :src="message[0].sender.avatar.original_url" alt="User"
+                        class="w-10 h-10 rounded-full mr-4" />
+                    <div v-else>
+                        <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
                     </div>
+                    <div class="flex-1">
+                        <div v-if="message && message[0] && !isLoading" class="text-lg font-semibold">
+                            {{ message[0].sender.first_name }} {{ message[0].sender.last_name }}
+                        </div>
+                        <div v-else>
+                            <div class="ml-5 w-20 h-4 bg-gray-300 rounded"></div>
+                        </div>
+                    </div>
+                </div>
 
+                <div v-if="message && message[0] && !isLoading" class="flex flex-col flex-grow h-full">
                     <!-- Chat Messages -->
                     <div class="flex-1 p-4 overflow-y-auto">
                         <div class="space-y-4">
@@ -117,18 +126,17 @@ const viewProfile = async (id: number) => {
                             </div>
                         </div>
                     </div>
-
-                    <!-- Chat Input -->
-                    <div class="flex items-center p-2 bg-gray-100 border-t">
-                        <input type="text" v-model="newMessage" placeholder="Aa"
-                            class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-green-400" />
-                        <button @click="" class="ml-4 p-2 bg-primary text-white rounded-full hover:bg-primary/80">
-                            <Icon icon="mdi:send" class="w-5 h-5" />
-                        </button>
-                    </div>
                 </div>
                 <div v-else class="flex items-center justify-center flex-grow">
                     <Icon icon="line-md:loading-loop" width="24" height="24" />
+                </div>
+                <!-- Chat Input -->
+                <div class="flex items-center p-2 bg-gray-100 border-t">
+                    <input type="text" v-model="newMessage" placeholder="Aa"
+                        class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-green-400" />
+                    <button @click="" class="ml-4 p-2 bg-primary text-white rounded-full hover:bg-primary/80">
+                        <Icon icon="mdi:send" class="w-5 h-5" />
+                    </button>
                 </div>
             </div>
 
