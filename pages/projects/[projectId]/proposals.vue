@@ -4,6 +4,7 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { PaginatedList, PaginationMeta } from '~/types/models/Pagination';
 import { accountStore } from '~/store/accountStore';
 import type { Proposal } from '~/types/models/Proposal';
+import type { Channel } from '~/types/models/Channel';
 
 const { account } = storeToRefs(accountStore());
 
@@ -28,9 +29,10 @@ const route = useRoute();
 const router = useRouter();
 const receiverName = ref('');
 const message = ref('');
+const isMessageModalOpen = ref(false);
 
 const filter = ref<Filter>({
-    include: 'project.account.user,attachments,contract,account.user.avatar,account.skills',
+    include: 'project.account.user,attachments,contract,account.user.avatar,account.skills,chat_channel',
     project_id: parseInt(route.params.projectId as string),
     is_saved: false,
     page: 1,
@@ -38,6 +40,7 @@ const filter = ref<Filter>({
 });
 
 const { data: proposals, fetchData: fetchAllProposals, pending: isLoading } = useFetchData<ProposalList, ApiErrorResponse>();
+const { data: channels, fetchData: fetchChannels } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
 
 const queryString = computed(() => {
     let params: Record<string, string> = {
@@ -67,6 +70,8 @@ const fetchProposals = async () => {
 
 onMounted(async () => {
     await fetchProposals();
+    await fetchChannels('v1/chat/channels', { headers: requestHeaders.value });
+    console.log('channels', channels.value);
 });
 
 watch(
@@ -88,14 +93,21 @@ const viewContract = async (id: number) => {
     await router.push(`/contract/${id}`);
 };
 
-const handleChat = async (id: number, accountName: string) => {
-    console.log('Chat with: ', id, accountName);
-    receiverName.value = accountName;
-    isMessageModalOpen.value = true;
+const handleChat = async ({ proposal_id, accountName, channel_id }:{proposal_id?: number | null, accountName?: string | null, channel_id?: number | null}) => 
+{
+    console.log('proposal_id', proposal_id);
+    console.log('accountName', accountName);
+    console.log('channel_id', channel_id);
+    if (proposal_id && accountName) {
+        receiverName.value = accountName;
+        isMessageModalOpen.value = true;
+    }
+    else{
+        await router.push(`/messages/${channel_id}`);
+    }
     // You can use the accountName as needed in your modal or other logic
 };
 
-const isMessageModalOpen = ref(false);
 const totalCount = computed(() => proposals.value?.meta?.total_count ?? 0);
 const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count ?? 0);
 
@@ -129,7 +141,7 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                             @click="viewFreelancer" :key="proposal.id" :proposal="proposal" :show-save-button="true"
                             @save="(proposals as ProposalList).meta.total_saved_count++"
                             @un-save="(proposals as ProposalList).meta.total_saved_count--" @hire="hireFreelancer"
-                            @view="viewContract" @message="handleChat" />
+                            @view="viewContract" @message="handleChat({proposal_id: $event.proposal_id, accountName: $event.sender, channel_id: $event.channel_id})" />
                         <div v-else class="animate-pulse space-y-4">
                             <div class=" h-40 bg-gray-200 rounded w-full"></div>
                         </div>
