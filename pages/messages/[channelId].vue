@@ -70,6 +70,7 @@ const name = computed(() => {
     <div class="h-full block lg:hidden ">
         <!-- Chat Section -->
         <div v-if="currentTab == 'chat-section'" class="lg:w-2/3 bg-white flex flex-col h-full border-l-2 border-r-2">
+
             <!-- Chat Header -->
             <div class="flex items-center p-4 bg-gray-50 border-b">
                 <button @click="router.push('/messages')" class="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
@@ -83,7 +84,7 @@ const name = computed(() => {
                 </div>
                 <div class="flex justify-between w-full">
                     <div class="flex-1">
-                        <div v-if="chats && !isLoading" class="text-lg font-semibold flex flex-col">
+                        <div v-if="chats && !isLoading && activeChannel" class="text-lg font-semibold flex flex-col">
                             <span>{{ name }}</span>
                             <span v-if="activeChannel" class="text-xs text-gray-500">{{
                                 timeAgo(activeChannel?.last_activity_at)
@@ -158,7 +159,7 @@ const name = computed(() => {
             </div>
             <div v-if="message.length > 0" class="mt-5 flex flex-col items-center">
                 <img v-if="activeChannel" :src="avatar" alt="User" class="w-24 h-24 rounded-full" />
-                <div class="text-lg font-semibold">{{ name }}</div>
+                <div v-if="activeChannel" class="text-lg font-semibold">{{ name }}</div>
                 <div class="mt-2 border-b-2 w-full pb-3">
                     <div class="flex justify-center flex-col items-center">
                         <Icon icon="iconamoon:profile-circle-fill"
@@ -222,9 +223,8 @@ const name = computed(() => {
                         <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
                     </div>
                     <div class="flex-1">
-                        <div v-if="chats && !isLoading" class="text-lg font-semibold flex flex-col">
-                            <span>{{ activeChannel?.members.find(member => account?.id != member.id)?.first_name }} {{ activeChannel?.members.find(member => account?.id != member.id)?.last_name
-                                }}</span>
+                        <div v-if="chats && !isLoading && activeChannel" class="text-lg font-semibold flex flex-col">
+                            <span>{{ name }}</span>
                             <span v-if="activeChannel" class="text-xs text-gray-500">{{
                                 timeAgo(activeChannel?.last_activity_at)
                                 }}</span>
@@ -278,11 +278,9 @@ const name = computed(() => {
             <!-- Profile Section -->
             <div class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4 border-l">
                 <div v-if="chats && !isLoading" class="flex flex-col items-center">
-                    <img v-if="activeChannel" :src="activeChannel?.members.find(member => account?.id != member.id)?.avatar.original_url" alt="User"
+                    <img v-if="activeChannel" :src="avatar" alt="User"
                         class="w-24 h-24 rounded-full" />
-                    <div class="text-lg font-semibold">{{ activeChannel?.members.find(member => account?.id != member.id)?.first_name }} {{
-                        activeChannel?.members.find(member => account?.id != member.id)?.last_name
-                        }}</div>
+                    <div v-if="activeChannel" class="text-lg font-semibold">{{ name }}</div>
                     <div class="mt-2 border-b-2 w-full pb-3">
                         <div class="flex justify-center flex-col items-center">
                             <Icon icon="iconamoon:profile-circle-fill"
