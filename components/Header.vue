@@ -100,7 +100,10 @@ defineProps({
         </div>
         <div class="relative flex justify-end space-x-4 group">
             <template v-if="isAuthenticated">
-                <div @click="toggleDropdown" class="cursor-pointer">
+                <NuxtLink to="/messages" @click="closeDropdown" class="rounded-full bg-gray-200 p-2">
+                    <Icon icon="flowbite:messages-solid" width="30" height="30" class="text-primary" />
+                </NuxtLink>
+                <div @click="toggleDropdown" class="cursor-pointer flex flex-row gap-2 items-center">
                     <template v-if="user?.avatar?.original_url">
                         <img :src="user?.avatar?.original_url" alt="User Avatar"
                             class="h-10 w-10 object-cover rounded-full">

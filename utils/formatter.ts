@@ -1,7 +1,7 @@
-const currencyFormatter = (
+export function currencyFormatter(
   number: number,
   currency_code: string = 'USD'
-): string => {
+): string {
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency_code,
@@ -9,13 +9,11 @@ const currencyFormatter = (
     maximumFractionDigits: 0,
   });
   return formatter.format(number);
-};
+}
 
-const timeAgo = (timestamp: string): string => {
+export function timeAgo(timestamp: string): string {
   const now = new Date();
-  console.log('Timestamp:',timestamp);
   const time = new Date(timestamp);
-  console.log('Now:',now, 'Time:',time);
   const diff = (Math.abs(now.getTime() - time.getTime())/1000);
 
   if (diff < 60) {
@@ -36,9 +34,9 @@ const timeAgo = (timestamp: string): string => {
     const years = Math.floor(diff / 31536000);
     return years === 1 ? "1 year ago" : `${years} years ago`;
   }
-};
+}
 
-const formatDayTime = (dateString: string): string => {
+export function formatDayTime(dateString: string): string {
   // Convert the string into a Date object
   const date = new Date(dateString);
 
@@ -53,6 +51,4 @@ const formatDayTime = (dateString: string): string => {
   const minutes = String(date.getMinutes()).padStart(2, '0');
 
   return `${day}, ${hours}:${minutes}`;
-};
-
-export { currencyFormatter, timeAgo, formatDayTime };
+}

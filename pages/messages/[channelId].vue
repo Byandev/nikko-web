@@ -4,6 +4,7 @@ import type { Channel } from '~/types/models/Channel';
 import { accountStore } from '~/store/accountStore';
 import type { Message } from '~/types/models/Message';
 import { Icon } from '@iconify/vue';
+import { formatDayTime } from '~/utils/formatter';
 
 const { account } = storeToRefs(accountStore());
 
@@ -48,6 +49,11 @@ const selectChat = async (id: number) => {
 const viewProfile = async (id: number) => {
     await router.push(`/freelancer/${id}`);
 };
+
+
+const activeChannel = computed(() => {
+    return chats.value.find((chat) => chat.id === Number(route.params.channelId as string));
+});
 </script>
 
 
@@ -196,17 +202,22 @@ const viewProfile = async (id: number) => {
 
                 <!-- Chat Header -->
                 <div class="flex items-center p-4 bg-gray-50 border-b">
-                    <img v-if="message && message[0] && !isLoading" :src="message[0].sender.avatar.original_url"
+                    <img v-if="chats && !isLoading"
+                        :src="activeChannel?.members[1].avatar.original_url ?? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'"
                         alt="User" class="w-10 h-10 rounded-full mr-4" />
                     <div v-else>
                         <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
                     </div>
                     <div class="flex-1">
-                        <div v-if="message && message[0] && !isLoading" class="text-lg font-semibold">
-                            {{ message[0].sender.first_name }} {{ message[0].sender.last_name }}
+                        <div v-if="chats && !isLoading" class="text-lg font-semibold flex flex-col">
+                            <span>{{ activeChannel?.members[1].first_name }} {{ activeChannel?.members[1].last_name
+                                }}</span>
+                            <span v-if="activeChannel" class="text-xs text-gray-500">{{ timeAgo(activeChannel?.last_activity_at)
+                                }}</span>
                         </div>
                         <div v-else>
                             <div class="ml-5 w-20 h-4 bg-gray-300 rounded"></div>
+                            <div class="mt-2 ml-5 w-12 h-4 bg-gray-300 rounded"></div>
                         </div>
                     </div>
                 </div>
@@ -216,7 +227,7 @@ const viewProfile = async (id: number) => {
                     <div class="flex-1 p-4 overflow-y-auto">
                         <div class="space-y-4">
                             <div v-for="(item, index) in message" :key="index">
-                                <div v-if="item.sender.first_name === 'other'" class="flex justify-start">
+                                <div v-if="item.sender.id !== account?.id" class="flex justify-start">
                                     <div class="bg-white p-3 rounded-lg shadow w-max">
                                         <p>{{ item.content }}</p>
                                         <span class="text-xs text-gray-500">{{ formatDayTime(item.created_at) }}</span>
@@ -252,13 +263,16 @@ const viewProfile = async (id: number) => {
 
             <!-- Profile Section -->
             <div class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4 border-l">
-                <div v-if="message.length > 0" class="flex flex-col items-center">
-                    <img :src="message[0].sender.avatar.original_url" alt="User" class="w-24 h-24 rounded-full mb-4" />
-                    <div class="text-lg font-semibold">{{ message[0].sender.first_name }} {{ message[0].sender.last_name
+                <div v-if="chats && !isLoading" class="flex flex-col items-center">
+                    <img :src="activeChannel?.members[1].avatar.original_url" alt="User"
+                        class="w-24 h-24 rounded-full" />
+                    <div class="text-lg font-semibold">{{ activeChannel?.members[1].first_name }} {{
+                        activeChannel?.members[1].last_name
                         }}</div>
-                    <div class="mt-4 border-b-2 w-full pb-3">
+                    <div class="mt-2 border-b-2 w-full pb-3">
                         <div class="flex justify-center flex-col items-center">
-                            <Icon icon="iconamoon:profile-circle-fill" @click="viewProfile(message[0].sender.id)"
+                            <Icon icon="iconamoon:profile-circle-fill"
+                                @click="viewProfile(activeChannel?.members[1].id ?? 0)"
                                 class="w-12 h-12 text-gray-500  hover:cursor-pointer hover:bg-gray-200 rounded-full p-1" />
                             <span class="text-sm text-gray-500">Profile</span>
                         </div>
