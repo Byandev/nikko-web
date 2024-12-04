@@ -50,35 +50,48 @@ const viewProfile = async (id: number) => {
     await router.push(`/freelancer/${id}`);
 };
 
-
 const activeChannel = computed(() => {
     return chats.value.find((chat) => chat.id === Number(route.params.channelId as string));
 });
+
+const avatar = computed(() => {
+    return activeChannel.value?.members.find(member => account.value?.id != member.id)?.avatar.original_url;
+});
+
+const name = computed(() => {
+    return activeChannel.value?.members.find(member => account.value?.id != member.id)?.first_name + ' ' + activeChannel.value?.members.find(member => account.value?.id != member.id)?.last_name;
+});
+
 </script>
 
 
 <template>
+    <!-- Mobile View -->
     <div class="h-full block lg:hidden ">
         <!-- Chat Section -->
         <div v-if="currentTab == 'chat-section'" class="lg:w-2/3 bg-white flex flex-col h-full border-l-2 border-r-2">
-
             <!-- Chat Header -->
             <div class="flex items-center p-4 bg-gray-50 border-b">
                 <button @click="router.push('/messages')" class="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
                     <Icon icon="mdi:arrow-left" class="w-5 h-5" />
                 </button>
-                <img v-if="message && message[0] && !isLoading" :src="message[0].sender.avatar.original_url" alt="User"
-                    class="w-10 h-10 rounded-full mr-4" />
+                <img v-if="chats && !isLoading && activeChannel"
+                    :src="avatar"
+                    alt="User" class="w-10 h-10 rounded-full mr-4" />
                 <div v-else>
                     <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
                 </div>
                 <div class="flex justify-between w-full">
                     <div class="flex-1">
-                        <div v-if="message && message[0] && !isLoading" class="text-lg font-semibold">
-                            {{ message[0].sender.first_name }} {{ message[0].sender.last_name }}
+                        <div v-if="chats && !isLoading" class="text-lg font-semibold flex flex-col">
+                            <span>{{ name }}</span>
+                            <span v-if="activeChannel" class="text-xs text-gray-500">{{
+                                timeAgo(activeChannel?.last_activity_at)
+                                }}</span>
                         </div>
                         <div v-else>
                             <div class="ml-5 w-20 h-4 bg-gray-300 rounded"></div>
+                            <div class="mt-2 ml-5 w-12 h-4 bg-gray-300 rounded"></div>
                         </div>
                     </div>
                     <div>
@@ -143,13 +156,13 @@ const activeChannel = computed(() => {
                     <Icon icon="mdi:arrow-left" class="w-5 h-5" />
                 </button>
             </div>
-            <div v-if="message.length > 0" class="flex flex-col items-center">
-                <img :src="message[0].sender.avatar.original_url" alt="User" class="w-24 h-24 rounded-full mb-4" />
-                <div class="text-lg font-semibold">{{ message[0].sender.first_name }} {{ message[0].sender.last_name
-                    }}</div>
-                <div class="mt-4 border-b-2 w-full pb-3">
+            <div v-if="message.length > 0" class="mt-5 flex flex-col items-center">
+                <img v-if="activeChannel" :src="avatar" alt="User" class="w-24 h-24 rounded-full" />
+                <div class="text-lg font-semibold">{{ name }}</div>
+                <div class="mt-2 border-b-2 w-full pb-3">
                     <div class="flex justify-center flex-col items-center">
-                        <Icon icon="iconamoon:profile-circle-fill" @click="viewProfile(message[0].sender.id)"
+                        <Icon icon="iconamoon:profile-circle-fill"
+                            @click="viewProfile(activeChannel?.members.find(member => account?.id != member.id)?.id ?? 0)"
                             class="w-12 h-12 text-gray-500  hover:cursor-pointer hover:bg-gray-200 rounded-full p-1" />
                         <span class="text-sm text-gray-500">Profile</span>
                     </div>
@@ -161,8 +174,10 @@ const activeChannel = computed(() => {
         </div>
     </div>
 
+    <!-- Desktop View -->
     <div class="hidden lg:block my-8 lg:mx-auto mx-5 max-w-7xl ring-1 ring-gray-300 rounded-md h-[80vh]">
         <div class="flex flex-col lg:flex-row h-full">
+
             <!-- Sidebar -->
             <div class="w-full lg:w-1/3 flex flex-col h-full">
                 <!-- Search Bar -->
@@ -185,12 +200,11 @@ const activeChannel = computed(() => {
                     </div>
                     <div v-if="chats && !isLoading" v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)"
                         :class="['flex items-center p-4 border-b cursor-pointer', chat.id == Number(route.params.channelId as string)? 'bg-gray-200': 'bg-white']">
-                        <img :src="chat.members[1].avatar.original_url" alt="User"
+                        <img :src="activeChannel?.members.find(member=> account?.id != member.id)?.avatar.original_url" alt="User"
                             class="w-12 h-12 rounded-full mr-4" />
                         <div class="flex-1">
-                            <div class="text-lg font-semibold">{{ chat.members[1].first_name }} {{
-                                chat.members[1].last_name }}</div>
-                            <!-- <div class="text-sm text-gray-600 truncate">{{ chat. }}</div> -->
+                            <div class="text-lg font-semibold">{{ activeChannel?.members.find(member => account?.id != member.id)?.first_name }} {{
+                                 activeChannel?.members.find(member => account?.id != member.id)?.last_name }}</div>
                         </div>
                         <div class="text-xs text-gray-500">{{ timeAgo(chat.created_at) }}</div>
                     </div>
@@ -199,20 +213,20 @@ const activeChannel = computed(() => {
 
             <!-- Chat Section -->
             <div class="w-full lg:w-2/3 bg-white flex flex-col h-full border-l-2 border-r-2">
-
                 <!-- Chat Header -->
                 <div class="flex items-center p-4 bg-gray-50 border-b">
-                    <img v-if="chats && !isLoading"
-                        :src="activeChannel?.members[1].avatar.original_url ?? 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'"
+                    <img v-if="chats && !isLoading && activeChannel"
+                        :src="activeChannel?.members.find(member => account?.id != member.id)?.avatar.original_url"
                         alt="User" class="w-10 h-10 rounded-full mr-4" />
                     <div v-else>
                         <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
                     </div>
                     <div class="flex-1">
                         <div v-if="chats && !isLoading" class="text-lg font-semibold flex flex-col">
-                            <span>{{ activeChannel?.members[1].first_name }} {{ activeChannel?.members[1].last_name
+                            <span>{{ activeChannel?.members.find(member => account?.id != member.id)?.first_name }} {{ activeChannel?.members.find(member => account?.id != member.id)?.last_name
                                 }}</span>
-                            <span v-if="activeChannel" class="text-xs text-gray-500">{{ timeAgo(activeChannel?.last_activity_at)
+                            <span v-if="activeChannel" class="text-xs text-gray-500">{{
+                                timeAgo(activeChannel?.last_activity_at)
                                 }}</span>
                         </div>
                         <div v-else>
@@ -264,15 +278,15 @@ const activeChannel = computed(() => {
             <!-- Profile Section -->
             <div class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4 border-l">
                 <div v-if="chats && !isLoading" class="flex flex-col items-center">
-                    <img :src="activeChannel?.members[1].avatar.original_url" alt="User"
+                    <img v-if="activeChannel" :src="activeChannel?.members.find(member => account?.id != member.id)?.avatar.original_url" alt="User"
                         class="w-24 h-24 rounded-full" />
-                    <div class="text-lg font-semibold">{{ activeChannel?.members[1].first_name }} {{
-                        activeChannel?.members[1].last_name
+                    <div class="text-lg font-semibold">{{ activeChannel?.members.find(member => account?.id != member.id)?.first_name }} {{
+                        activeChannel?.members.find(member => account?.id != member.id)?.last_name
                         }}</div>
                     <div class="mt-2 border-b-2 w-full pb-3">
                         <div class="flex justify-center flex-col items-center">
                             <Icon icon="iconamoon:profile-circle-fill"
-                                @click="viewProfile(activeChannel?.members[1].id ?? 0)"
+                                @click="viewProfile(activeChannel?.members.find(member => account?.id != member.id)?.id ?? 0)"
                                 class="w-12 h-12 text-gray-500  hover:cursor-pointer hover:bg-gray-200 rounded-full p-1" />
                             <span class="text-sm text-gray-500">Profile</span>
                         </div>
