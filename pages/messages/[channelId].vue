@@ -191,12 +191,12 @@ const name = computed(() => {
                 <div class="overflow-y-auto flex-grow">
                     <div v-if="isLoading" class="animate-pulse space-y-2" v-for="n in 2" :key="n">
                         <div class="flex items-center p-4 border-b">
-                            <div class="w-12 h-12 bg-gray-200 rounded-full mr-4"></div>
+                            <div class="w-12 h-12 bg-gray-200 rounded-full mr-4 animate-pulse"></div>
                             <div class="flex-1">
-                                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                                <div class="h-4 bg-gray-200 rounded w-1/2"></div>
+                                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
+                                <div class="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
                             </div>
-                            <div class="h-4 bg-gray-200 rounded w-12"></div>
+                            <div class="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
                         </div>
                     </div>
                     <div v-if="chats && !isLoading" v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)"
@@ -220,7 +220,7 @@ const name = computed(() => {
                         :src="activeChannel?.members.find(member => account?.id != member.id)?.avatar.original_url"
                         alt="User" class="w-10 h-10 rounded-full mr-4" />
                     <div v-else>
-                        <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
+                        <div class="w-10 h-10 bg-gray-300 rounded-full animate-pulse"></div>
                     </div>
                     <div class="flex-1">
                         <div v-if="chats && !isLoading && activeChannel" class="text-lg font-semibold flex flex-col">
@@ -230,8 +230,8 @@ const name = computed(() => {
                                 }}</span>
                         </div>
                         <div v-else>
-                            <div class="ml-5 w-20 h-4 bg-gray-300 rounded"></div>
-                            <div class="mt-2 ml-5 w-12 h-4 bg-gray-300 rounded"></div>
+                            <div class="ml-5 w-20 h-4 bg-gray-300 rounded animate-pulse"></div>
+                            <div class="mt-2 ml-5 w-12 h-4 bg-gray-300 rounded animate-pulse"></div>
                         </div>
                     </div>
                 </div>
@@ -276,11 +276,17 @@ const name = computed(() => {
             </div>
 
             <!-- Profile Section -->
-            <div class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4 border-l">
+            <div class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4">
                 <div v-if="chats && !isLoading" class="flex flex-col items-center">
                     <img v-if="activeChannel" :src="avatar" alt="User"
-                        class="w-24 h-24 rounded-full" />
-                    <div v-if="activeChannel" class="text-lg font-semibold">{{ name }}</div>
+                        class="w-24 h-24 rounded-full animate-pulse" />
+                    <div v-else>
+                        <div class="w-24 h-24 bg-gray-300 rounded-full animate-pulse"></div>
+                    </div>
+                    <div v-if="activeChannel" class="text-lg font-semibold animate-pulse">{{ name }}</div>
+                    <div v-else>
+                        <div class="mt-2 w-28 h-6 bg-gray-300 rounded"></div>
+                    </div>
                     <div class="mt-2 border-b-2 w-full pb-3">
                         <div class="flex justify-center flex-col items-center">
                             <Icon icon="iconamoon:profile-circle-fill"
