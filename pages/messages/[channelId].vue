@@ -412,9 +412,9 @@ const showLoadMore = computed(() => {
 
 
             <!-- Profile Section -->
-            <div class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4">
+            <div class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full">
                 <div v-if="chats && !isChannelLoading" class="flex flex-col items-center">
-                    <img v-if="activeChannel" :src="avatar" alt="User" class="w-24 h-24 rounded-full" />
+                    <img v-if="activeChannel" :src="avatar" alt="User" class="mt-5 w-24 h-24 rounded-full" />
                     <div v-else>
                         <div class="w-24 h-24 bg-gray-300 rounded-full animate-pulse"></div>
                     </div>
@@ -422,7 +422,7 @@ const showLoadMore = computed(() => {
                     <div v-else>
                         <div class="mt-2 w-28 h-6 bg-gray-300 rounded animate-pulse"></div>
                     </div>
-                    <div class="mt-2 border-b-2 w-full pb-3">
+                    <div class="mt-2 mb-2 border-b-2 w-full pb-3 flex flex-row justify-center gap-5">
                         <div class="flex justify-center flex-col items-center">
                             <Icon icon="iconamoon:profile-circle-fill"
                                 @click="viewProfile(activeChannel?.members.find(member => account?.id != member.id)?.id ?? 0)"
