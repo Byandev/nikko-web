@@ -40,7 +40,7 @@ const channelsQueryString = computed(() => {
 const messageQueryString = computed(() => {
     let params: Record<string, string> = {
         page: page.value.toString(),
-        'per_page': '10'
+        'per_page': '20'
     }
 
     return new URLSearchParams(params).toString();
@@ -213,6 +213,13 @@ const showLoadMore = computed(() => {
             <!-- Chat Messages -->
             <div ref="messagesContainer" v-if="message && message[0] && !isMessagesLoading"
                 class="flex-1 p-4 overflow-y-auto flex-grow">
+                <div class="text-center my-4" v-if="showLoadMore">
+                    <button @click="page = page + 1"
+                        class="ml-5 ring-1 ring-primary px-4 py-2 bg-white text-primary rounded-full hover:bg-white/80">
+                        <Icon v-if="isMessagesLoading" icon="line-md:loading-loop" class="w-5 h-5" />
+                        <span v-else>Load more</span>
+                    </button>
+                </div>
                 <div class="space-y-4">
                     <div v-if="message.length === 0 && !isMessagesLoading" class="text-center text-gray-500">
                         No messages yet. Start the conversation!
