@@ -78,6 +78,18 @@ defineProps({
                         class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
                         Invitations
                     </NuxtLink>
+                    <NuxtLink to="/my-contract/pending-offers" @click="closeDropdown"
+                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                        Pending Offers
+                    </NuxtLink>
+                    <NuxtLink to="/my-contract/active-jobs" @click="closeDropdown"
+                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                        Active Jobs
+                    </NuxtLink>
+                    <NuxtLink to="/my-contract/completed-jobs" @click="closeDropdown"
+                        class="block px-4 py-2 text-gray-800 hover:bg-gray-100">
+                        Completed Jobs
+                    </NuxtLink>
                 </div>
             </div>
 

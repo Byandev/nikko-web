@@ -60,8 +60,9 @@ const updateContractStatus = async (id: number | null) => {
                 status: 'COMPLETED',
             }
         });
+        router.push('/my-contract/completed-contracts');
     } catch (e) {
-        console.log(`Failed to update contract status to ${status}: `, e.message);
+        console.log(`Failed to update contract status`, e.message);
     }
 };
 
