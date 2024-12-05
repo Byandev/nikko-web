@@ -109,7 +109,7 @@ const name = computed(() => {
                             <span>{{ name }}</span>
                             <span v-if="activeChannel" class="text-xs text-gray-500">{{
                                 timeAgo(activeChannel?.last_activity_at)
-                            }}</span>
+                                }}</span>
                         </div>
                         <div v-else>
                             <div class="ml-5 w-20 h-4 bg-gray-300 rounded"></div>
@@ -205,12 +205,12 @@ const name = computed(() => {
             <div class="w-full lg:w-1/3 flex flex-col h-full">
                 <!-- Search Bar -->
                 <div class="border border-gray-300 rounded-2xl p-2 flex flex-row items-center gap-2 m-4">
-                    <Icon icon="material-symbols:search" class=" text-xl text-gray-400" />
+                    <Icon icon="material-symbols:search" class="text-xl text-gray-400" />
                     <input type="text" placeholder="Search chat" class="w-full outline-none border-none" />
                 </div>
 
                 <!-- Chat List -->
-                <div class="overflow-y-auto flex-grow">
+                <div class="flex-grow overflow-y-auto">
                     <div v-if="isChannelLoading" class="animate-pulse space-y-2" v-for="n in 2" :key="n">
                         <div class="flex items-center p-4 border-b">
                             <div class="w-12 h-12 bg-gray-200 rounded-full mr-4 animate-pulse"></div>
@@ -221,23 +221,26 @@ const name = computed(() => {
                             <div class="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
                         </div>
                     </div>
+
                     <div v-if="chats && !isChannelLoading" v-for="chat in chats" :key="chat.id"
                         @click="selectChat(chat.id)"
                         :class="['flex items-center p-4 border-b cursor-pointer', chat.id == Number(route.params.channelId as string) ? 'bg-gray-200' : 'bg-white']">
                         <img :src="activeChannel?.members.find(member => account?.id != member.id)?.avatar.original_url"
                             alt="User" class="w-12 h-12 rounded-full mr-4" />
                         <div class="flex-1">
-                            <div class="text-lg font-semibold">{{ activeChannel?.members.find(member => account?.id !=
-                                member.id)?.first_name }} {{
-                                    activeChannel?.members.find(member => account?.id != member.id)?.last_name }}</div>
+                            <div class="text-lg font-semibold">
+                                {{ activeChannel?.members.find(member => account?.id != member.id)?.first_name }}
+                                {{ activeChannel?.members.find(member => account?.id != member.id)?.last_name }}
+                            </div>
                         </div>
                         <div class="text-xs text-gray-500">{{ timeAgo(chat.created_at) }}</div>
                     </div>
                 </div>
             </div>
 
+
             <!-- Chat Section -->
-            <div class="w-full lg:w-2/3 bg-white flex flex-col h-full border-l-2 border-r-2">
+            <div class="w-full lg:w-2/3 bg-white flex flex-col border-l-2 border-r-2 h-[80vh]">
 
                 <!-- Chat Header -->
                 <div class="flex items-center p-4 bg-gray-50 border-b">
@@ -251,9 +254,9 @@ const name = computed(() => {
                         <div v-if="chats && !isChannelLoading && activeChannel"
                             class="text-lg font-semibold flex flex-col">
                             <span>{{ name }}</span>
-                            <span v-if="activeChannel" class="text-xs text-gray-500">{{
-                                timeAgo(activeChannel?.last_activity_at)
-                            }}</span>
+                            <span v-if="activeChannel" class="text-xs text-gray-500">
+                                {{ timeAgo(activeChannel?.last_activity_at) }}
+                            </span>
                         </div>
                         <div v-else>
                             <div class="ml-5 w-20 h-4 bg-gray-300 rounded animate-pulse"></div>
@@ -262,48 +265,51 @@ const name = computed(() => {
                     </div>
                 </div>
 
-                <div v-if="message && message[0] && !isMessagesLoading" class="flex flex-col h-full">
-
-                    <!-- Chat Messages -->
-                    <div class="flex-1 p-4 overflow-y-auto h-20">
-                        <div class="flex flex-col gap-2 h-1/2">
-                            <div v-for="(item, index) in message" :key="index">
-                                <!-- Received Messages -->
-                                <div v-if="item.sender.id !== account?.id" class="flex justify-start">
-                                    <div class="bg-white p-3 rounded-lg shadow w-max">
-                                        <p>{{ item.content }}</p>
-                                        <span class="text-xs text-gray-500">{{ formatDayTime(item.created_at) }}</span>
-                                    </div>
+                <!-- Chat Messages -->
+                <div class="p-4 overflow-y-auto grow">
+                    <div v-if="message && message[0] && !isMessagesLoading" class="flex flex-col gap-2">
+                        <div v-for="(item, index) in message" :key="index">
+                            <!-- Received Messages -->
+                            <div v-if="item.sender.id !== account?.id" class="flex justify-start">
+                                <div class="bg-white p-3 rounded-lg shadow w-max">
+                                    <p>{{ item.content }}</p>
+                                    <span class="text-xs text-gray-500">
+                                        {{ formatDayTime(item.created_at) }}
+                                    </span>
                                 </div>
-                                <!-- Sent Messages -->
-                                <div v-else class="flex justify-end">
-                                    <div class="relative group flex flex-row items-center gap-2">
-                                        <span
-                                            class="bg-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            {{ formatDayTime(item.created_at) }}
-                                        </span>
-                                        <div class="bg-primary p-3 rounded-lg shadow max-w-1/4 text-white flex">
-                                            <p class="break-words">{{ item.content }}</p>
-                                        </div>
+                            </div>
+                            <!-- Sent Messages -->
+                            <div v-else class="flex justify-end">
+                                <div class="relative group flex flex-row items-center gap-2">
+                                    <span
+                                        class="bg-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                        {{ formatDayTime(item.created_at) }}
+                                    </span>
+                                    <div class="bg-primary p-3 rounded-lg shadow max-w-1/4 text-white flex">
+                                        <p class="break-words">{{ item.content }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div v-else class="flex items-center justify-center flex-grow">
-                    <Icon icon="line-md:loading-loop" width="24" height="24" />
-                </div>
-                 <!-- Chat Input -->
-                 <div class="flex items-center p-2 bg-gray-100 border-t">
-                        <input type="text" v-model="newMessage" placeholder="Aa"
-                            class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-green-400" />
-                        <button @click="handleMessageSubmit"
-                            class="ml-4 p-2 bg-primary text-white rounded-full hover:bg-primary/80">
-                            <Icon :icon="!isSending ? 'mdi:send' : 'line-md:loading-loop'" class="w-5 h-5" />
-                        </button>
+                    <!-- Loading State -->
+                    <div v-else class="flex items-center justify-center grow">
+                        <Icon icon="line-md:loading-loop" width="24" height="24" />
                     </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="p-2 bg-gray-100 border-t flex items-center">
+                    <input type="text" v-model="newMessage" placeholder="Aa"
+                        class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring focus:ring-green-400" />
+                    <button @click="handleMessageSubmit"
+                        class="ml-4 p-2 bg-primary text-white rounded-full hover:bg-primary/80">
+                        <Icon :icon="!isSending ? 'mdi:send' : 'line-md:loading-loop'" class="w-5 h-5" />
+                    </button>
+                </div>
+
             </div>
+
 
             <!-- Profile Section -->
             <div class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4">
@@ -331,4 +337,5 @@ const name = computed(() => {
             </div>
         </div>
     </div>
+
 </template>
