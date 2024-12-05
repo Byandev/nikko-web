@@ -5,11 +5,12 @@ import { accountStore } from '~/store/accountStore';
 import type { Message } from '~/types/models/Message';
 import { Icon } from '@iconify/vue';
 import { formatDayTime } from '~/utils/formatter';
+import type { PaginatedList } from '~/types/models/Pagination';
 
 const { account } = storeToRefs(accountStore());
 
 const { data: channels, fetchData: fetchChannels, pending: isChannelLoading } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
-const { data: messages, fetchData: fetchMessages, pending: isMessagesLoading } = useFetchData<{ data: Message[] }, ApiErrorResponse>();
+const { data: messages, fetchData: fetchMessages, pending: isMessagesLoading } = useFetchData<PaginatedList<Message>, ApiErrorResponse>();
 const { sendRequest: sendMesage, pending: isSending } = useSubmit<{ data: Message }, ApiErrorResponse>();
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
@@ -18,22 +19,68 @@ const requestHeaders = computed<HeadersInit | undefined>(() =>
 
 const chats = ref<Channel[]>([]);
 const message = ref<Message[]>([]);
+
 const router = useRouter();
 const route = useRoute();
 const newMessage = ref('');
+const page = ref(1);
 
 const currentTab = ref('chat-section');
 const showDropdown = ref(false);
+const searchQuery = ref('');
+
+const channelsQueryString = computed(() => {
+    let params: Record<string, string> = {
+        'filter[search]': searchQuery.value,
+    }
+
+    return new URLSearchParams(params).toString();
+})
+
+const messageQueryString = computed(() => {
+    let params: Record<string, string> = {
+        page: page.value.toString(),
+        'per_page': '10'
+    }
+
+    return new URLSearchParams(params).toString();
+})
+
+watch(
+    [() => channelsQueryString.value],
+    debounce(async () => {
+        await fetchChannels(`/v1/chat/channels?${channelsQueryString.value}`, {
+            headers: requestHeaders.value
+        });
+        if (channels.value && channels.value.data) {
+            chats.value = channels.value.data
+            scrollToBottom();
+        }
+    }, 500)
+);
+
+watch(
+    [() => page.value],
+    debounce(async () => {
+        await fetchMessages(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, {
+            headers: requestHeaders.value
+        });
+        if (messages.value && messages.value.data) {
+            message.value = [...message.value, ...messages.value.data];
+        }
+    }, 500)
+);
+
 
 onMounted(async () => {
-    await fetchChannels(`/v1/chat/channels`, {
+    await fetchChannels(`/v1/chat/channels?${channelsQueryString.value}`, {
         headers: requestHeaders.value
     });
     if (channels.value && channels.value.data) {
         chats.value = channels.value.data
     }
 
-    await fetchMessages(`/v1/chat/channels/${route.params.channelId}/messages`, {
+    await fetchMessages(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, {
         headers: requestHeaders.value
     });
 
@@ -109,8 +156,10 @@ const scrollToBottom = () => {
     });
 };
 
-watch(() => newMessage.value, () => {
-    scrollToBottom();
+const showLoadMore = computed(() => {
+    if (messages.value && messages.value.meta) {
+        return messages.value.meta.current_page < messages.value.meta.last_page;
+    }
 });
 
 </script>
@@ -151,8 +200,9 @@ watch(() => newMessage.value, () => {
                         </button>
                         <div v-if="showDropdown"
                             class="absolute mt-2 right-10 w-48 bg-white border rounded-lg shadow-lg z-50">
-                            <button @click="{currentTab = 'gallery-section';
-                                showDropdown=false;
+                            <button @click="{
+                                currentTab = 'gallery-section';
+                                showDropdown = false;
                             }"
                                 class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">Gallery</button>
                         </div>
@@ -202,11 +252,12 @@ watch(() => newMessage.value, () => {
         <!-- Profile Section -->
         <div v-if="currentTab == 'gallery-section'" class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4">
             <div>
-                <button @click="{currentTab = 'chat-section';
-                    showDropdown=false;
+                <button @click="{
+                    currentTab = 'chat-section';
+                    showDropdown = false;
                 }" class="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
-                <Icon icon="mdi:arrow-left" class="w-5 h-5" />
-            </button>
+                    <Icon icon="mdi:arrow-left" class="w-5 h-5" />
+                </button>
             </div>
             <div v-if="chats && !isChannelLoading" class="flex flex-col items-center">
                 <img v-if="activeChannel" :src="avatar" alt="User" class="w-24 h-24 rounded-full" />
@@ -241,7 +292,8 @@ watch(() => newMessage.value, () => {
                 <!-- Search Bar -->
                 <div class="border border-gray-300 rounded-2xl p-2 flex flex-row items-center gap-2 m-4">
                     <Icon icon="material-symbols:search" class="text-xl text-gray-400" />
-                    <input type="text" placeholder="Search chat" class="w-full outline-none border-none" />
+                    <input type="text" v-model="searchQuery" placeholder="Search chat"
+                        class="w-full outline-none border-none" />
                 </div>
 
                 <!-- Chat List -->
@@ -306,6 +358,14 @@ watch(() => newMessage.value, () => {
                 <!-- Chat Messages -->
                 <div ref="messagesContainer" v-if="message && message[0] && !isMessagesLoading"
                     class="flex-1 p-4 overflow-y-auto flex-grow">
+                    <div class="text-center my-4" v-if="showLoadMore">
+                        <button @click="page = page + 1"
+                            class="ml-5 ring-1 ring-primary px-4 py-2 bg-white text-primary rounded-full hover:bg-white/80">
+                            <Icon v-if="isMessagesLoading" icon="line-md:loading-loop" class="w-5 h-5" />
+                            <span v-else>Load more</span>
+                        </button>
+                    </div>
+
                     <div class="space-y-4">
                         <div v-if="message.length === 0 && !isMessagesLoading" class="text-center text-gray-500">
                             No messages yet. Start the conversation!
