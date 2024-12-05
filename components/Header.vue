@@ -98,10 +98,10 @@ defineProps({
                 </div>
             </div>
         </div>
-        <div class="relative flex justify-end space-x-4 group">
+        <div class="relative flex justify-end space-x-3 group">
             <template v-if="isAuthenticated">
-                <NuxtLink to="/messages" @click="closeDropdown" class="rounded-full bg-gray-200 p-2">
-                    <Icon icon="flowbite:messages-solid" width="30" height="30" class="text-primary" />
+                <NuxtLink to="/messages" @click="closeDropdown" class="rounded-full p-2">
+                    <Icon icon="humbleicons:chat" width="32" height="32" class="text-primary" />
                 </NuxtLink>
                 <div @click="toggleDropdown" class="cursor-pointer flex flex-row gap-2 items-center">
                     <template v-if="user?.avatar?.original_url">
