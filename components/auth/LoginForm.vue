@@ -54,9 +54,9 @@ const submitForm = async () => {
     await getSession();
 
     if (account.value.type === "FREELANCER") {
-      await router.push("/find-work");
+      navigateTo("/find-work",{external:true});
     } else if (account.value.type === "CLIENT") {
-      await router.push("/find-freelancer");
+      navigateTo("/find-freelancer",{external:true});
     }
   } catch (error) {
     $externalResults.value = (error as ApiErrorResponse)?.data?.errors || {};

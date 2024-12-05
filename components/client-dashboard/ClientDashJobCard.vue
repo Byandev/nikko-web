@@ -22,10 +22,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  (e: 'save', id: number): void;
-  (e: 'un-save', id: number): void;
-  (e: 'apply', id: number): void;
-  (e: 'withdraw-proposal', id: number): void;
+  (e: 'delete', id: number): void;
   (e: 'click', id: number): void;
   (e: 'submit'): void;
 }>();
@@ -54,7 +51,7 @@ const handleEdit = () => {
 
 const handleDelete = () => {
     if (props?.job.id !== undefined) {
-        emit('withdraw-proposal', props.job.id);
+        emit('delete', props.job.id);
     }
 };
 
