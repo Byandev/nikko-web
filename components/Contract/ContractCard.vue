@@ -12,7 +12,6 @@ const emit = defineEmits<{
     (e: 'view', id: number): void;
     (e: 'save', id: number): void;
     (e: 'un-save', id: number): void;
-    (e: 'message', id: number, sender: string): void;
 }>();
 
 
@@ -140,12 +139,6 @@ const toggleSave = async () => {
                 :text="!proposal.contract ? `Hire`: `View Contract`" type="button"
                 :background="!proposal.contract ? `white` : `primary`"
                 :foreground="!proposal.contract ? `primary` : `white`" class="ring-1 ring-primary" />
-
-            <Button @click="emit('message', proposal.id, accountName)"
-                text="Message" type="button"
-                background="white"
-                foreground="primary" class="ring-1 ring-primary" />
-
         </div>
     </div>
 </template>
