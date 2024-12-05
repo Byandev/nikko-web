@@ -393,6 +393,9 @@ const showLoadMore = computed(() => {
                         </div>
                     </div>
                 </div>
+                <div v-else class="flex items-center justify-center flex-grow">
+                    <Icon icon="line-md:loading-loop" width="24" height="24" />
+                </div>
 
                 <!-- Chat Input -->
                 <div v-if="message && message[0] && !isMessagesLoading"
