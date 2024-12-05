@@ -73,7 +73,7 @@ const selectChat = async (id: number) => {
 }
 
 const viewProfile = async (id: number) => {
-    await router.push(`/${account.value?.type !== 'FREELANCER'? 'freelancer': 'client'}/${id}`);
+    await router.push(`/${account.value?.type !== 'FREELANCER' ? 'freelancer' : 'client'}/${id}`);
 };
 
 const activeChannel = computed(() => {
@@ -126,15 +126,18 @@ watch(() => newMessage.value, () => {
                 <button @click="router.push('/messages')" class="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
                     <Icon icon="mdi:arrow-left" class="w-5 h-5" />
                 </button>
-                <img v-if="chats && !isChannelLoading && activeChannel" :src="avatar" alt="User" class="w-10 h-10 rounded-full mr-4" />
+                <img v-if="chats && !isChannelLoading && activeChannel" :src="avatar" alt="User"
+                    class="w-10 h-10 rounded-full mr-4" />
                 <div v-else>
                     <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
                 </div>
                 <div class="flex justify-between w-full">
                     <div class="flex-1">
-                        <div v-if="chats && !isChannelLoading && activeChannel" class="text-lg font-semibold flex flex-col">
+                        <div v-if="chats && !isChannelLoading && activeChannel"
+                            class="text-lg font-semibold flex flex-col">
                             <span>{{ name }}</span>
-                            <span v-if="activeChannel" class="text-xs text-gray-500">{{ timeAgo(activeChannel?.last_activity_at) }}</span>
+                            <span v-if="activeChannel" class="text-xs text-gray-500">{{
+                                timeAgo(activeChannel?.last_activity_at) }}</span>
                         </div>
                         <div v-else>
                             <div class="ml-5 w-20 h-4 bg-gray-300 rounded"></div>
@@ -142,37 +145,39 @@ watch(() => newMessage.value, () => {
                         </div>
                     </div>
                     <div>
-                        <button @click="showDropdown = !showDropdown" class="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
+                        <button @click="showDropdown = !showDropdown"
+                            class="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
                             <Icon icon="bi:three-dots" class="w-5 h-5" />
                         </button>
-                        <div v-if="showDropdown" class="absolute mt-2 right-10 w-48 bg-white border rounded-lg shadow-lg z-50">
-                            <button @click="currentTab = 'gallery-section'" class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">Gallery</button>
+                        <div v-if="showDropdown"
+                            class="absolute mt-2 right-10 w-48 bg-white border rounded-lg shadow-lg z-50">
+                            <button @click="{currentTab = 'gallery-section';
+                                showDropdown=false;
+                            }"
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">Gallery</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Chat Messages -->
-            <div ref="messagesContainer" v-if="message && message[0] && !isMessagesLoading" class="flex-1 p-4 overflow-y-auto flex-grow">
+            <div ref="messagesContainer" v-if="message && message[0] && !isMessagesLoading"
+                class="flex-1 p-4 overflow-y-auto flex-grow">
                 <div class="space-y-4">
                     <div v-if="message.length === 0 && !isMessagesLoading" class="text-center text-gray-500">
                         No messages yet. Start the conversation!
                     </div>
                     <div v-for="(item, index) in sortedMessages" :key="index">
-                        <div v-if="item.sender.first_name === 'other'" class="flex justify-start">
-                            <div class="bg-white p-3 rounded-lg shadow w-max">
+                        <div v-if="item.sender.id != account?.id" class="flex justify-start">
+                            <div class="bg-white p-3 rounded-lg shadow">
                                 <p>{{ item.content }}</p>
                                 <span class="text-xs text-gray-500">{{ formatDayTime(item.created_at) }}</span>
                             </div>
                         </div>
                         <div v-else class="flex justify-end">
-                            <div class="relative group flex flex-row items-center gap-2">
-                                <span class="bg-gray-700 text-white text-xs rounded p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    {{ formatDayTime(item.created_at) }}
-                                </span>
-                                <div class="bg-primary p-3 rounded-lg shadow max-w-1/4 text-white flex">
-                                    <p class="break-words">{{ item.content }}</p>
-                                </div>
+                            <div class="bg-primary text-white p-3 rounded-lg shadow">
+                                <p>{{ item.content }}</p>
+                                <span class="text-xs text-gray-100">{{ formatDayTime(item.created_at) }}</span>
                             </div>
                         </div>
                     </div>
@@ -184,11 +189,45 @@ watch(() => newMessage.value, () => {
             </div>
 
             <!-- Chat Input -->
-            <div class="p-2 bg-gray-100 border-t flex items-center">
-                <input type="text" v-model="newMessage" placeholder="Aa" class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-0 " />
-                <button @click="handleMessageSubmit" class="ml-4 p-2 bg-primary text-white rounded-full hover:bg-primary/80">
+            <div v-if="message && message[0] && !isMessagesLoading" class="p-2 bg-gray-100 border-t flex items-center">
+                <input type="text" v-model="newMessage" placeholder="Aa"
+                    class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-0 " />
+                <button @click="handleMessageSubmit"
+                    class="ml-4 p-2 bg-primary text-white rounded-full hover:bg-primary/80">
                     <Icon :icon="!isSending ? 'mdi:send' : 'line-md:loading-loop'" class="w-5 h-5" />
                 </button>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div v-if="currentTab == 'gallery-section'" class="w-full lg:w-1/3 bg-gray-50 flex flex-col h-full p-4">
+            <div>
+                <button @click="{currentTab = 'chat-section';
+                    showDropdown=false;
+                }" class="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
+                <Icon icon="mdi:arrow-left" class="w-5 h-5" />
+            </button>
+            </div>
+            <div v-if="chats && !isChannelLoading" class="flex flex-col items-center">
+                <img v-if="activeChannel" :src="avatar" alt="User" class="w-24 h-24 rounded-full" />
+                <div v-else>
+                    <div class="w-24 h-24 bg-gray-300 rounded-full animate-pulse"></div>
+                </div>
+                <div v-if="activeChannel" class="text-lg font-semibold">{{ name }}</div>
+                <div v-else>
+                    <div class="mt-2 w-28 h-6 bg-gray-300 rounded animate-pulse"></div>
+                </div>
+                <div class="mt-2 border-b-2 w-full pb-3">
+                    <div class="flex justify-center flex-col items-center">
+                        <Icon icon="iconamoon:profile-circle-fill"
+                            @click="viewProfile(activeChannel?.members.find(member => account?.id != member.id)?.id ?? 0)"
+                            class="w-12 h-12 text-gray-500  hover:cursor-pointer hover:bg-gray-200 rounded-full p-1" />
+                        <span class="text-sm text-gray-500">Profile</span>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="flex items-center justify-center flex-grow">
+                <Icon icon="line-md:loading-loop" width="24" height="24" />
             </div>
         </div>
     </div>
@@ -265,28 +304,23 @@ watch(() => newMessage.value, () => {
                 </div>
 
                 <!-- Chat Messages -->
-                <div ref="messagesContainer" class="p-4 overflow-y-auto grow">
-                    <div v-if="message.length === 0 && !isMessagesLoading" class="text-center text-gray-500">
-                        No messages yet. Start the conversation!
-                    </div>
-                    <div v-if="message" class="flex flex-col gap-2">
+                <div ref="messagesContainer" v-if="message && message[0] && !isMessagesLoading"
+                    class="flex-1 p-4 overflow-y-auto flex-grow">
+                    <div class="space-y-4">
+                        <div v-if="message.length === 0 && !isMessagesLoading" class="text-center text-gray-500">
+                            No messages yet. Start the conversation!
+                        </div>
                         <div v-for="(item, index) in sortedMessages" :key="index">
-                            <!-- Received Messages -->
-                            <div v-if="item.sender.id !== account?.id" class="flex justify-start">
+                            <div v-if="item.sender.id != account?.id" class="flex justify-start">
                                 <div class="bg-white p-3 rounded-lg shadow">
                                     <p>{{ item.content }}</p>
-                                    <span class="text-xs text-gray-500">
-                                        {{ formatDayTime(item.created_at) }}
-                                    </span>
+                                    <span class="text-xs text-gray-500">{{ formatDayTime(item.created_at) }}</span>
                                 </div>
                             </div>
-                            <!-- Sent Messages -->
                             <div v-else class="flex justify-end">
-                                <div class="bg-primary text-white p-3 rounded-lg shadow w-max">
+                                <div class="bg-primary text-white p-3 rounded-lg shadow">
                                     <p>{{ item.content }}</p>
-                                    <span class="text-xs text-gray-100">
-                                        {{ formatDayTime(item.created_at) }}
-                                    </span>
+                                    <span class="text-xs text-gray-100">{{ formatDayTime(item.created_at) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -294,7 +328,8 @@ watch(() => newMessage.value, () => {
                 </div>
 
                 <!-- Chat Input -->
-                <div class="p-2 bg-gray-100 border-t flex items-center">
+                <div v-if="message && message[0] && !isMessagesLoading"
+                    class="p-2 bg-gray-100 border-t flex items-center">
                     <input type="text" v-model="newMessage" placeholder="Aa"
                         class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-0 " />
                     <button @click="handleMessageSubmit"
