@@ -37,6 +37,10 @@ const props = defineProps({
     isMobile: {
         type: Boolean,
         default: false,
+    },
+    attachmentFiles: {
+        type: Array as PropType<File[]>,
+        required: false,
     }
 });
 
@@ -46,6 +50,7 @@ const emit = defineEmits<{
   (e: 'submit-message'): void;
   (e: 'update:modelValue', value: string): void;
   (e: 'update:showDropdown', value: boolean): void;
+  (e: 'update:attachments', file: File[]): void;
 }>();
 
 const chatMessages = ref<InstanceType<typeof ChatMessages> | null>(null);
@@ -107,7 +112,7 @@ defineExpose({
             <ChatMessages ref="chatMessages" :show-load-more="props.showLoadMore" :messages="messages" :isMessagesLoading="isMessagesLoading" :page="page" @load-more="emit('page', props.page + 1)" />
 
             <!-- Chat Input -->
-            <ChatInput :modelValue="props.modelValue" :message="messages" :isMessagesLoading="isMessagesLoading" :isSending="isSending" @submit-message="emit('submit-message')" @update:modelValue="emit('update:modelValue', $event);" />
+            <ChatInput :modelValue="props.modelValue" @update:attachments="emit('update:attachments',$event)" :attachment-files="props.attachmentFiles" :message="messages" :isMessagesLoading="isMessagesLoading" :isSending="isSending" @submit-message="emit('submit-message')" @update:modelValue="emit('update:modelValue', $event);" />
 
         </div>
 </template>

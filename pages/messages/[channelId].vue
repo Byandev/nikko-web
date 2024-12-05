@@ -6,12 +6,14 @@ import type { Message } from '~/types/models/Message';
 import { Icon } from '@iconify/vue';
 import type { PaginatedList } from '~/types/models/Pagination';
 import type ChatChannel from '~/components/chat/ChatChannel.vue';
+import type { Media } from '~/types/models/Media';
 
 const { account } = storeToRefs(accountStore());
 
 const { data: channels, fetchData: fetchChannels, pending: isChannelLoading } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
 const { data: messages, fetchData: fetchMessages, pending: isMessagesLoading } = useFetchData<PaginatedList<Message>, ApiErrorResponse>();
 const { sendRequest: sendMesage, pending: isSending } = useSubmit<{ data: Message }, ApiErrorResponse>();
+const { sendRequest: sendAttachment, pending: isSendingAttachment } = useSubmit<{ data: Media }, ApiErrorResponse>();
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
@@ -19,6 +21,7 @@ const requestHeaders = computed<HeadersInit | undefined>(() =>
 
 const chats = ref<Channel[]>([]);
 const message = ref<Message[]>([]);
+const attachmentFiles = ref<File[] | string[]>([]);
 
 const router = useRouter();
 const route = useRoute();
@@ -93,16 +96,34 @@ onMounted(async () => {
 });
 
 const handleMessageSubmit = async () => {
+    const uploadedImages = ref<number[]>([]);
+    if (newMessage.value.trim() || attachmentFiles.value.length > 0) {
+        if(attachmentFiles){
+            const uploadPromises = attachmentFiles.value
+                .filter(file => file instanceof File)
+                .map(file => {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    return sendAttachment('/v1/medias', {
+                        method: 'POST',
+                        body: formData,
+                    });
+            });
+        
+            const uploadResponses = await Promise.all(uploadPromises);
+            uploadedImages.value = uploadResponses.map(response => response.data.id);
+        }
 
-    if (newMessage.value.trim()) {
         await sendMesage(`/v1/chat/channels/${route.params.channelId}/messages`, {
             method: 'POST',
             headers: requestHeaders.value,
             body: {
-                content: newMessage.value.trim()
+                ...(newMessage.value.trim() && { content: newMessage.value } ),
+                ...(uploadedImages.value.length > 0 && { attachment_ids: uploadedImages.value }),
             }
         });
         newMessage.value = '';
+        attachmentFiles.value = [];
         await fetchMessages(`/v1/chat/channels/${route.params.channelId}/messages`, {
             headers: requestHeaders.value
         });
@@ -162,7 +183,7 @@ const showLoadMore = computed(() => {
     <div class="h-full block lg:hidden ">
 
         <!-- Chat Channel -->
-        <ChatChannel v-if="currentTab == 'chat-channel' && activeChannel":page="messages?.meta.current_page" :showLoadMore="showLoadMore" @page="page = $event" :isMobile="true" :avatar="avatar" :name="name" :activeChannel="activeChannel" :chats="sortedChats" :isChannelLoading="isChannelLoading" @current_page="currentTab = $event" :channels="chats" :messages="sortedMessages" @submit-message="handleMessageSubmit" :modelValue="newMessage" @update:modelValue="newMessage = $event" @update:showDropdown="showDropdown = $event" :showDropdown="showDropdown" @current-page="currentTab = $event" />
+        <ChatChannel v-if="currentTab == 'chat-channel' && activeChannel" @update:attachments="attachmentFiles = $event" :attachmentFiles="attachmentFiles as File[]" :page="messages?.meta.current_page" :showLoadMore="showLoadMore" @page="page = $event" :isMobile="true" :avatar="avatar" :name="name" :activeChannel="activeChannel" :chats="sortedChats" :isChannelLoading="isChannelLoading" @current_page="currentTab = $event" :channels="chats" :messages="sortedMessages" @submit-message="handleMessageSubmit" :modelValue="newMessage" @update:modelValue="newMessage = $event" @update:showDropdown="showDropdown = $event" :showDropdown="showDropdown" @current-page="currentTab = $event" />
 
         <!-- Chat Option -->
         <ChatOption v-if="currentTab == 'chat-option' && activeChannel" :isMobile="true" :activeChannel="activeChannel" :isChannelLoading="isChannelLoading" @update:current-page="currentTab = $event" @update:showDropdown="showDropdown = $event" @view-profile="viewProfile" :avatar="avatar" :name="name" />
@@ -188,7 +209,7 @@ const showLoadMore = computed(() => {
 
 
             <!-- Chat Channel -->
-            <ChatChannel ref="chatChannel" v-if="activeChannel" :isSending="isSending" :page="messages?.meta.current_page" @page="page = $event" :showLoadMore="showLoadMore" :avatar="avatar" :name="name" :activeChannel="activeChannel" :chats="chats" :isChannelLoading="isChannelLoading" @current_page="currentTab = $event" :channels="chats" :messages="sortedMessages" @submit-message="handleMessageSubmit" :modelValue="newMessage" @update:modelValue="newMessage = $event" @update:showDropdown="showDropdown = $event" :showDropdown="showDropdown" @current-page="currentTab = $event" />
+            <ChatChannel ref="chatChannel" v-if="activeChannel" @update:attachments="attachmentFiles = $event" :attachmentFiles="attachmentFiles as File[]" :isSending="isSending || isSendingAttachment" :page="messages?.meta.current_page" @page="page = $event" :showLoadMore="showLoadMore" :avatar="avatar" :name="name" :activeChannel="activeChannel" :chats="chats" :isChannelLoading="isChannelLoading" @current_page="currentTab = $event" :channels="chats" :messages="sortedMessages" @submit-message="handleMessageSubmit" :modelValue="newMessage" @update:modelValue="newMessage = $event" @update:showDropdown="showDropdown = $event" :showDropdown="showDropdown" @current-page="currentTab = $event" />
 
 
             <!-- Profile Section -->

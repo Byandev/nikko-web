@@ -52,15 +52,29 @@ defineExpose({
                     </div>
                     <div v-for="(item, index) in props.messages" :key="index">
                         <div v-if="item.sender.id != account?.id" class="flex justify-start">
-                            <div class="bg-white p-3 rounded-lg shadow">
-                                <p>{{ item.content }}</p>
-                                <span class="text-xs text-gray-500">{{ formatDayTime(item.created_at) }}</span>
+                            <div class="flex flex-col gap-2">
+                                <div class="bg-white p-3 rounded-lg shadow" v-if="item.content">
+                                    <p>{{ item.content }}</p>
+                                    <span class="text-xs text-gray-500">{{ formatDayTime(item.created_at) }}</span>
+                                </div>
                             </div>
                         </div>
                         <div v-else class="flex justify-end">
-                            <div class="bg-primary text-white p-3 rounded-lg shadow">
-                                <p>{{ item.content }}</p>
-                                <span class="text-xs text-gray-100">{{ formatDayTime(item.created_at) }}</span>
+                            <div class="flex flex-col gap-2">
+                                <div class="bg-primary text-white p-3 rounded-lg shadow" v-if="item.content">
+                                    <p>{{ item.content }}</p>
+                                    <span class="text-xs text-gray-100">{{ formatDayTime(item.created_at) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div v-if="item.sender.id != account?.id" class="flex justify-start">
+                            <div v-if="item.attachments.length > 0">
+                                <img v-if="item.attachments" v-for="attachment in item.attachments" :src="attachment.original_url" alt="attachment" class="max-w-full h-auto rounded-lg bg-white p-3 shadow w-1/2" />
+                            </div>
+                        </div>
+                        <div v-else class="flex justify-end">
+                            <div v-if="item.attachments.length > 0">
+                                <img v-if="item.attachments.length > 0" v-for="attachment in item.attachments" :src="attachment.original_url" alt="attachment" class="max-w-full h-auto rounded-lg bg-white p-3 shadow w-1/2" />
                             </div>
                         </div>
                     </div>
