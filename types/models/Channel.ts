@@ -1,4 +1,4 @@
-import type { Member } from "./Member";
+import type { User } from "./User";
 
 export interface Channel {
     id: number;
@@ -8,5 +8,5 @@ export interface Channel {
     last_activity_at: string;
     created_at: string;
     updated_at: string;
-    members: Member[];
+    members: User[];
 }

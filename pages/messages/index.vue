@@ -64,7 +64,7 @@ onMounted(async () => {
                 </div>
                 <div v-if="chats && !isLoading" v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)"
                     :class="['flex items-center p-4 border-b cursor-pointer bg-white']">
-                    <img :src="chat.members.find(member => member.id != account?.id)?.avatar.original_url" alt="User"
+                    <img :src="chat.members.find(member => member.id != account?.id)?.avatar?.original_url" alt="User"
                         class="w-12 h-12 rounded-full mr-4" />
                     <div class="flex-1">
                         <div class="text-lg font-semibold">{{ chat.members.find(member => member.id !=
@@ -104,7 +104,7 @@ onMounted(async () => {
                     </div>
                     <div v-if="chats && !isLoading" v-for="chat in sortedChats" :key="chat.id" @click="selectChat(chat.id)"
                         :class="['flex items-center p-4 border-b cursor-pointer bg-white']">
-                        <img :src="chat.members.find(member => member.id != account?.id)?.avatar.original_url"
+                        <img :src="chat.members.find(member => member.id != account?.id)?.avatar?.original_url"
                             alt="User" class="w-12 h-12 rounded-full mr-4" />
                         <div class="flex-1">
                             <div class="text-lg font-semibold">{{ chat.members.find(member => member.id !=

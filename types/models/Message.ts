@@ -1,5 +1,5 @@
 import type { Media } from "./Media";
-import type { Member } from "./Member";
+import type { User } from "./User";
 
 export interface Message {
     id: number;
@@ -8,6 +8,6 @@ export interface Message {
     content: string;
     created_at: string;
     updated_at: string;
-    sender: Member;
+    sender: User;
     attachments: Media[];
 }

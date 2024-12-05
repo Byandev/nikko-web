@@ -131,7 +131,7 @@ const activeParticipant = computed(() => {
     return activeChannel.value?.members.find(member => account.value?.id !== member.id);
 });
 
-const avatar = computed(() => activeParticipant.value?.avatar.original_url);
+const avatar = computed(() => activeParticipant.value?.avatar?.original_url);
 const name = computed(() => `${activeParticipant.value?.first_name} ${activeParticipant.value?.last_name}`);
 
 const sortedChats = computed(() => {
@@ -322,7 +322,7 @@ const showLoadMore = computed(() => {
                     <div v-if="chats && !isChannelLoading" v-for="chat in sortedChats" :key="chat.id"
                         @click="selectChat(chat.id)"
                         :class="['flex items-center p-4 border-b cursor-pointer', chat.id == Number(route.params.channelId as string) ? 'bg-gray-200' : 'bg-white']">
-                        <img :src="activeChannel?.members.find(member => account?.id != member.id)?.avatar.original_url"
+                        <img :src="activeChannel?.members.find(member => account?.id != member.id)?.avatar?.original_url"
                             alt="User" class="w-12 h-12 rounded-full mr-4" />
                         <div class="flex-1">
                             <div class="text-lg font-semibold">
@@ -342,7 +342,7 @@ const showLoadMore = computed(() => {
                 <!-- Chat Header -->
                 <div class="flex items-center p-4 bg-gray-50 border-b">
                     <img v-if="chats && !isChannelLoading && activeChannel"
-                        :src="activeChannel?.members.find(member => account?.id != member.id)?.avatar.original_url"
+                        :src="activeChannel?.members.find(member => account?.id != member.id)?.avatar?.original_url"
                         alt="User" class="w-10 h-10 rounded-full mr-4" />
                     <div v-else>
                         <div class="w-10 h-10 bg-gray-300 rounded-full animate-pulse"></div>
