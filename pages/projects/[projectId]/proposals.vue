@@ -26,8 +26,6 @@ interface ProposalList extends PaginatedList<Proposal> {
 
 const route = useRoute();
 const router = useRouter();
-const receiverName = ref('');
-const message = ref('');
 
 const filter = ref<Filter>({
     include: 'project.account.user,attachments,contract,account.user.avatar,account.skills',
@@ -88,14 +86,6 @@ const viewContract = async (id: number) => {
     await router.push(`/contract/${id}`);
 };
 
-const handleChat = async (id: number, accountName: string) => {
-    console.log('Chat with: ', id, accountName);
-    receiverName.value = accountName;
-    isMessageModalOpen.value = true;
-    // You can use the accountName as needed in your modal or other logic
-};
-
-const isMessageModalOpen = ref(false);
 const totalCount = computed(() => proposals.value?.meta?.total_count ?? 0);
 const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count ?? 0);
 
@@ -129,7 +119,7 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                             @click="viewFreelancer" :key="proposal.id" :proposal="proposal" :show-save-button="true"
                             @save="(proposals as ProposalList).meta.total_saved_count++"
                             @un-save="(proposals as ProposalList).meta.total_saved_count--" @hire="hireFreelancer"
-                            @view="viewContract" @message="handleChat" />
+                            @view="viewContract" />
                         <div v-else class="animate-pulse space-y-4">
                             <div class=" h-40 bg-gray-200 rounded w-full"></div>
                         </div>
@@ -141,27 +131,5 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                 </div>
             </div>
         </div>
-
-        <Modal v-if="isMessageModalOpen" :modelValue="isMessageModalOpen"
-            @update:modelValue="isMessageModalOpen = $event" @close="isMessageModalOpen = false">
-            <template #title>
-                <div class="flex items-center space-x-2 justify-center">
-                    <span>New Message</span>
-                </div>
-            </template>
-            <template #content>
-                <div class="flex flex-col gap-2">
-                    <span class="border-b-2 p-2 w-full text-left border-t-2 py-4"> To: <span class="ml-2 ring-1 rounded-md p-2 ring-gray-200 text-primary">{{ receiverName }}</span></span>
-                    <textarea v-model="message"
-                        class="ring-0 ring-gray-300 w-full p-2 rounded-md placeholder:text-gray-400 sm:text-sm sm:leading-6 outline-none"
-                        placeholder="Type your message here"></textarea>
-                </div>
-            </template>
-            <template #actions>
-                <Button @click="isMessageModalOpen = false" text="Cancel" type="button" background="white"
-                    foreground="primary" />
-                <Button @click="" text="Send" type="button" background="primary" foreground="white" />
-            </template>
-        </Modal>
     </div>
 </template>
