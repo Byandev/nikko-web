@@ -20,6 +20,12 @@ const selectChat = async (id: number) => {
     await router.push(`/messages/${id}`);
 }
 
+const sortedChats = computed(() => {
+    return chats.value.sort((a, b) => {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+});
+
 onMounted(async () => {
     await fetchChannels(`/v1/chat/channels`, {
         headers: requestHeaders.value
@@ -96,7 +102,7 @@ onMounted(async () => {
                             <div class="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
                         </div>
                     </div>
-                    <div v-if="chats && !isLoading" v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)"
+                    <div v-if="chats && !isLoading" v-for="chat in sortedChats" :key="chat.id" @click="selectChat(chat.id)"
                         :class="['flex items-center p-4 border-b cursor-pointer bg-white']">
                         <img :src="chat.members.find(member => member.id != account?.id)?.avatar.original_url"
                             alt="User" class="w-12 h-12 rounded-full mr-4" />

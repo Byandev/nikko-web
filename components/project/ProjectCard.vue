@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router';
 import type { Proposal } from '~/types/models/Proposal';
 import type { Partial } from 'lodash';
 import type { Contract } from '~/types/models/Contract';
-import currencyFormatter from '~/utils/formatter';
+import { currencyFormatter } from '~/utils/formatter';
 
 const props = defineProps<{ project: Project; contract?: Contract, showSaveButton?: boolean, showProposeButton?: boolean, showAcceptButton?: boolean, showWithdrawApplication?: boolean, showRejectButton?: boolean, showApplyButton?: boolean, showCompleteButton?: boolean, viewAs: 'FREELANCER' | 'CLIENT', showContractDetails?: boolean }>();
 const emit = defineEmits<{
