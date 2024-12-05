@@ -3,7 +3,6 @@ import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Channel } from '~/types/models/Channel';
 import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
-import { formatDayTime } from '~/utils/formatter';
 
 const { account } = storeToRefs(accountStore());
 
@@ -21,9 +20,11 @@ const selectChat = async (id: number) => {
 }
 
 const sortedChats = computed(() => {
-    return chats.value.sort((a, b) => {
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
+    if (chats.value) {
+        return chats.value.sort((a, b) => {
+            return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+        });
+    }
 });
 
 onMounted(async () => {
@@ -51,29 +52,7 @@ onMounted(async () => {
             </div>
 
             <!-- Chat List -->
-            <div class="overflow-y-auto flex-grow">
-                <div v-if="isLoading" class="animate-pulse space-y-2" v-for="n in 2" :key="n">
-                    <div class="flex items-center p-4 border-b">
-                        <div class="w-12 h-12 bg-gray-200 rounded-full mr-4 animate-pulse"></div>
-                        <div class="flex-1">
-                            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                            <div class="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                        </div>
-                        <div class="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
-                    </div>
-                </div>
-                <div v-if="chats && !isLoading" v-for="chat in chats" :key="chat.id" @click="selectChat(chat.id)"
-                    :class="['flex items-center p-4 border-b cursor-pointer bg-white']">
-                    <img :src="chat.members.find(member => member.id != account?.id)?.avatar?.original_url" alt="User"
-                        class="w-12 h-12 rounded-full mr-4" />
-                    <div class="flex-1">
-                        <div class="text-lg font-semibold">{{ chat.members.find(member => member.id !=
-                            account?.id)?.first_name }} {{
-                                chat.members.find(member => member.id != account?.id)?.last_name }}</div>
-                    </div>
-                    <div class="text-xs text-gray-500">{{ timeAgo(chat.created_at) }}</div>
-                </div>
-            </div>
+            <ChatList v-if="sortedChats" :chats="sortedChats" :isChannelLoading="isLoading" @select-chat="selectChat" />
         </div>
     </div>
 
@@ -91,29 +70,7 @@ onMounted(async () => {
                 </div>
 
                 <!-- Chat List -->
-                <div class="overflow-y-auto flex-grow">
-                    <div v-if="isLoading" class="animate-pulse space-y-2" v-for="n in 2" :key="n">
-                        <div class="flex items-center p-4 border-b">
-                            <div class="w-12 h-12 bg-gray-200 rounded-full mr-4 animate-pulse"></div>
-                            <div class="flex-1">
-                                <div class="h-4 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                                <div class="h-4 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                            </div>
-                            <div class="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
-                        </div>
-                    </div>
-                    <div v-if="chats && !isLoading" v-for="chat in sortedChats" :key="chat.id" @click="selectChat(chat.id)"
-                        :class="['flex items-center p-4 border-b cursor-pointer bg-white']">
-                        <img :src="chat.members.find(member => member.id != account?.id)?.avatar?.original_url"
-                            alt="User" class="w-12 h-12 rounded-full mr-4" />
-                        <div class="flex-1">
-                            <div class="text-lg font-semibold">{{ chat.members.find(member => member.id !=
-                                account?.id)?.first_name }} {{
-                                    chat.members.find(member => member.id != account?.id)?.last_name }}</div>
-                        </div>
-                        <div class="text-xs text-gray-500">{{ timeAgo(chat.created_at) }}</div>
-                    </div>
-                </div>
+                <ChatList v-if="sortedChats" :chats="sortedChats" :isChannelLoading="isLoading" @select-chat="selectChat" />
             </div>
 
              <!-- Chat Section -->
