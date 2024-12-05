@@ -97,7 +97,7 @@ defineExpose({
                                 emit('current-page', 'chat-option');
                                 emit('update:showDropdown',false);
                             }"
-                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">Gallery</button>
+                                class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">Chat Option</button>
                         </div>
                     </div>
                 </div>
