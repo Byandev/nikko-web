@@ -142,7 +142,7 @@ onMounted(async () => {
 
 
             <!-- Chat Channel -->
-            <ChatChannel ref="chatChannel" @refresh="refreshMessages" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
+            <ChatChannel ref="chatChannel" @refresh="refreshMessages" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
 
             <!-- Profile Section -->
