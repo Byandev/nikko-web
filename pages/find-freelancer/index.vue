@@ -253,7 +253,7 @@ const removeCountry = (country: ICountry) => {
         <div class="grid grid-cols-1 gap-5">
           <div class="border border-gray-300 rounded-lg p-4 flex flex-row items-center gap-2">
             <Icon icon="material-symbols:search" class=" text-xl text-gray-400" />
-            <input v-model="filters.search" type="text" placeholder="Search for any jobs"
+            <input v-model="filters.search" type="text" placeholder="Search for any freelancers"
                    class="w-full outline-none border-none" />
           </div>
 
