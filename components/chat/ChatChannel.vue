@@ -86,7 +86,7 @@ watch(
   debounce(fetchChannelsData, 500)
 );
 
-defineExpose({
+defineExpose ({
   fetchChannelsData,
   isChannelLoading,
   scrollToBottom,

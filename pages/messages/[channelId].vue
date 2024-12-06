@@ -16,6 +16,7 @@ const requestHeaders = computed<HeadersInit | undefined>(() =>
 );
 
 const message = ref<Message[]>([]);
+
 const router = useRouter();
 const route = useRoute();
 const page = ref(1);
@@ -45,7 +46,6 @@ watch(
         }
     }, 500)
 );
-
 const selectChat = async (id: number) => {
     await router.push(`/messages/${id}`);
     currentTab.value = 'chat-section';
@@ -80,7 +80,6 @@ onMounted(async () => {
     chatChannel.value?.fetchChannelsData();
 });
 
-
 </script>
 
 
@@ -110,7 +109,7 @@ onMounted(async () => {
                 </div>
 
                 <!-- Chat List -->
-                <ChatList :route="route.params.channelId as string" :chats="chatChannel?.sortedChats ?? []" :activeChannel="chatChannel?.activeChannel" :isChannelLoading="chatChannel?.isChannelLoading" @select-chat="selectChat" />
+                <ChatList v-if="chatChannel?.activeChannel" :route="route.params.channelId as string" :chats="chatChannel?.sortedChats" :activeChannel="chatChannel?.activeChannel" :isChannelLoading="chatChannel?.isChannelLoading" @select-chat="selectChat" />
             </div>
 
 
@@ -119,7 +118,7 @@ onMounted(async () => {
 
 
             <!-- Profile Section -->
-            <ChatOption :activeChannel="chatChannel?.activeChannel as Channel" :isChannelLoading="chatChannel?.isChannelLoading" @update:current-page="currentTab = $event" @update:showDropdown="showDropdown = $event" @view-profile="viewProfile" :avatar="chatChannel?.avatar" :name="chatChannel?.name" />
+            <ChatOption v-if="chatChannel?.activeChannel" :activeChannel="chatChannel?.activeChannel" :isChannelLoading="chatChannel?.isChannelLoading" @update:current-page="currentTab = $event" @update:showDropdown="showDropdown = $event" @view-profile="viewProfile" :avatar="chatChannel?.avatar" :name="chatChannel?.name" />
         </div>
     </div>
 
