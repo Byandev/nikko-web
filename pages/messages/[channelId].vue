@@ -91,7 +91,6 @@ const selectChat = async (id: number) => {
 
 const refreshMessages = async () => {
   await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
-  messages.value = messages.value.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); //Sort messages by created_at
   chatChannel.value?.scrollToBottom();
 };
 
@@ -105,7 +104,6 @@ watch(
 onMounted(async () => {
   await fetchData(`/v1/chat/channels?${channelsQueryString.value}`, 'channels');
   await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
-  messages.value = messages.value.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); //Sort messages by created_at
   chatChannel.value?.scrollToBottom();
 });
 </script>
