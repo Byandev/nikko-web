@@ -137,7 +137,7 @@ const submitForm = async (id: number) => {
     <div class="my-8 lg:mx-auto mx-5">
         <div class="max-w-6xl grid grid-cols-1 gap-4 mt-5 mx-auto">
             <div class="w-full justify-between flex-row flex">
-                <h1 class="text-4xl font-medium whitespace-nowrap">{{ account?.type === 'FREELANCER'? 'Your proposal' : 'Review proposal' }}</h1>
+                <h1 class="text-4xl font-medium whitespace-nowrap">{{ account?.type === 'FREELANCER'? 'Review proposal' : 'Your proposal' }}</h1>
                 <Button v-if="account?.type === 'FREELANCER'" :text="isEditing? 'Done': 'Edit'" @click="isEditing? isEditing=false: isEditing=true" type="button" foreground="white" background="primary"/>
             </div>
             <div class="flex flex-col gap-4">
