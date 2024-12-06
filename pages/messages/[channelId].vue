@@ -7,9 +7,6 @@ import { Icon } from '@iconify/vue';
 import type ChatChannel from '~/components/chat/ChatChannel.vue';
 
 import { accountStore } from '~/store/accountStore';
-import { storeToRefs } from 'pinia';
-import { ref, computed, watch, onMounted } from 'vue';
-import { debounce } from 'lodash-es';
 
 const { account } = storeToRefs(accountStore());
 
@@ -117,7 +114,7 @@ onMounted(async () => {
     <div class="h-full block lg:hidden ">
 
         <!-- Chat Channel -->
-        <ChatChannel v-if="currentTab == 'chat-channel'" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
+        <ChatChannel v-if="currentTab == 'chat-channel'" ref="chatChannel" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
         <!-- Chat Option -->
         <ChatOption v-if="currentTab == 'chat-option'" :isMobile="true" :isChannelLoading="isChannelLoading" @view-profile="viewProfile" :avatar="avatar" :name="name" :id="id ?? 0" />
@@ -143,7 +140,7 @@ onMounted(async () => {
 
 
             <!-- Chat Channel -->
-            <ChatChannel :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
+            <ChatChannel ref="chatChannel" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
 
             <!-- Profile Section -->

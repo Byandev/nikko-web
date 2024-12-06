@@ -35,7 +35,7 @@ const scrollToBottom = () => {
   chatMessages.value?.scrollToBottom();
 };
 
-defineExpose ({
+defineExpose({
   scrollToBottom,
 });
 </script>
@@ -84,7 +84,7 @@ defineExpose ({
             </div>
 
             <!-- Chat Messages -->
-            <ChatMessages :show-load-more="showLoadMore" :messages="messages" :isMessagesLoading="isMessagesLoading" :page="page" @load-more="emit('page', props.page + 1)" />
+            <ChatMessages ref="chatMessages" :show-load-more="showLoadMore" :messages="messages" :isMessagesLoading="isMessagesLoading" :page="page" @load-more="emit('page', props.page + 1)" />
 
             <!-- Chat Input -->
             <ChatInput :route="props.route" />

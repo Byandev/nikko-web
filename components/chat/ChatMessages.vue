@@ -21,7 +21,6 @@ const messagesContainer = ref<HTMLElement | null>(null);
 const scrollToBottom = () => {
     nextTick(() => {
         if (messagesContainer.value) {
-            console.log(messagesContainer.value.scrollHeight);
             messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
         }
     });
