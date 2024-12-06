@@ -90,18 +90,17 @@ const selectChat = async (id: number) => {
 };
 
 const refreshMessages = async () => {
-  page.value = 1;
-  await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
+  await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?page=1&per_page=20`, 'messages');
   if (fetchedMessages.value && fetchedMessages.value.data) {
-        messages.value = fetchedMessages.value.data;
+    messages.value = fetchedMessages.value.data;
   }
+  chatChannel.value?.scrollToBottom();
 };
 
 watch(
   [() => page.value],
   debounce(async () => {
     await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
-    chatChannel.value?.scrollToBottom();
   }, 500)
 );
 
