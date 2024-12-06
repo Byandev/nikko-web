@@ -100,9 +100,16 @@ watch(
   }, 500)
 );
 
+const refreshMessages = async () => {
+  await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
+  messages.value = messages.value.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); //Sort messages by created_at
+  chatChannel.value?.scrollToBottom();
+};
+
 onMounted(async () => {
   await fetchData(`/v1/chat/channels?${channelsQueryString.value}`, 'channels');
   await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
+  messages.value = messages.value.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); //Sort messages by created_at
   chatChannel.value?.scrollToBottom();
 });
 </script>
@@ -114,7 +121,7 @@ onMounted(async () => {
     <div class="h-full block lg:hidden ">
 
         <!-- Chat Channel -->
-        <ChatChannel v-if="currentTab == 'chat-channel'" ref="chatChannel" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
+        <ChatChannel v-if="currentTab == 'chat-channel'" @refresh="refreshMessages" ref="chatChannel" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
         <!-- Chat Option -->
         <ChatOption v-if="currentTab == 'chat-option'" :isMobile="true" :isChannelLoading="isChannelLoading" @view-profile="viewProfile" :avatar="avatar" :name="name" :id="id ?? 0" />
@@ -140,7 +147,7 @@ onMounted(async () => {
 
 
             <!-- Chat Channel -->
-            <ChatChannel ref="chatChannel" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
+            <ChatChannel ref="chatChannel" @refresh="refreshMessages" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
 
             <!-- Profile Section -->

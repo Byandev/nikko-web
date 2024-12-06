@@ -26,6 +26,7 @@ const emit = defineEmits<{
   (e: 'current-page', page: string): void;
   (e: 'page', page: number): void;
   (e: 'update:showDropdown', state: boolean): void;
+  (e: 'refresh'): void;
 }>();
 
 const router = useRouter();
@@ -87,7 +88,7 @@ defineExpose({
             <ChatMessages ref="chatMessages" :show-load-more="showLoadMore" :messages="messages" :isMessagesLoading="isMessagesLoading" :page="page" @load-more="emit('page', props.page + 1)" />
 
             <!-- Chat Input -->
-            <ChatInput :route="props.route" />
+            <ChatInput :route="props.route" @refresh="emit('refresh')" />
 
         </div>
 </template>
