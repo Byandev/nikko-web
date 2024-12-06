@@ -86,7 +86,6 @@ const viewContract = async (id: number) => {
     await router.push(`/contract/${id}`);
 };
 
-
 const totalCount = computed(() => proposals.value?.meta?.total_count ?? 0);
 const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count ?? 0);
 
@@ -117,19 +116,17 @@ const totalSavedCount = computed(() => proposals.value?.meta?.total_saved_count 
                     </div>
                     <div class="space-y-5">
                         <ContractCard v-if="proposals?.data && !isLoading" v-for="proposal in proposals.data"
-                            @click="viewFreelancer"
-                            :key="proposal.id" :proposal="proposal" :show-save-button="true"
+                            @click="viewFreelancer" :key="proposal.id" :proposal="proposal" :show-save-button="true"
                             @save="(proposals as ProposalList).meta.total_saved_count++"
-                            @un-save="(proposals as ProposalList).meta.total_saved_count--"
-                            @hire="hireFreelancer"
-                            @view="viewContract"/>
+                            @un-save="(proposals as ProposalList).meta.total_saved_count--" @hire="hireFreelancer"
+                            @view="viewContract" />
                         <div v-else class="animate-pulse space-y-4">
                             <div class=" h-40 bg-gray-200 rounded w-full"></div>
-                    </div>
+                        </div>
                         <Pagination v-if="!isLoading && proposals?.data && proposals?.data.length > 0"
                             :pagination="proposals.meta" @prev-page="filter.page = filter.page - 1"
                             @next-page="filter.page = filter.page + 1" />
-                        
+
                     </div>
                 </div>
             </div>

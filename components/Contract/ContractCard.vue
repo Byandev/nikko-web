@@ -3,7 +3,6 @@ import { HeartIcon } from '@heroicons/vue/24/outline';
 import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
-import type { Account } from '~/types/models/Account';
 
 const { account } = storeToRefs(accountStore());
 
@@ -81,8 +80,7 @@ const toggleSave = async () => {
         <div class="w-full md:w-9/12 px-5 py-5 space-y-4">
             <div class="flex flex-col md:flex-row justify-between gap-4">
                 <div class="flex flex-col md:flex-row gap-3 items-center w-full">
-                    <img v-if="accountAvatar" :src="avatarUrl.value"
-                        alt="profile" class="w-16 h-16 rounded-full"/>
+                    <img v-if="accountAvatar" :src="avatarUrl.value" alt="profile" class="w-16 h-16 rounded-full" />
                     <div v-else class="w-16 h-16 rounded-full bg-gray-200 animate-pulse"></div>
                     <div class="flex flex-col justify-center flex-grow w-full">
                         <div class="flex justify-between">
@@ -107,8 +105,7 @@ const toggleSave = async () => {
                     </div>
                 </div>
             </div>
-            <div v-if="accountSkills && accountSkills.length > 0"
-                class="mt-4 w-full">
+            <div v-if="accountSkills && accountSkills.length > 0" class="mt-4 w-full">
                 <label for="profileTitle" class="block text-sm font-medium leading-6 text-gray-900">
                     Skills
                 </label>
@@ -134,12 +131,14 @@ const toggleSave = async () => {
         </div>
 
         <div class="w-full md:w-3/12 divide-y p-4 flex flex-col item-center gap-2 justify-center">
-            <Button text="View Profile" background="white" foreground="primary" class="ring-1 ring-primary w-full font-base"
-                @click="emit('click', proposal.account.id ?? 0)" type="button"/>
+            <Button text="View Profile" background="white" foreground="primary"
+                class="ring-1 ring-primary w-full font-base" @click="emit('click', proposal.account.id ?? 0)"
+                type="button" />
 
-            <Button @click="!proposal.contract ? emit('hire', proposal.id) : emit('view', proposal.contract.id)" :text="!proposal.contract ? `Hire`: `View Contract`" type="button" :background="!proposal.contract ? `white` : `primary`"
+            <Button @click="!proposal.contract ? emit('hire', proposal.id) : emit('view', proposal.contract.id)"
+                :text="!proposal.contract ? `Hire`: `View Contract`" type="button"
+                :background="!proposal.contract ? `white` : `primary`"
                 :foreground="!proposal.contract ? `primary` : `white`" class="ring-1 ring-primary" />
-
         </div>
     </div>
 </template>

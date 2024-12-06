@@ -94,7 +94,15 @@ const handleDelete = async () => {
 }
 
 const goback = () => {
-    router.push(`/projects/${contract.value?.data.proposal.project.id}/${contract.value?.data.status === 'PENDING' ? 'proposals' : 'hires'}`);
+    if (contract.value?.data.proposal.project.id) {
+        if (contract.value?.data.proposal.project.id) {
+            if (contract.value.data.status === 'PENDING' || contract.value.data.status === 'REJECTED') {
+                router.push(`/projects/${contract.value.data.proposal.project.id}/proposals`);
+            } else {
+                router.push(`/projects/${contract.value.data.proposal.project.id}/hires`);
+            }
+        }
+    }
 }
 
 onMounted(async () => {

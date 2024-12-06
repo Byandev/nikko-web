@@ -112,7 +112,7 @@ const submitForm = async () => {
       body: body.value,
     });
 
-    router.push('/find-work');
+    router.push('/my-contract/invitations');
   } catch (error) {
     
   }
