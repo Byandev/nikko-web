@@ -105,7 +105,7 @@ watch(() => attachmentFiles.value, async (newFiles) => {
             <Icon icon="mdi:paperclip" class="w-5 h-5" />
             <input type="file" multiple @change="handleAttachment" class="hidden" />
         </label>
-        <input type="text" :value="newMessage" placeholder="Aa"
+        <input type="text" v-model="newMessage" placeholder="Aa"
             class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-0 " />
         <button @click="handleMessageSubmit" class="ml-4 p-2 bg-primary text-white rounded-full hover:bg-primary/80">
             <Icon :icon="!isSending ? 'mdi:send' : 'line-md:loading-loop'" class="w-5 h-5" />

@@ -88,7 +88,7 @@ onMounted(async () => {
     <div class="h-full block lg:hidden ">
 
         <!-- Chat Channel -->
-        <ChatChannel v-if="currentTab == 'chat-channel'" :show-dropdown="showDropdown" :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :route="route.params.channelId as string" :page="messages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @current_page="currentTab = $event" :messages="sortedMessages" @current-page="currentTab = $event" />
+        <ChatChannel v-if="currentTab == 'chat-channel'" :show-dropdown="showDropdown" :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :route="route.params.channelId as string" :page="messages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="sortedMessages" @current-page="currentTab = $event" />
 
         <!-- Chat Option -->
         <ChatOption v-if="currentTab == 'chat-option'" :isMobile="true" :activeChannel="chatChannel?.activeChannel as Channel" :isChannelLoading="chatChannel?.isChannelLoading" @update:current-page="currentTab = $event" @view-profile="viewProfile" :avatar="chatChannel?.avatar" :name="chatChannel?.name" />
@@ -114,7 +114,7 @@ onMounted(async () => {
 
 
             <!-- Chat Channel -->
-            <ChatChannel :show-dropdown="showDropdown" :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :route="route.params.channelId as string" :page="messages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" @current_page="currentTab = $event" :messages="sortedMessages" @current-page="currentTab = $event" />
+            <ChatChannel :show-dropdown="showDropdown" :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :route="route.params.channelId as string" :page="messages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :messages="sortedMessages" @current-page="currentTab = $event" />
 
 
             <!-- Profile Section -->
