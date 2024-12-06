@@ -1,3 +1,4 @@
+import type { Proposal } from "./Proposal";
 import type { User } from "./User";
 
 export interface Channel {
@@ -6,6 +7,7 @@ export interface Channel {
     subject_type: string;
     title: string;
     last_activity_at: string;
+    subject: Proposal;
     created_at: string;
     updated_at: string;
     members: User[];

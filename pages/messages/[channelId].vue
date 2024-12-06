@@ -89,8 +89,10 @@ const selectChat = async (id: number) => {
   currentTab.value = 'chat-section';
 };
 
-const viewProfile = async (id: number) => {
-  await router.push(`/${account.value?.type !== 'FREELANCER' ? 'freelancer' : 'client'}/${id}`);
+const refreshMessages = async () => {
+  await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
+  messages.value = messages.value.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); //Sort messages by created_at
+  chatChannel.value?.scrollToBottom();
 };
 
 watch(
@@ -100,12 +102,6 @@ watch(
   }, 500)
 );
 
-const refreshMessages = async () => {
-  await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
-  messages.value = messages.value.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()); //Sort messages by created_at
-  chatChannel.value?.scrollToBottom();
-};
-
 onMounted(async () => {
   await fetchData(`/v1/chat/channels?${channelsQueryString.value}`, 'channels');
   await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
@@ -113,8 +109,6 @@ onMounted(async () => {
   chatChannel.value?.scrollToBottom();
 });
 </script>
-
-
 
 <template>
     <!-- Mobile View -->
@@ -124,7 +118,7 @@ onMounted(async () => {
         <ChatChannel v-if="currentTab == 'chat-channel'" @refresh="refreshMessages" ref="chatChannel" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
         <!-- Chat Option -->
-        <ChatOption v-if="currentTab == 'chat-option'" :isMobile="true" :isChannelLoading="isChannelLoading" @view-profile="viewProfile" :avatar="avatar" :name="name" :id="id ?? 0" />
+        <ChatOption v-if="currentTab == 'chat-option'" :channel-id="Number(route.params.channelId as string)" :isMobile="true" :isChannelLoading="isChannelLoading" :avatar="avatar" :name="name" :id="id ?? 0" />
         
     </div>
 
@@ -151,7 +145,7 @@ onMounted(async () => {
 
 
             <!-- Profile Section -->
-            <ChatOption :isChannelLoading="isChannelLoading" @view-profile="viewProfile" :avatar="avatar" :name="name" :id="id ?? 0" />
+            <ChatOption :isChannelLoading="isChannelLoading" :channel-id="Number(route.params.channelId as string)" :avatar="avatar" :name="name" :id="id ?? 0" />
         </div>
     </div>
 

@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import type { Channel } from '~/types/models/Channel';
-import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
-
-const { account } = storeToRefs(accountStore());
+import { accountStore } from '~/store/accountStore';
+import type { ApiErrorResponse } from '~/types/api/response/error';
+import type { Channel } from '~/types/models/Channel';
 
 const props = defineProps({
     avatar: String,
     name: String,
     id: {
+        type: Number,
+        required: true,
+    },
+    channelId: {
         type: Number,
         required: true,
     },
@@ -19,10 +22,28 @@ const props = defineProps({
     }
 });
 
+const { account } = storeToRefs(accountStore());
+const requestHeaders = computed<HeadersInit | undefined>(() =>
+  account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
+);
+
+const { data: fetchedChannel, fetchData: fetchChannel, pending: isFetching } = useFetchData<{ data: Channel }, ApiErrorResponse>();
+
+const router = useRouter();
+
+const viewProfile = async (id: number) => {
+  await router.push(`/${account.value?.type !== 'FREELANCER' ? 'freelancer' : 'client'}/${id}`);
+};
+
 const emit = defineEmits<{
     (e: 'update:current-page', page: string): void;
-    (e: 'view-profile', id: number): void;
 }>();
+
+onMounted(() => {
+    fetchChannel(`/v1/chat/channels/${props.channelId}`,{
+        headers: requestHeaders.value,
+    });
+});
 
 </script>
 
@@ -47,9 +68,25 @@ const emit = defineEmits<{
                 <div class="mt-2 border-b-2 w-full pb-3">
                     <div class="flex justify-center flex-col items-center">
                         <Icon icon="iconamoon:profile-circle-fill"
-                            @click="emit('view-profile', props.id)"
+                            @click="viewProfile(props.id)"
                             class="w-12 h-12 text-gray-500  hover:cursor-pointer hover:bg-gray-200 rounded-full p-1" />
                         <span class="text-sm text-gray-500">Profile</span>
+                    </div>
+                </div>
+                <div v-if="!isFetching" class="mt-2 border-b-2 w-full pb-3 flex flex-col gap-2">
+                    <span v-for="member in fetchedChannel?.data.members">
+                        {{ member.first_name }} {{ member.last_name }} {{ member.id === account?.id ? '(Owner)' : '(Member)' }}
+                    </span>
+                </div>
+
+                <div v-if="!isFetching" class="mt-2 border-b-2 w-full pb-3 flex flex-col gap-2">
+                    <div class="flex justify-start flex-col items-start gap-2 text-primary">
+                        <button @click="router.push(`/jobs/${fetchedChannel?.data.subject.project_id}`)">
+                            View Job
+                        </button>
+                        <button @click="router.push(`/proposal/${fetchedChannel?.data.subject.id}`)">
+                            View Proposal
+                        </button>
                     </div>
                 </div>
             </div>
