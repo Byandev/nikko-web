@@ -10,7 +10,7 @@ export interface Proposal {
     project_id: number;
     bid: number;
     transaction_fee: number;
-    chat_channel: Channel | null;
+    chat_channel?: Channel;
     length: string;
     status: string;
     is_saved: boolean;

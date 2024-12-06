@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import type { Message } from '~/types/models/Message';
-import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
-
-const { account } = storeToRefs(accountStore());
 
 const props = defineProps({
     messages: {
@@ -50,72 +47,7 @@ defineExpose({
             <div v-if="messages.length === 0 && !isMessagesLoading" class="text-center text-gray-500">
                 No messages yet. Start the conversation!
             </div>
-            <div v-for="(item, index) in props.messages" :key="index">
-                <div v-if="item.sender.id != account?.id" class="flex justify-start">
-                    <div class="flex flex-col gap-2">
-                        <div class="flex flex-row">
-                            <div class="flex items-center" v-if="item.content">
-                                <img :src="item.sender.avatar?.thumb_url" alt="avatar"
-                                    class="w-8 h-8 rounded-full mr-2 border" />
-                            </div>
-                            <div class="bg-white p-3 rounded-lg shadow" v-if="item.content">
-                                <p>{{ item.content }}</p>
-                                <span class="text-xs text-gray-500">{{ formatDayTime(item.created_at) }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div v-else class="flex justify-end">
-                    <div class="flex flex-col gap-2">
-                        <div class="flex flex-row">
-                            <div class="bg-primary text-white p-3 rounded-lg shadow" v-if="item.content">
-                                <p>{{ item.content }}</p>
-                                <span class="text-xs text-gray-100">{{ formatDayTime(item.created_at) }}</span>
-                            </div>
-                            <div class="flex items-center" v-if="item.content">
-                                <img :src="item.sender.avatar?.thumb_url" alt="avatar"
-                                    class="w-8 h-8 rounded-full ml-2 border" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="item.sender.id != account?.id" class="flex justify-start">
-                    <div class="text-left">
-                        <div v-if="item.attachments.length > 0" class="flex items-start">
-                            <!-- Avatar -->
-                            <div class="flex items-center mr-2">
-                                <img :src="item.sender.avatar?.thumb_url" alt="avatar"
-                                    class="min-w-8 h-8 rounded-full border" />
-                            </div>
-
-                            <!-- Images -->
-                            <div class="flex flex-col items-start">
-                                <img v-for="attachment in item.attachments" :src="attachment.original_url"
-                                    alt="attachment" class="h-auto rounded-lg bg-white p-3 shadow w-2/5" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div v-else class="flex justify-end">
-                    <div class="text-right">
-                        <div v-if="item.attachments.length > 0" class="flex items-end">
-                            <!-- Images -->
-                            <div class="flex flex-col items-end">
-                                <img v-for="attachment in item.attachments" :src="attachment.original_url"
-                                    alt="attachment" class="h-auto rounded-lg bg-white p-3 shadow w-2/5" />
-                            </div>
-
-                            <!-- Avatar -->
-                            <div class="flex items-center ml-2">
-                                <img :src="item.sender.avatar?.thumb_url" alt="avatar"
-                                    class="min-w-8 h-8 rounded-full border" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
+            <ChatMessage :messages="messages" />
         </div>
     </div>
     <div v-else class="flex items-center justify-center flex-grow">

@@ -25,6 +25,8 @@ const emit = defineEmits<{
     (e: 'select-chat', id: number): void;
 }>();
 
+console.log('Is Loading?', props.isChannelLoading);
+
 
 </script>
 

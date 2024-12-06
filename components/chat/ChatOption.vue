@@ -21,7 +21,6 @@ const props = defineProps({
 
 const emit = defineEmits<{
     (e: 'update:current-page', page: string): void;
-    (e: 'update:showDropdown', value: boolean): void;
     (e: 'view-profile', id: number): void;
 }>();
 
@@ -32,7 +31,6 @@ const emit = defineEmits<{
             <div v-if="props.isMobile">
                 <button @click="{
                     emit('update:current-page', 'chat-channel');	
-                    emit('update:showDropdown', false);
                 }" class="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
                     <Icon icon="mdi:arrow-left" class="w-5 h-5" />
                 </button>

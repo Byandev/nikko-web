@@ -1,68 +1,100 @@
 <script setup lang="ts">
-const router = useRouter();
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { storeToRefs } from 'pinia';
+import debounce from 'lodash/debounce';
 import type { Channel } from '~/types/models/Channel';
 import type { Message } from '~/types/models/Message';
-import { Icon } from '@iconify/vue';
 import type ChatMessages from './ChatMessages.vue';
+import type { ApiErrorResponse } from '~/types/api/response/error';
+import { accountStore } from '~/store/accountStore';
+import { Icon } from '@iconify/vue';
 
-const props = defineProps({
-    avatar: String,
-    name: String,
-    channels: {
-        type: Array as PropType<Channel[]>,
-        required: true,
-    },
-    messages: {
-        type: Array as PropType<Message[]>,
-        required: true,
-    },
-    activeChannel: {
-        type: Object as PropType<Channel>,
-        required: true,
-    },
-    isChannelLoading: Boolean,
-    isMessagesLoading: Boolean,
-    isSending: Boolean,
-    modelValue : {
-        type: String,
-        default: '',
-        required: true,
-    },
-    showDropdown: Boolean,
-    showLoadMore: Boolean,
-    page: {
-        type: Number,
-        default: 1,
-    },
-    isMobile: {
-        type: Boolean,
-        default: false,
-    },
-    attachmentFiles: {
-        type: Array as PropType<File[]>,
-        required: false,
-    }
-});
+const props = defineProps<{
+  route: string;
+  isMobile?: boolean;
+  showLoadMore: boolean;
+  messages: Message[];
+  isMessagesLoading: boolean;
+  page: number;
+  searchQuery: string;
+  showDropdown: boolean;
+}>();
 
 const emit = defineEmits<{
   (e: 'current-page', page: string): void;
   (e: 'page', page: number): void;
-  (e: 'submit-message'): void;
-  (e: 'update:modelValue', value: string): void;
-  (e: 'update:showDropdown', value: boolean): void;
-  (e: 'update:attachments', file: File[]): void;
+  (e: 'update:showDropdown', state: boolean): void;
 }>();
 
+const { account } = storeToRefs(accountStore());
+const router = useRouter();
+const chats = ref<Channel[]>([]);
 const chatMessages = ref<InstanceType<typeof ChatMessages> | null>(null);
 
-const scrollToBottom = () => {
-    chatMessages.value?.scrollToBottom();
-};
+const { data: channels, fetchData: fetchChannels, pending: isChannelLoading } =
+  useFetchData<{ data: Channel[] }, ApiErrorResponse>();
 
-defineExpose({
-    scrollToBottom,
+const channelsQueryString = computed(() => {
+  const params: Record<string, string> = {
+    'filter[search]': props.searchQuery,
+  };
+  return new URLSearchParams(params).toString();
 });
 
+const sortedChats = computed(() =>
+  chats.value.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+);
+
+const activeChannel = computed(() => {
+  return sortedChats.value.find((chat) => chat.id === Number(props.route));
+});
+
+const activeParticipant = computed(() =>
+  activeChannel.value?.members.find((member) => account.value?.id !== member.id)
+);
+
+const avatar = computed(() => activeParticipant.value?.avatar?.original_url);
+
+const name = computed(
+  () => `${activeParticipant.value?.first_name} ${activeParticipant.value?.last_name}`
+);
+
+const requestHeaders = computed<HeadersInit | undefined>(() =>
+  account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
+);
+
+const scrollToBottom = () => {
+  chatMessages.value?.scrollToBottom();
+};
+
+const fetchChannelsData = async () => {
+  await fetchChannels(`/v1/chat/channels?${channelsQueryString.value}`, {
+    headers: requestHeaders.value,
+  });
+  if (channels.value?.data) {
+    chats.value = channels.value.data;
+  }
+};
+
+onMounted(async () => {
+  await fetchChannelsData();
+});
+
+watch(
+  [() => channelsQueryString.value],
+  debounce(fetchChannelsData, 500)
+);
+
+defineExpose({
+  fetchChannelsData,
+  isChannelLoading,
+  scrollToBottom,
+  activeChannel,
+  sortedChats,
+  avatar,
+  name,
+});
 </script>
 
 <template>
@@ -92,15 +124,15 @@ defineExpose({
                         </div>
                     </div>
                     <div v-if="isMobile">
-                        <button @click="emit('update:showDropdown',!props.showDropdown);"	
+                        <button @click="emit('update:showDropdown', !showDropdown)"	
                             class="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300">
                             <Icon icon="bi:three-dots" class="w-5 h-5" />
                         </button>
-                        <div v-if="props.showDropdown"
+                        <div v-if="showDropdown"
                             class="absolute mt-2 right-10 w-48 bg-white border rounded-lg shadow-lg z-50">
                             <button @click="{
                                 emit('current-page', 'chat-option');
-                                emit('update:showDropdown',false);
+                                emit('update:showDropdown', false);
                             }"
                                 class="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left">Chat Option</button>
                         </div>
@@ -109,10 +141,10 @@ defineExpose({
             </div>
 
             <!-- Chat Messages -->
-            <ChatMessages ref="chatMessages" :show-load-more="props.showLoadMore" :messages="messages" :isMessagesLoading="isMessagesLoading" :page="page" @load-more="emit('page', props.page + 1)" />
+            <ChatMessages ref="chatMessages" :show-load-more="showLoadMore" :messages="messages" :isMessagesLoading="isMessagesLoading" :page="page" @load-more="emit('page', props.page + 1)" />
 
             <!-- Chat Input -->
-            <ChatInput :modelValue="props.modelValue" @update:attachments="emit('update:attachments',$event)" :attachment-files="props.attachmentFiles" :message="messages" :isMessagesLoading="isMessagesLoading" :isSending="isSending" @submit-message="emit('submit-message')" @update:modelValue="emit('update:modelValue', $event);" />
+            <ChatInput :route="props.route" />
 
         </div>
 </template>
