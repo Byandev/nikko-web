@@ -287,7 +287,7 @@ const submitForm = async (id: number) => {
                                         Click to select a file</p>
                                 </div>
                             </div>
-                            <div v-if="selectedFiles.length || form.attachments.length" :class="account?.type === 'CLIENT'? 'mt-5' : ''">
+                            <div v-if="selectedFiles.length || form.attachments.length" :class="account?.type === 'FREELANCER'? 'mt-5' : ''">
                                 <ul class="mt-2 space-y-4">
                                     <li v-for="(image, index) in form.attachments" :key="index"
                                         class="flex items-center justify-between p-2 bg-gray-100 rounded-md shadow-sm">

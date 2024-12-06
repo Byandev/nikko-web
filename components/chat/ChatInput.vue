@@ -6,7 +6,7 @@ import type { Message } from "~/types/models/Message";
 import { accountStore } from "~/store/accountStore";
 
 const props = defineProps<{
-    route: String;
+    activeChannelId: String;
 }>();
 
 const emit = defineEmits<{
@@ -67,7 +67,7 @@ const handleMessageSubmit = async () => {
             uploadedImages.value = uploadResponses.map(response => response.data.id);
         }
 
-        await sendMesage(`/v1/chat/channels/${props.route}/messages`, {
+        await sendMesage(`/v1/chat/channels/${props.activeChannelId}/messages`, {
             method: 'POST',
             headers: requestHeaders.value,
             body: {

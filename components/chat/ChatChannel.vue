@@ -8,7 +8,7 @@ import { Icon } from '@iconify/vue';
 
 const props = defineProps<{
   channels: Channel[];
-  route: string;
+  activeChannelId: string;
   isMobile?: boolean;
   showLoadMore: boolean;
   messages: Message[];
@@ -16,7 +16,6 @@ const props = defineProps<{
   isChannelLoading: boolean;
   isMessagesLoading: boolean;
   page: number;
-  searchQuery: string;
   showDropdown: boolean;
   avatar: string;
   name: string;
@@ -88,7 +87,7 @@ defineExpose({
             <ChatMessages ref="chatMessages" :show-load-more="showLoadMore" :messages="messages" :isMessagesLoading="isMessagesLoading" :page="page" @load-more="emit('page', props.page + 1)" />
 
             <!-- Chat Input -->
-            <ChatInput :route="props.route" @refresh="emit('refresh')" />
+            <ChatInput :activeChannelId="props.activeChannelId" @refresh="emit('refresh')" />
 
         </div>
 </template>

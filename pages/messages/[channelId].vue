@@ -116,7 +116,7 @@ onMounted(async () => {
     <div class="h-full block lg:hidden ">
 
         <!-- Chat Channel -->
-        <ChatChannel v-if="currentTab == 'chat-channel'" @refresh="refreshMessages" ref="chatChannel" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
+        <ChatChannel v-if="currentTab == 'chat-channel'" @refresh="refreshMessages" ref="chatChannel" :active-channel="activeChannel" :channels="channels" :activeChannelId="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
         <!-- Chat Option -->
         <ChatOption v-if="currentTab == 'chat-option'" :channel-id="Number(route.params.channelId as string)" :isMobile="true" :isChannelLoading="isChannelLoading" :avatar="avatar" :name="name" :id="id ?? 0" />
@@ -137,12 +137,12 @@ onMounted(async () => {
                 </div>
 
                 <!-- Chat List -->
-                <ChannelList :route="route.params.channelId as string" :channels="channels" :isChannelLoading="isChannelLoading" @select-chat="selectChat" />
+                <ChannelList :activeChannelId="route.params.channelId as string" :channels="channels" :isChannelLoading="isChannelLoading" @select-chat="selectChat" />
             </div>
 
 
             <!-- Chat Channel -->
-            <ChatChannel ref="chatChannel" @refresh="refreshMessages" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
+            <ChatChannel ref="chatChannel" @refresh="refreshMessages" :active-channel="activeChannel" :channels="channels" :activeChannelId="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
 
             <!-- Profile Section -->

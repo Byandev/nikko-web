@@ -10,7 +10,7 @@ const props = defineProps({
         required: true,
     },
     isChannelLoading: Boolean,
-    route: {
+    activeChannelId: {
         type: String,
         required: false,
     }
@@ -41,7 +41,7 @@ const emit = defineEmits<{
 
         <div v-if="channels && !isChannelLoading" v-for="channel in channels" :key="channel.id"
             @click="emit('select-chat',channel.id)"
-            :class="['flex items-center p-4 border-b cursor-pointer', channel?.id == Number(props.route) ? 'bg-gray-200' : 'bg-white']">
+            :class="['flex items-center p-4 border-b cursor-pointer', channel?.id == Number(props.activeChannelId) ? 'bg-gray-200' : 'bg-white']">
             <img :src="channel?.members.find(member => account?.id != member.id)?.avatar?.original_url"
                 alt="User" class="w-12 h-12 rounded-full mr-4" />
             <div class="flex-1">
