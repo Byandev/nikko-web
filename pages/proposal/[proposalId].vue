@@ -137,8 +137,8 @@ const submitForm = async (id: number) => {
     <div class="my-8 lg:mx-auto mx-5">
         <div class="max-w-6xl grid grid-cols-1 gap-4 mt-5 mx-auto">
             <div class="w-full justify-between flex-row flex">
-                <h1 class="text-4xl font-medium whitespace-nowrap">{{ account?.type !== 'CLIENT'? 'Your proposal' : 'Review proposal' }}</h1>
-                <Button v-if="account?.type === 'CLIENT'" :text="isEditing? 'Done': 'Edit'" @click="isEditing? isEditing=false: isEditing=true" type="button" foreground="white" background="primary"/>
+                <h1 class="text-4xl font-medium whitespace-nowrap">{{ account?.type === 'FREELANCER'? 'Your proposal' : 'Review proposal' }}</h1>
+                <Button v-if="account?.type === 'FREELANCER'" :text="isEditing? 'Done': 'Edit'" @click="isEditing? isEditing=false: isEditing=true" type="button" foreground="white" background="primary"/>
             </div>
             <div class="flex flex-col gap-4">
                 <div class="ring-1 ring-gray-300 rounded-md px-4 md:px-8 my-3 flex-1" v-if="!isLoading && proposal">
@@ -277,7 +277,7 @@ const submitForm = async (id: number) => {
                         </header>
                         <section class="pb-6 md:pb-8">
                             <div class="flex flex-col gap-4">
-                                <div v-if="account?.type === 'CLIENT'" class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500 cursor-pointer"
+                                <div v-if="account?.type === 'FREELANCER'" class="flex flex-row items-center px-2 rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-primary-500 cursor-pointer"
                                     @click="handleClick">
                                     <Icon icon="mdi:file" :ssr="true" />
                                     <input :disable="!isEditing" type="file" id="file" multiple
@@ -297,7 +297,7 @@ const submitForm = async (id: number) => {
                                                 :title="image.name">{{
                                                 image.name }}</span>
                                         </div>
-                                        <button v-if="account?.type === 'CLIENT'" @click="handleRemoveFile(String(image.name))"
+                                        <button v-if="account?.type === 'FREELANCER'" @click="handleRemoveFile(String(image.name))"
                                             class="text-red-500 hover:text-red-700">
                                             <Icon icon="mdi:close" width="16" height="16" />
                                         </button>
@@ -308,7 +308,7 @@ const submitForm = async (id: number) => {
                                 v$.attachments.$errors[0].$message }}</span>
                         </section>
                     </div>
-                    <div v-if="account?.type === 'CLIENT'" class="flex flex-row gap-2 w-full justify-end">
+                    <div v-if="account?.type === 'FREELANCER'" class="flex flex-row gap-2 w-full justify-end">
                         <Button text="Update Proposal" type="submit" background="primary" :is-loading="isLoading || isSubmitting || isUploading
                             " foreground="white" />
                         <NuxtLink :to="`/find-work`">
