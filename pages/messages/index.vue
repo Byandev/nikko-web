@@ -6,7 +6,7 @@ import { Icon } from '@iconify/vue';
 
 const { account } = storeToRefs(accountStore());
 
-const { data: fetchedChannels, fetchData: fetchChannels, pending: isLoading, pending: isChannelLoading } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
+const { data: fetchedChannels, fetchData: fetchChannels, pending: isChannelLoading } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
