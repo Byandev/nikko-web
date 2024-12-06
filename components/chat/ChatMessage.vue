@@ -12,11 +12,13 @@ const props = defineProps({
     isMessagesLoading: Boolean,
 });
 
+const reversedMessages = computed(() => [...props.messages].reverse());
+
 </script>
 
 <template>
-    <div v-for="(message, index) in props.messages" :key="index">
-                <div v-if="message.sender.id != account?.id" class="flex justify-start">
+    <div v-for="(message, index) in reversedMessages" :key="index">
+                <div v-if="message.sender.id != account?.id" class="flex justify-start flex-col-reverse">
                     <div class="flex flex-col gap-2">
                         <div class="flex flex-row">
                             <div class="flex items-center" v-if="message.content">
@@ -79,6 +81,5 @@ const props = defineProps({
                         </div>
                     </div>
                 </div>
-
             </div>
 </template>
