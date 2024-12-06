@@ -91,6 +91,9 @@ const selectChat = async (id: number) => {
 
 const refreshMessages = async () => {
   await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
+  if (fetchedMessages.value && fetchedMessages.value.data) {
+        messages.value = fetchedMessages.value.data;
+  }
   chatChannel.value?.scrollToBottom();
 };
 
