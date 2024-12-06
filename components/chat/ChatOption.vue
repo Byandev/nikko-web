@@ -8,8 +8,8 @@ const { account } = storeToRefs(accountStore());
 const props = defineProps({
     avatar: String,
     name: String,
-    activeChannel: {
-        type: Object as PropType<Channel>,
+    id: {
+        type: Number,
         required: true,
     },
     isChannelLoading: Boolean,
@@ -35,19 +35,19 @@ const emit = defineEmits<{
                     <Icon icon="mdi:arrow-left" class="w-5 h-5" />
                 </button>
             </div>
-            <div v-if="activeChannel && !isChannelLoading" class="flex flex-col items-center">
-                <img v-if="activeChannel" :src="avatar" alt="User" class="w-24 h-24 rounded-full" />
+            <div v-if="!isChannelLoading" class="flex flex-col items-center">
+                <img v-if="avatar" :src="avatar" alt="User" class="w-24 h-24 rounded-full" />
                 <div v-else>
                     <div class="w-24 h-24 bg-gray-300 rounded-full animate-pulse"></div>
                 </div>
-                <div v-if="activeChannel" class="text-lg font-semibold">{{ name }}</div>
+                <div v-if="name" class="text-lg font-semibold">{{ name }}</div>
                 <div v-else>
                     <div class="mt-2 w-28 h-6 bg-gray-300 rounded animate-pulse"></div>
                 </div>
                 <div class="mt-2 border-b-2 w-full pb-3">
                     <div class="flex justify-center flex-col items-center">
                         <Icon icon="iconamoon:profile-circle-fill"
-                            @click="emit('view-profile',activeChannel?.members.find(member => account?.id != member.id)?.id ?? 0)"
+                            @click="emit('view-profile', props.id)"
                             class="w-12 h-12 text-gray-500  hover:cursor-pointer hover:bg-gray-200 rounded-full p-1" />
                         <span class="text-sm text-gray-500">Profile</span>
                     </div>

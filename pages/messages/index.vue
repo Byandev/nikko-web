@@ -6,33 +6,27 @@ import { Icon } from '@iconify/vue';
 
 const { account } = storeToRefs(accountStore());
 
-const { data: channels, fetchData: fetchChannels, pending: isLoading } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
+const { data: fetchedChannels, fetchData: fetchChannels, pending: isLoading, pending: isChannelLoading } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
     account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
 );
 
-const chats = ref<Channel[]>([]);
+const channels = ref<Channel[]>([]);
+
 const router = useRouter();
+const route = useRoute();
 
 const selectChat = async (id: number) => {
     await router.push(`/messages/${id}`);
 }
 
-const sortedChats = computed(() => {
-    if (chats.value) {
-        return chats.value.sort((a, b) => {
-            return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-        });
-    }
-});
-
 onMounted(async () => {
     await fetchChannels(`/v1/chat/channels`, {
         headers: requestHeaders.value
     });
-    if (channels.value && channels.value.data) {
-        chats.value = channels.value.data
+    if (fetchedChannels.value && fetchedChannels.value.data) {
+        channels.value = fetchedChannels.value.data
     }
 });
 
@@ -52,7 +46,7 @@ onMounted(async () => {
             </div>
 
             <!-- Chat List -->
-            <ChatList v-if="sortedChats" :chats="sortedChats" :isChannelLoading="isLoading" @select-chat="selectChat" />
+            <ChannelList :route="route.params.channelId as string" :channels="channels" :isChannelLoading="isChannelLoading" @select-chat="selectChat" />
         </div>
     </div>
 
@@ -70,7 +64,7 @@ onMounted(async () => {
                 </div>
 
                 <!-- Chat List -->
-                <ChatList v-if="sortedChats" :chats="sortedChats" :isChannelLoading="isLoading" @select-chat="selectChat" />
+                <ChannelList :route="route.params.channelId as string" :channels="channels" :isChannelLoading="isChannelLoading" @select-chat="selectChat" />
             </div>
 
              <!-- Chat Section -->

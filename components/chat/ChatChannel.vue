@@ -1,24 +1,25 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { storeToRefs } from 'pinia';
-import debounce from 'lodash/debounce';
 import type { Channel } from '~/types/models/Channel';
 import type { Message } from '~/types/models/Message';
 import type ChatMessages from './ChatMessages.vue';
-import type { ApiErrorResponse } from '~/types/api/response/error';
-import { accountStore } from '~/store/accountStore';
 import { Icon } from '@iconify/vue';
 
 const props = defineProps<{
+  channels: Channel[];
   route: string;
   isMobile?: boolean;
   showLoadMore: boolean;
   messages: Message[];
+  activeChannel?: Channel;
+  isChannelLoading: boolean;
   isMessagesLoading: boolean;
   page: number;
   searchQuery: string;
   showDropdown: boolean;
+  avatar: string;
+  name: string;
 }>();
 
 const emit = defineEmits<{
@@ -27,73 +28,15 @@ const emit = defineEmits<{
   (e: 'update:showDropdown', state: boolean): void;
 }>();
 
-const { account } = storeToRefs(accountStore());
 const router = useRouter();
-const chats = ref<Channel[]>([]);
 const chatMessages = ref<InstanceType<typeof ChatMessages> | null>(null);
-
-const { data: channels, fetchData: fetchChannels, pending: isChannelLoading } =
-  useFetchData<{ data: Channel[] }, ApiErrorResponse>();
-
-const channelsQueryString = computed(() => {
-  const params: Record<string, string> = {
-    'filter[search]': props.searchQuery,
-  };
-  return new URLSearchParams(params).toString();
-});
-
-const sortedChats = computed(() =>
-  chats.value.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-);
-
-const activeChannel = computed(() => {
-  return sortedChats.value.find((chat) => chat.id === Number(props.route));
-});
-
-const activeParticipant = computed(() =>
-  activeChannel.value?.members.find((member) => account.value?.id !== member.id)
-);
-
-const avatar = computed(() => activeParticipant.value?.avatar?.original_url);
-
-const name = computed(
-  () => `${activeParticipant.value?.first_name} ${activeParticipant.value?.last_name}`
-);
-
-const requestHeaders = computed<HeadersInit | undefined>(() =>
-  account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
-);
 
 const scrollToBottom = () => {
   chatMessages.value?.scrollToBottom();
 };
 
-const fetchChannelsData = async () => {
-  await fetchChannels(`/v1/chat/channels?${channelsQueryString.value}`, {
-    headers: requestHeaders.value,
-  });
-  if (channels.value?.data) {
-    chats.value = channels.value.data;
-  }
-};
-
-onMounted(async () => {
-  await fetchChannelsData();
-});
-
-watch(
-  [() => channelsQueryString.value],
-  debounce(fetchChannelsData, 500)
-);
-
 defineExpose ({
-  fetchChannelsData,
-  isChannelLoading,
   scrollToBottom,
-  activeChannel,
-  sortedChats,
-  avatar,
-  name,
 });
 </script>
 
@@ -141,7 +84,7 @@ defineExpose ({
             </div>
 
             <!-- Chat Messages -->
-            <ChatMessages ref="chatMessages" :show-load-more="showLoadMore" :messages="messages" :isMessagesLoading="isMessagesLoading" :page="page" @load-more="emit('page', props.page + 1)" />
+            <ChatMessages :show-load-more="showLoadMore" :messages="messages" :isMessagesLoading="isMessagesLoading" :page="page" @load-more="emit('page', props.page + 1)" />
 
             <!-- Chat Input -->
             <ChatInput :route="props.route" />

@@ -1,86 +1,115 @@
 <script setup lang="ts">
 import type { ApiErrorResponse } from '~/types/api/response/error';
 import type { Channel } from '~/types/models/Channel';
-import { accountStore } from '~/store/accountStore';
 import type { Message } from '~/types/models/Message';
-import { Icon } from '@iconify/vue';
 import type { PaginatedList } from '~/types/models/Pagination';
+import { Icon } from '@iconify/vue';
 import type ChatChannel from '~/components/chat/ChatChannel.vue';
+
+import { accountStore } from '~/store/accountStore';
+import { storeToRefs } from 'pinia';
+import { ref, computed, watch, onMounted } from 'vue';
+import { debounce } from 'lodash-es';
 
 const { account } = storeToRefs(accountStore());
 
-const { data: messages, fetchData: fetchMessages, pending: isMessagesLoading } = useFetchData<PaginatedList<Message>, ApiErrorResponse>();
-
-const requestHeaders = computed<HeadersInit | undefined>(() =>
-    account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
-);
-
-const message = ref<Message[]>([]);
-
-const router = useRouter();
-const route = useRoute();
+const messages = ref<Message[]>([]);
+const channels = ref<Channel[]>([]);
 const page = ref(1);
 const showDropdown = ref(false);
 const searchQuery = ref('');
 const currentTab = ref('chat-channel');
-
 const chatChannel = ref<InstanceType<typeof ChatChannel> | null>(null);
 
-const messageQueryString = computed(() => {
-    let params: Record<string, string> = {
-        page: page.value.toString(),
-        'per_page': '20'
-    }
+const router = useRouter();
+const route = useRoute();
 
-    return new URLSearchParams(params).toString();
-})
+const { data: fetchedMessages, fetchData: fetchMessages, pending: isMessagesLoading } = useFetchData<PaginatedList<Message>, ApiErrorResponse>();
+const { data: fetchedChannels, fetchData: fetchChannels, pending: isChannelLoading } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
 
-watch(
-    [() => page.value],
-    debounce(async () => {
-        await fetchMessages(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, {
-            headers: requestHeaders.value
-        });
-        if (messages.value && messages.value.data) {
-            message.value = [...message.value, ...messages.value.data];
-        }
-    }, 500)
+const requestHeaders = computed<HeadersInit | undefined>(() =>
+  account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
 );
-const selectChat = async (id: number) => {
-    await router.push(`/messages/${id}`);
-    currentTab.value = 'chat-section';
-}
 
-const viewProfile = async (id: number) => {
-    await router.push(`/${account.value?.type !== 'FREELANCER' ? 'freelancer' : 'client'}/${id}`);
-};
-
-const sortedMessages = computed(() => {
-    return message.value.sort((a, b) => {
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-    });
+const messageQueryString = computed(() => {
+  const params: Record<string, string> = {
+    page: page.value.toString(),
+    per_page: '20',
+  };
+  return new URLSearchParams(params).toString();
 });
+
+const channelsQueryString = computed(() => {
+  const params: Record<string, string> = {
+    'filter[search]': searchQuery.value,
+  };
+  return new URLSearchParams(params).toString();
+});
+
+const activeChannel = computed(() => 
+  channels.value.find((channel) => channel.id === Number(route.params.channelId))
+);
+
+const activeParticipant = computed(() => 
+  activeChannel.value?.members.find((member) => account.value?.id !== member.id)
+);
+
+const avatar = computed(() => activeParticipant.value?.avatar?.original_url);
+
+const name = computed(() => 
+  `${activeParticipant.value?.first_name} ${activeParticipant.value?.last_name}`
+);
+
+const id = computed(() => activeParticipant.value?.id);
 
 const showLoadMore = computed(() => {
-    if (messages.value && messages.value.meta) {
-        return messages.value.meta.current_page < messages.value.meta.last_page;
-    }
+  if (fetchedMessages.value && fetchedMessages.value.meta) {
+    return fetchedMessages.value.meta.current_page < fetchedMessages.value.meta.last_page;
+  }
 });
+
+const fetchData = async (url: string, type: 'messages' | 'channels') => {
+  try {
+    const headers = requestHeaders.value;
+    if (type === 'messages') {
+      await fetchMessages(url, { headers });
+      if (fetchedMessages.value && fetchedMessages.value.data) {
+        messages.value = [...messages.value, ...fetchedMessages.value.data];
+      }
+    } else if (type === 'channels') {
+      await fetchChannels(url, { headers });
+      if (fetchedChannels.value?.data) {
+        channels.value = fetchedChannels.value.data;
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+const selectChat = async (id: number) => {
+  await router.push(`/messages/${id}`);
+  currentTab.value = 'chat-section';
+};
+
+const viewProfile = async (id: number) => {
+  await router.push(`/${account.value?.type !== 'FREELANCER' ? 'freelancer' : 'client'}/${id}`);
+};
+
+watch(
+  [() => page.value],
+  debounce(async () => {
+    await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
+  }, 500)
+);
 
 onMounted(async () => {
-    await fetchMessages(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, {
-        headers: requestHeaders.value
-    });
-
-    if (messages.value && messages.value.data) {
-        message.value = messages.value.data
-        chatChannel.value?.scrollToBottom();
-    }
-
-    chatChannel.value?.fetchChannelsData();
+  await fetchData(`/v1/chat/channels?${channelsQueryString.value}`, 'channels');
+  await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
+  chatChannel.value?.scrollToBottom();
 });
-
 </script>
+
 
 
 <template>
@@ -88,10 +117,10 @@ onMounted(async () => {
     <div class="h-full block lg:hidden ">
 
         <!-- Chat Channel -->
-        <ChatChannel v-if="currentTab == 'chat-channel'" :show-dropdown="showDropdown" :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :route="route.params.channelId as string" :page="messages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="sortedMessages" @current-page="currentTab = $event" />
+        <ChatChannel v-if="currentTab == 'chat-channel'" :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
         <!-- Chat Option -->
-        <ChatOption v-if="currentTab == 'chat-option'" :isMobile="true" :activeChannel="chatChannel?.activeChannel as Channel" :isChannelLoading="chatChannel?.isChannelLoading" @update:current-page="currentTab = $event" @view-profile="viewProfile" :avatar="chatChannel?.avatar" :name="chatChannel?.name" />
+        <ChatOption v-if="currentTab == 'chat-option'" :isMobile="true" :isChannelLoading="isChannelLoading" @view-profile="viewProfile" :avatar="avatar" :name="name" :id="id ?? 0" />
         
     </div>
 
@@ -109,16 +138,16 @@ onMounted(async () => {
                 </div>
 
                 <!-- Chat List -->
-                <ChatList v-if="chatChannel?.activeChannel" :route="route.params.channelId as string" :chats="chatChannel?.sortedChats" :activeChannel="chatChannel?.activeChannel" :isChannelLoading="chatChannel?.isChannelLoading" @select-chat="selectChat" />
+                <ChannelList :route="route.params.channelId as string" :channels="channels" :isChannelLoading="isChannelLoading" @select-chat="selectChat" />
             </div>
 
 
             <!-- Chat Channel -->
-            <ChatChannel :show-dropdown="showDropdown" :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :route="route.params.channelId as string" :page="messages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :messages="sortedMessages" @current-page="currentTab = $event" />
+            <ChatChannel :active-channel="activeChannel" :channels="channels" :route="route.params.channelId as string" :show-dropdown="showDropdown"  :search-query="searchQuery" :is-messages-loading="isMessagesLoading" :page="fetchedMessages?.meta.current_page ?? 0" :showLoadMore="showLoadMore ?? false" @page="page = $event" :isMobile="true" @update:show-dropdown="showDropdown = $event" :messages="messages" @current-page="currentTab = $event" :is-channel-loading="isChannelLoading" :avatar="avatar ?? ''" :name="name" />
 
 
             <!-- Profile Section -->
-            <ChatOption v-if="chatChannel?.activeChannel" :activeChannel="chatChannel?.activeChannel" :isChannelLoading="chatChannel?.isChannelLoading" @update:current-page="currentTab = $event" @update:showDropdown="showDropdown = $event" @view-profile="viewProfile" :avatar="chatChannel?.avatar" :name="chatChannel?.name" />
+            <ChatOption :isChannelLoading="isChannelLoading" @view-profile="viewProfile" :avatar="avatar" :name="name" :id="id ?? 0" />
         </div>
     </div>
 
