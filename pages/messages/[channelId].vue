@@ -21,12 +21,15 @@ const chatChannel = ref<InstanceType<typeof ChatChannel> | null>(null);
 const router = useRouter();
 const route = useRoute();
 
+const { $echo } = useNuxtApp();
+
 const { data: fetchedMessages, fetchData: fetchMessages, pending: isMessagesLoading } = useFetchData<PaginatedList<Message>, ApiErrorResponse>();
 const { data: fetchedChannels, fetchData: fetchChannels, pending: isChannelLoading } = useFetchData<{ data: Channel[] }, ApiErrorResponse>();
 
 const requestHeaders = computed<HeadersInit | undefined>(() =>
   account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
 );
+
 
 const messageQueryString = computed(() => {
   const params: Record<string, string> = {
@@ -43,17 +46,17 @@ const channelsQueryString = computed(() => {
   return new URLSearchParams(params).toString();
 });
 
-const activeChannel = computed(() => 
+const activeChannel = computed(() =>
   channels.value.find((channel) => channel.id === Number(route.params.channelId))
 );
 
-const activeParticipant = computed(() => 
+const activeParticipant = computed(() =>
   activeChannel.value?.members.find((member) => account.value?.id !== member.id)
 );
 
 const avatar = computed(() => activeParticipant.value?.avatar?.original_url);
 
-const name = computed(() => 
+const name = computed(() =>
   `${activeParticipant.value?.first_name} ${activeParticipant.value?.last_name}`
 );
 
@@ -108,6 +111,16 @@ onMounted(async () => {
   await fetchData(`/v1/chat/channels?${channelsQueryString.value}`, 'channels');
   await fetchData(`/v1/chat/channels/${route.params.channelId}/messages?${messageQueryString.value}`, 'messages');
   chatChannel.value?.scrollToBottom();
+
+
+  console.log(`chat.messages.${route.params.channelId}`)
+  $echo.channel(`chat.channels.${route.params.channelId}`)
+      .listen('.Modules\\Chat\\Broadcasting\\MessageSent', (data: any) => {
+        console.log(data)
+      })
+      .listenToAll((event: any, data: any) => {
+        console.log(event, data)
+      });
 });
 </script>
 
@@ -120,7 +133,7 @@ onMounted(async () => {
 
         <!-- Chat Option -->
         <ChatOption v-if="currentTab == 'chat-option'" :channel-id="Number(route.params.channelId as string)" :isMobile="true" :isChannelLoading="isChannelLoading" :avatar="avatar" :name="name" :id="id ?? 0" />
-        
+
     </div>
 
     <!-- Desktop View -->
