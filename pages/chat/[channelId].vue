@@ -34,16 +34,8 @@ onUnmounted(() => {
 <template>
   <!-- Mobile View -->
   <div class="h-full block lg:hidden ">
-    <!-- Sidebar -->
-    <div class="w-full lg:w-1/3 flex flex-col h-full">
-
-      <!-- Search Bar -->
-      <div class="border border-gray-300 rounded-2xl p-2 flex flex-row items-center gap-2 m-4">
-        <Icon icon="material-symbols:search" class=" text-xl text-gray-400" />
-        <input type="text" placeholder="Search chat" class="w-full outline-none border-none" />
-      </div>
-
-      <Channels />
+    <div class="w-full lg:w-2/3 bg-white rounded-r-md overflow-hidden">
+      <ChannelChat />
     </div>
   </div>
 
@@ -66,7 +58,7 @@ onUnmounted(() => {
 
         <!-- Chat Section -->
         <div class="w-full lg:w-2/3 bg-white rounded-r-md overflow-hidden">
-          <ChannelChat/>
+          <ChannelChat />
         </div>
       </div>
     </div>
