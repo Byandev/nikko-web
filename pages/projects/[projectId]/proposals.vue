@@ -102,7 +102,7 @@ const handModal = async ({ proposal_id, accountName, channel_id }:{proposal_id?:
         current_proposal_id.value = proposal_id;
     }
     else{
-        await router.push(`/chats/${channel_id}`);
+        await router.push(`/chat/${channel_id}`);
     }
     // You can use the accountName as needed in your modal or other logic
 };
@@ -125,7 +125,7 @@ const handleSubmit = async () => {
             })
         });
 
-        await router.push(`/chats/${response.data.id}`);
+        await router.push(`/chat/${response.data.id}`);
     } catch (error) {
         console.error(error);
     }
