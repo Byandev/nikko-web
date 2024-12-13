@@ -2,21 +2,16 @@ import { defineStore } from 'pinia';
 import type {Channel} from "~/types/models/Channel";
 import type {Message} from "~/types/models/Message";
 import {initialPaginatedList, type PaginatedList} from "~/types/models/Pagination";
-import type {ApiErrorResponse} from "~/types/api/response/error";
 import type {ResponseData} from "~/types/api/types";
-import {sortBy} from "lodash";
-import type {User} from "~/types/models/User";
+import _ from "lodash";
 
 export const chatStore = defineStore('chat', () => {
     const { $api } = useNuxtApp();
-
-    const {data} = useAuth();
-
     const channel = ref<{loading: boolean, data: Channel | null}>({loading: true, data: null})
     const channels = ref<{loading: boolean, data: PaginatedList<Channel>}>({loading: true, data: initialPaginatedList});
     const messages = ref<{loading: boolean, data: PaginatedList<Message>}>({loading: true, data: initialPaginatedList});
 
-    const sortedMessages = computed(() => sortBy(
+    const sortedMessages = computed(() => _.sortBy(
         messages.value.data.data.filter(
             data => data.channel_id === channel.value?.data?.id),
         (message: Message) => new Date(message.created_at)
@@ -44,7 +39,8 @@ export const chatStore = defineStore('chat', () => {
     }
 
     const getMessages = async (channelId: number) => {
-        const response = await $api<PaginatedList<Message>>(`/v1/chat/channels/${channelId}/messages`)
+        // todo: Load more messages on scroll
+        const response = await $api<PaginatedList<Message>>(`/v1/chat/channels/${channelId}/messages?per_page=1000`)
 
         messages.value = {loading: false, data: response}
 

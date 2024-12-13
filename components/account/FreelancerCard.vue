@@ -111,7 +111,7 @@ const toggleSave = async () => {
       </div>
 
       <div v-if="hasProposalDetails" class="py-2 space-y-1 px-5">
-        <p>Total earning: <span>$0</span></p>
+        <p>Total earning: <span>{{currencyFormatter(freelancer.total_earnings)}}</span></p>
         <p v-if="freelancer.user.country_code">Location: <span>{{ freelancer.user.country_code }}</span></p>
       </div>
 
