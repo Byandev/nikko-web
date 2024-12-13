@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
-import type { ApiErrorResponse } from "~/types/api/response/error";
-import type { Media } from "~/types/models/Media";
-import type { Message } from "~/types/models/Message";
-import { accountStore } from "~/store/accountStore";
+import {Icon} from "@iconify/vue";
+import type {ApiErrorResponse} from "~/types/api/response/error";
+import type {Media} from "~/types/models/Media";
+import type {Message} from "~/types/models/Message";
+import {accountStore} from "~/store/accountStore";
 
 const props = defineProps<{
-    activeChannelId: String;
+    channelId: String;
 }>();
 
 const emit = defineEmits<{
-    (e: 'refresh'): void;
+    (e: 'sent', data: Message): void
 }>();
 
-const { sendRequest: sendMesage, pending: isSending } = useSubmit<{ data: Message }, ApiErrorResponse>();
+const { sendRequest: sendMessage, pending: isSending } = useSubmit<{ data: Message }, ApiErrorResponse>();
 const { sendRequest: sendAttachment } = useSubmit<{ data: Media }, ApiErrorResponse>();
 
 const { account } = storeToRefs(accountStore());
@@ -21,15 +21,11 @@ const attachmentFiles = ref<File[]>([]);
 const newMessage = ref<string>('');
 const attachmentUrls = ref<string[]>([]);
 const attachmentNames = ref<string[]>([]);
-const requestHeaders = computed<HeadersInit | undefined>(() =>
-    account.value?.id ? { 'X-ACCOUNT-ID': account.value.id.toString() } : undefined
-);
 
 const handleAttachment = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
-        const newFiles = [...attachmentFiles.value, ...Array.from(target.files)];
-        attachmentFiles.value = newFiles;
+      attachmentFiles.value = [...attachmentFiles.value, ...Array.from(target.files)];
     }
 };
 
@@ -62,23 +58,23 @@ const handleMessageSubmit = async () => {
                         body: formData,
                     });
             });
-        
+
             const uploadResponses = await Promise.all(uploadPromises);
             uploadedImages.value = uploadResponses.map(response => response.data.id);
         }
 
-        await sendMesage(`/v1/chat/channels/${props.activeChannelId}/messages`, {
+        const response = await sendMessage(`/v1/chat/channels/${props.channelId}/messages`, {
             method: 'POST',
-            headers: requestHeaders.value,
             body: {
                 ...(newMessage.value.trim() && { content: newMessage.value } ),
                 ...(uploadedImages.value.length > 0 && { attachment_ids: uploadedImages.value }),
             }
         });
+
         newMessage.value = '';
         attachmentFiles.value = [];
 
-        emit('refresh');
+        emit('sent', response.data);
     }
 };
 
@@ -100,7 +96,7 @@ watch(() => attachmentFiles.value, async (newFiles) => {
             </button>
         </div>
     </div>
-    <div class="p-2 bg-gray-100 border-t flex items-center">        
+    <div class="p-2 bg-gray-100 border-t flex items-center">
         <label class="mr-2 p-2 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 cursor-pointer">
             <Icon icon="mdi:paperclip" class="w-5 h-5" />
             <input type="file" multiple @change="handleAttachment" class="hidden" />

@@ -10,4 +10,5 @@ export interface Message {
     updated_at: string;
     sender: User;
     attachments: Media[];
+    sent_by_me: boolean
 }
