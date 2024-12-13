@@ -22,4 +22,6 @@ export interface Account {
     skills: Skill[];
     educations: Education[];
     work_experiences: WorkExperience[];
+    total_earnings: number;
+    total_spent: number
 }
