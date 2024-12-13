@@ -52,7 +52,7 @@ const queryString = computed(() => {
     ...(filters.value.skills.length ? { "filter[skills]": filters.value.skills.map(skill => skill.id).join(',') } : {}),
     ...(filters.value.is_saved ? {"filter[is_saved]": "true"}: {}),
     include: 'user.avatar,skills',
-    type: AccountType.FREELANCER,
+    "filter[type]": AccountType.FREELANCER,
     page: page.value.toString(),
     per_page: '10'
   }
