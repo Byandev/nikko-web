@@ -9,7 +9,7 @@
     </div>
     <div class="w-full">
       <p class="text-base text-slate-900">{{ channel.title }}</p>
-      <p class="text-xs text-slate-700">{{ moment(channel.last_activity_at).fromNow() }}</p>
+      <p class="text-xs text-slate-700">{{ timestamp }}</p>
     </div>
   </div>
 </template>
@@ -30,6 +30,10 @@ const avatarUrl = computed<string>(() => {
           .find(member => member.id !== (data.value as { data?: User })?.data?.id)?.avatar?.thumb_url
       ??
       'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png'
+})
+
+const timestamp = computed<string>(() => {
+  return moment(props.channel.updated_at).fromNow()
 })
 
 </script>

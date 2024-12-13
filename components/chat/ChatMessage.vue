@@ -13,7 +13,7 @@
           <p>{{ message.content }}</p>
         </div>
 
-        <div class="space-y-1" v-if="message.attachments?.length">
+        <div :class="['space-y-1 flex',  isSentByMe ? 'justify-end': 'justify-start']" v-if="message.attachments?.length">
           <img v-for="attachment in message.attachments" :src="attachment.original_url"
                alt="attachment" class="h-auto rounded-lg bg-white p-1 shadow w-2/5"/>
         </div>

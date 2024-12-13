@@ -6,13 +6,15 @@
       </div>
 
       <div class="space-y-5 p-5 overflow-y-scroll flex-1" ref="messagesContainer">
-        <Message v-for="message in sortedMessages" :key="`message-${message.id}`" :message="message"/>
+        <ChatMessage v-for="message in sortedMessages" :key="`message-${message.id}`" :message="message"/>
       </div>
 
       <ChatInput :channel-id="channel.data.id" @sent="newMessageSent"/>
     </div>
 
-    <div class="col-span-1">ds</div>
+    <div class="col-span-1">
+      <ChannelDetails :channel="channel.data"/>
+    </div>
   </div>
 </template>
 
@@ -20,6 +22,7 @@
 import {chatStore} from "~/store/chatStore";
 import ChannelMenu from "~/components/chat/ChannelMenu.vue";
 import type {Message} from "~/types/models/Message";
+import ChannelDetails from "~/components/chat/ChannelDetails.vue";
 
 const {channel, messages, sortedMessages} = storeToRefs(chatStore())
 const {appendMessage} = chatStore()
@@ -39,5 +42,13 @@ const scrollToBottom = (): void => {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
   }
 };
+
+watch(
+    () => sortedMessages.value.length,
+    async () => {
+      await nextTick();
+      scrollToBottom();
+    }
+);
 
 </script>

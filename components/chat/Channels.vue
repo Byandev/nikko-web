@@ -5,11 +5,11 @@
 
   <div class="divide-y" v-else>
     <ChannelMenu
-        v-for="channel in channels.data.data"
-        :key="`channel-${channel.id}`"
         :channel="channel"
-        @click="() => onChannelClicked(channel)"
+        :key="`channel-${channel.id}`"
+        v-for="channel in channels.data.data"
         :is-active="channel.id.toString() === route.params.channelId"
+        @click="() => onChannelClicked(channel)"
     />
   </div>
 </template>

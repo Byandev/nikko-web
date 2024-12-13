@@ -5,9 +5,12 @@ import {initialPaginatedList, type PaginatedList} from "~/types/models/Paginatio
 import type {ApiErrorResponse} from "~/types/api/response/error";
 import type {ResponseData} from "~/types/api/types";
 import {sortBy} from "lodash";
+import type {User} from "~/types/models/User";
 
 export const chatStore = defineStore('chat', () => {
     const { $api } = useNuxtApp();
+
+    const {data} = useAuth();
 
     const channel = ref<{loading: boolean, data: Channel | null}>({loading: true, data: null})
     const channels = ref<{loading: boolean, data: PaginatedList<Channel>}>({loading: true, data: initialPaginatedList});
@@ -61,5 +64,14 @@ export const chatStore = defineStore('chat', () => {
         }
     }
 
-    return { channels, messages, getChannels, getChannel, getMessages, channel, sortedMessages, appendMessage };
+    return {
+        channel,
+        channels,
+        messages,
+        sortedMessages,
+        getChannel,
+        getChannels,
+        getMessages,
+        appendMessage
+    };
 });
