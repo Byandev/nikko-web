@@ -94,7 +94,7 @@ const viewContract = async (id: number) => {
     await router.push(`/contract/${id}`);
 };
 
-const handModal = async ({ proposal_id, accountName, channel_id }:{proposal_id?: number | null, accountName?: string | null, channel_id?: number | null}) => 
+const handModal = async ({ proposal_id, accountName, channel_id }:{proposal_id?: number | null, accountName?: string | null, channel_id?: number | null}) =>
 {
     if (proposal_id && accountName) {
         receiverName.value = accountName;
@@ -102,7 +102,7 @@ const handModal = async ({ proposal_id, accountName, channel_id }:{proposal_id?:
         current_proposal_id.value = proposal_id;
     }
     else{
-        await router.push(`/messages/${channel_id}`);
+        await router.push(`/chats/${channel_id}`);
     }
     // You can use the accountName as needed in your modal or other logic
 };
@@ -125,7 +125,7 @@ const handleSubmit = async () => {
             })
         });
 
-        await router.push(`/messages/${response.data.id}`);
+        await router.push(`/chats/${response.data.id}`);
     } catch (error) {
         console.error(error);
     }

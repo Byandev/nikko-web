@@ -112,7 +112,7 @@ defineProps({
         </div>
         <div class="relative flex justify-end space-x-3 group">
             <template v-if="isAuthenticated">
-                <NuxtLink to="/messages" @click="closeDropdown" class="rounded-full p-2">
+                <NuxtLink to="/chat" @click="closeDropdown" class="rounded-full p-2">
                     <Icon icon="humbleicons:chat" width="32" height="32" class="text-primary" />
                 </NuxtLink>
                 <div @click="toggleDropdown" class="cursor-pointer flex flex-row gap-2 items-center">
