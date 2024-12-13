@@ -3,6 +3,7 @@ import { HeartIcon } from '@heroicons/vue/24/outline';
 import type { Proposal } from '~/types/models/Proposal';
 import { accountStore } from '~/store/accountStore';
 import type { ApiErrorResponse } from '~/types/api/response/error';
+import type { Channel } from '~/types/models/Channel';
 
 const { account } = storeToRefs(accountStore());
 
@@ -12,6 +13,7 @@ const emit = defineEmits<{
     (e: 'view', id: number): void;
     (e: 'save', id: number): void;
     (e: 'un-save', id: number): void;
+    (e: 'message', payload: { proposal_id?: number | null, sender?: string | null, channel_id?: number | null }): void;
 }>();
 
 
@@ -139,6 +141,12 @@ const toggleSave = async () => {
                 :text="!proposal.contract ? `Hire`: `View Contract`" type="button"
                 :background="!proposal.contract ? `white` : `primary`"
                 :foreground="!proposal.contract ? `primary` : `white`" class="ring-1 ring-primary" />
+
+            <Button @click="!proposal.chat_channel ? emit('message', { proposal_id: proposal.id, sender: accountName, channel_id: null }) : emit('message', { proposal_id: null, sender: null, channel_id: proposal.chat_channel.id })"
+                text="Message" type="button"
+                background="white"
+                foreground="primary" class="ring-1 ring-primary" />
+
         </div>
     </div>
 </template>

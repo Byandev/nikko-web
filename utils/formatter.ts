@@ -1,7 +1,7 @@
-const currencyFormatter = (
+export function currencyFormatter(
   number: number,
   currency_code: string = 'USD'
-): string => {
+): string {
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: currency_code,
@@ -9,5 +9,4 @@ const currencyFormatter = (
     maximumFractionDigits: 0,
   });
   return formatter.format(number);
-};
-export default currencyFormatter;
+}

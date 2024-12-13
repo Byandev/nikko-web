@@ -110,9 +110,12 @@ defineProps({
                 </div>
             </div>
         </div>
-        <div class="relative flex justify-end space-x-4 group">
+        <div class="relative flex justify-end space-x-3 group">
             <template v-if="isAuthenticated">
-                <div @click="toggleDropdown" class="cursor-pointer">
+                <NuxtLink to="/chat" @click="closeDropdown" class="rounded-full p-2">
+                    <Icon icon="humbleicons:chat" width="32" height="32" class="text-primary" />
+                </NuxtLink>
+                <div @click="toggleDropdown" class="cursor-pointer flex flex-row gap-2 items-center">
                     <template v-if="user?.avatar?.original_url">
                         <img :src="user?.avatar?.original_url" alt="User Avatar"
                             class="h-10 w-10 object-cover rounded-full">
