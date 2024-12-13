@@ -34,7 +34,7 @@ onMounted(() => {
 
   <!-- Desktop View -->
   <div class="px-8">
-    <div class="hidden lg:block my-8 max-w-7xl border border-gray-300 rounded-md h-[80vh]">
+    <div class="hidden lg:block my-8 max-w-7xl border border-gray-300 rounded-md h-[80vh] mx-auto">
       <div class="flex flex-col lg:flex-row h-full divide-x">
 
         <!-- Sidebar -->
@@ -50,8 +50,7 @@ onMounted(() => {
         </div>
 
         <!-- Chat Section -->
-        <div class="w-full lg:w-2/3 bg-white flex flex-col items-center justify-center h-full rounded-r-md">
-
+        <div class="w-full lg:w-2/3 bg-white rounded-r-md overflow-hidden">
         </div>
       </div>
     </div>
