@@ -115,6 +115,9 @@ defineProps({
                 <NuxtLink to="/chat" @click="closeDropdown" class="rounded-full p-2">
                     <Icon icon="humbleicons:chat" width="32" height="32" class="text-primary" />
                 </NuxtLink>
+                <NuxtLink to="/notifications" @click="closeDropdown" class="rounded-full p-2">
+                    <Icon icon="mingcute:notification-line" width="32" height="32" class="text-primary" />
+                </NuxtLink>
                 <div @click="toggleDropdown" class="cursor-pointer flex flex-row gap-2 items-center">
                     <template v-if="user?.avatar?.original_url">
                         <img :src="user?.avatar?.original_url" alt="User Avatar"
