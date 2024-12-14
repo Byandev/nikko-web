@@ -26,7 +26,8 @@
       </div>
 
       <!-- Chat Messages Container -->
-      <div class="space-y-5 p-5 overflow-y-auto grow" ref="messagesContainer" style="max-height: calc(100vh - 205px);">
+      <div class="space-y-5 p-5 overflow-y-auto grow" ref="messagesContainer" @scroll="handleScroll"
+        style="max-height: calc(100vh - 205px);">
         <ChatMessage v-for="message in sortedMessages" :key="`message-${message.id}`" :message="message" />
       </div>
 
@@ -46,11 +47,13 @@ import { storeToRefs } from 'pinia';
 import { chatStore } from '~/store/chatStore';
 import type { Message } from '~/types/models/Message';
 
-const { channel, messages, sortedMessages } = storeToRefs(chatStore());
+const { loadMoreMessages } = chatStore();
+
+const { channel, messages, sortedMessages, hasMoreMessages } = storeToRefs(chatStore());
 const { appendMessage } = chatStore();
 
 const messagesContainer = ref<HTMLDivElement | null>(null);
-const isOverlayOpen = ref(false); // State for overlay
+const isOverlayOpen = ref(false);
 
 const toggleOverlay = () => {
   isOverlayOpen.value = !isOverlayOpen.value;
@@ -67,6 +70,14 @@ const newMessageSent = (data: Message) => {
 const scrollToBottom = (): void => {
   if (messagesContainer.value) {
     messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight;
+  }
+};
+
+const handleScroll = async () => {
+  if (messagesContainer.value && hasMoreMessages.value) {
+    if (messagesContainer.value.scrollTop < 50) {
+      await loadMoreMessages(channel.value.data?.id || 0);
+    }
   }
 };
 

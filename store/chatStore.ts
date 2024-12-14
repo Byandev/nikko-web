@@ -10,6 +10,7 @@ export const chatStore = defineStore('chat', () => {
     const channel = ref<{loading: boolean, data: Channel | null}>({loading: true, data: null})
     const channels = ref<{loading: boolean, data: PaginatedList<Channel>}>({loading: true, data: initialPaginatedList});
     const messages = ref<{loading: boolean, data: PaginatedList<Message>}>({loading: true, data: initialPaginatedList});
+    const hasMoreMessages = ref(true);
 
     const sortedMessages = computed(() => _.sortBy(
         messages.value.data.data.filter(
@@ -38,13 +39,32 @@ export const chatStore = defineStore('chat', () => {
         return response
     }
 
-    const getMessages = async (channelId: number) => {
-        // todo: Load more messages on scroll
-        const response = await $api<PaginatedList<Message>>(`/v1/chat/channels/${channelId}/messages?per_page=1000`)
+    const getMessages = async (channelId: number, page: number = 1) => {
+        const response = await $api<PaginatedList<Message>>(`/v1/chat/channels/${channelId}/messages?per_page=10&page=${page}`)
 
-        messages.value = {loading: false, data: response}
+        if (page === 1) {
+            messages.value = {loading: false, data: response}
+        } else {
+            messages.value = {
+                loading: false,
+                data: {
+                    ...messages.value.data,
+                    data: [...response.data, ...messages.value.data.data]
+                }
+            }
+        }
+
+        hasMoreMessages.value = response.meta.current_page < response.meta.last_page;
 
         return response
+    }
+
+    const loadMoreMessages = async (channelId: number) => {
+        if (hasMoreMessages.value && !messages.value.loading) {
+            // messages.value.loading = true;
+            const nextPage = messages.value.data.meta.current_page + 1;
+            await getMessages(channelId, nextPage);
+        }
     }
 
     const appendMessage = (message: Message) => {
@@ -68,6 +88,8 @@ export const chatStore = defineStore('chat', () => {
         getChannel,
         getChannels,
         getMessages,
-        appendMessage
+        appendMessage,
+        hasMoreMessages,
+        loadMoreMessages
     };
 });
