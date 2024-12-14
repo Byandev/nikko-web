@@ -34,7 +34,7 @@ onUnmounted(() => {
 <template>
   <!-- Mobile View -->
   <div class="h-full block lg:hidden ">
-    <div class="w-full lg:w-2/3 bg-white rounded-r-md overflow-hidden">
+    <div class="w-full lg:w-2/3 rounded-r-md overflow-hidden h-full">
       <ChannelChat />
     </div>
   </div>
