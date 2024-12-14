@@ -8,7 +8,7 @@
       <img :src="avatarUrl" alt="User" class="w-12 h-12 rounded-full mr-4 border" />
     </div>
     <div class="w-full">
-      <p class="text-base text-slate-900">{{ channel.title }}</p>
+      <p class="text-sm text-slate-900">{{ channel.title }}</p>
       <p class="text-xs text-slate-700">{{ timestamp }}</p>
     </div>
   </div>
