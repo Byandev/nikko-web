@@ -61,7 +61,6 @@ export const chatStore = defineStore('chat', () => {
 
     const loadMoreMessages = async (channelId: number) => {
         if (hasMoreMessages.value && !messages.value.loading) {
-            // messages.value.loading = true;
             const nextPage = messages.value.data.meta.current_page + 1;
             await getMessages(channelId, nextPage);
         }
