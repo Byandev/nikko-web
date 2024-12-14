@@ -3,7 +3,6 @@ import {Icon} from "@iconify/vue";
 import type {ApiErrorResponse} from "~/types/api/response/error";
 import type {Media} from "~/types/models/Media";
 import type {Message} from "~/types/models/Message";
-import {accountStore} from "~/store/accountStore";
 
 const props = defineProps<{
     channelId: String;
@@ -16,7 +15,6 @@ const emit = defineEmits<{
 const { sendRequest: sendMessage, pending: isSending } = useSubmit<{ data: Message }, ApiErrorResponse>();
 const { sendRequest: sendAttachment } = useSubmit<{ data: Media }, ApiErrorResponse>();
 
-const { account } = storeToRefs(accountStore());
 const attachmentFiles = ref<File[]>([]);
 const newMessage = ref<string>('');
 const attachmentUrls = ref<string[]>([]);
@@ -99,7 +97,7 @@ watch(() => attachmentFiles.value, async (newFiles) => {
     <div class="p-2 bg-gray-100 border-t flex items-center">
         <label class="mr-2 p-2 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 cursor-pointer">
             <Icon icon="mdi:paperclip" class="w-5 h-5" />
-            <input type="file" multiple @change="handleAttachment" class="hidden" />
+            <input type="file" accept="image/*" multiple @change="handleAttachment" class="hidden" />
         </label>
         <input type="text" v-model="newMessage" placeholder="Aa"
             class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-0 " />
