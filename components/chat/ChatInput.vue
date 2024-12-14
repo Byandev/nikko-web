@@ -39,7 +39,8 @@ const closeModal = () => {
 const handleAttachment = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
-      attachmentFiles.value = [...attachmentFiles.value, ...Array.from(target.files)];
+        attachmentFiles.value = [...attachmentFiles.value, ...Array.from(target.files)];
+        target.value = '';
     }
 };
 
@@ -98,6 +99,11 @@ watch(() => attachmentFiles.value, async (newFiles) => {
         attachmentNames.value = newFiles.map(file => file.name);
     }
 }, { immediate: true });
+
+
+defineExpose({
+    attachmentFiles,
+})
 
 </script>
 

@@ -6,11 +6,11 @@
         <div v-if="isOverlayOpen" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
           <div class="bg-white p-5 rounded shadow-lg w-11/12 max-w-md">
             <div class="flex justify-end">
-              <button @click="toggleOverlay">
+              <button @click="toggleOverlay" class="text-xl font-bold">
                 &times;
               </button>
             </div>
-            <ChannelDetails v-if="channel.data" :channel="channel.data" />
+            <ChannelDetails v-if="channel.data" :channel="channel.data" class="mt-4" />
           </div>
         </div>
       </transition>
@@ -26,12 +26,13 @@
       </div>
 
       <!-- Chat Messages Container -->
-      <div class="space-y-5 p-5 overflow-y-auto grow" ref="messagesContainer" @scroll="handleScroll"
-        style="max-height: calc(100vh - 205px);">
+      <div class="space-y-5 p-5 overflow-y-auto grow" ref="messagesContainer"
+        :class="hasAttachments ? 'max-h-[calc(100vh-300px)]' : 'max-h-[calc(100vh-205px)]'"
+        @scroll="handleScroll">
         <ChatMessage v-for="message in sortedMessages" :key="`message-${message.id}`" :message="message" />
       </div>
 
-      <ChatInput :channel-id="channel.data.id" @sent="newMessageSent" />
+      <ChatInput ref="chatInput" :channel-id="channel.data.id" @sent="newMessageSent" />
     </div>
 
     <!-- Desktop View: Channel Details -->
@@ -46,13 +47,20 @@ import { Icon } from '@iconify/vue';
 import { storeToRefs } from 'pinia';
 import { chatStore } from '~/store/chatStore';
 import type { Message } from '~/types/models/Message';
+import ChatInput from '~/components/chat/ChatInput.vue';
 
 const { loadMoreMessages } = chatStore();
-
 const { channel, messages, sortedMessages, hasMoreMessages } = storeToRefs(chatStore());
 const { appendMessage } = chatStore();
 
 const messagesContainer = ref<HTMLDivElement | null>(null);
+const chatInput = ref<InstanceType<typeof ChatInput> | null>(null)
+const hasAttachments = ref(false);
+
+watch(() => chatInput.value?.attachmentFiles, (newFiles) => {
+  hasAttachments.value = !!(newFiles && newFiles.length > 0);
+});
+
 const isOverlayOpen = ref(false);
 
 const toggleOverlay = () => {

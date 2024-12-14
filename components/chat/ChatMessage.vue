@@ -1,5 +1,13 @@
 <template>
   <div class="space-y-1">
+    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white p-4 rounded-lg max-w-3xl max-h-3xl overflow-auto">
+            <img :src="selectedImage ?? ''" class="max-w-full max-h-full" />
+            <button @click="closeModal" class="mt-2 text-red-500 hover:text-red-700">
+                Close
+            </button>
+        </div>
+    </div>
     <div :class="['flex items-center space-x-2', isSentByMe ? 'justify-end': 'justify-start']">
       <div v-if="!isSentByMe">
         <img :src="senderAvatarUrl" alt="avatar" class="min-w-8 h-8 rounded-full border"/>
@@ -15,6 +23,7 @@
 
         <div :class="['space-y-1 flex',  isSentByMe ? 'justify-end': 'justify-start']" v-if="message.attachments?.length">
           <img v-for="attachment in message.attachments" :src="attachment.original_url"
+                @click="handleImageClick(attachment.original_url)"
                alt="attachment" class="h-auto rounded-lg bg-white p-1 shadow w-2/5"/>
         </div>
       </div>
@@ -35,6 +44,19 @@ import type {User} from "~/types/models/User";
 
 const props = defineProps<{ message: Message }>()
 const {data} = useAuth();
+
+const showModal = ref(false);
+const selectedImage = ref<string | null>(null);
+
+const handleImageClick = (imageUrl: string) => {
+    selectedImage.value = imageUrl;
+    showModal.value = true;
+};
+
+const closeModal = () => {
+    showModal.value = false;
+    selectedImage.value = null;
+};
 
 const timestamp = computed<string>(() => {
   return moment(props.message.created_at).fromNow()
