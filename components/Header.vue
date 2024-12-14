@@ -13,6 +13,23 @@ const isAuthenticated = computed(() => status.value === 'authenticated');
 const showDropdown = ref(false);
 const showDropdownMyContract = ref(false);
 const showSidebar = ref(false);
+const showNotifications = ref(false);
+
+const toggleNotifications = () => {
+    showNotifications.value = !showNotifications.value;
+};
+
+const notifications = ref([
+    { title: "Your job has been deleted", message: "WFH Frontend job has been deleted.", date: "5 days ago" },
+    { title: "New Proposal Received", message: "You've received a new proposal for your job.", date: "8 days ago" },
+    { title: "New Proposal Received", message: "You've received a new proposal for your job.", date: "15 days ago" },
+    { title: "New Proposal Received", message: "You've received a new proposal for your job.", date: "25 days ago" }
+]);
+
+const markAllAsRead = () => {
+    notifications.value = [];
+};
+
 
 const { sendRequest: signOut } = useSubmit<AuthenticationResponse, ApiErrorResponse>()
 
@@ -42,7 +59,7 @@ const handleLogout = async () => {
 };
 
 defineProps({
-  class: String
+    class: String
 })
 </script>
 
@@ -115,9 +132,9 @@ defineProps({
                 <NuxtLink to="/chat" @click="closeDropdown" class="rounded-full p-2">
                     <Icon icon="humbleicons:chat" width="32" height="32" class="text-primary" />
                 </NuxtLink>
-                <NuxtLink to="/notifications" @click="closeDropdown" class="rounded-full p-2">
+                <div @click="toggleNotifications" class="rounded-full p-2 hover:cursor-pointer relative">
                     <Icon icon="mingcute:notification-line" width="32" height="32" class="text-primary" />
-                </NuxtLink>
+                </div>
                 <div @click="toggleDropdown" class="cursor-pointer flex flex-row gap-2 items-center">
                     <template v-if="user?.avatar?.original_url">
                         <img :src="user?.avatar?.original_url" alt="User Avatar"
@@ -178,6 +195,36 @@ defineProps({
                     Submit proposals
                 </NuxtLink>
             </div>
+        </div>
+    </div>
+
+    <!-- Notifications Modal -->
+    <div v-if="showNotifications"
+        class="absolute top-14 right-0 md:right-24 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div class="flex justify-between items-center p-4 border-b">
+            <h3 class="text-lg font-bold text-gray-700">Notifications</h3>
+            <button @click="toggleNotifications">
+                <Icon icon="ic:baseline-close" width="20" height="20" class="text-gray-600" />
+            </button>
+        </div>
+        <div class="max-h-96 overflow-y-auto">
+            <!-- Notification Items -->
+            <div class="p-4 border-b" v-for="(notification, index) in notifications" :key="index">
+                <h4 class="text-sm font-bold text-gray-800">{{ notification.title }}</h4>
+                <p class="text-xs text-gray-600 mt-1">{{ notification.message }}</p>
+                <span class="text-xs text-gray-400">{{ notification.date }}</span>
+            </div>
+            <div class="p-4 text-center text-sm text-gray-500" v-if="!notifications.length">
+                No new notifications
+            </div>
+        </div>
+        <div class="p-4 flex justify-between items-center">
+            <button @click="markAllAsRead" class="text-sm text-gray-600 hover:text-black">
+                Mark all as read
+            </button>
+            <NuxtLink to="/notifications" class="text-sm font-semibold text-primary">
+                See All
+            </NuxtLink>
         </div>
     </div>
 </template>
