@@ -99,7 +99,7 @@ watch(() => attachmentFiles.value, async (newFiles) => {
     <div class="p-2 bg-gray-100 border-t flex items-center">
         <label class="mr-2 p-2 bg-gray-200 text-gray-600 rounded-full hover:bg-gray-300 cursor-pointer">
             <Icon icon="mdi:paperclip" class="w-5 h-5" />
-            <input type="file" multiple @change="handleAttachment" class="hidden" />
+            <input type="file" accept="image/*" multiple @change="handleAttachment" class="hidden" />
         </label>
         <input type="text" v-model="newMessage" placeholder="Aa"
             class="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-0 " />
