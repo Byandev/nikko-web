@@ -3,8 +3,6 @@ import {Icon} from "@iconify/vue";
 import type {ApiErrorResponse} from "~/types/api/response/error";
 import type {Media} from "~/types/models/Media";
 import type {Message} from "~/types/models/Message";
-import { ref } from 'vue';
-import MediaPreviewModal from '../modal/MediaPreviewModal.vue';
 
 const props = defineProps<{
     channelId: String;
