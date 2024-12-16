@@ -1,13 +1,6 @@
 <template>
   <div class="space-y-1">
-    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white p-4 rounded-lg max-w-3xl max-h-3xl overflow-auto">
-            <img :src="selectedImage ?? ''" class="max-w-full max-h-full" />
-            <button @click="closeModal" class="mt-2 text-red-500 hover:text-red-700">
-                Close
-            </button>
-        </div>
-    </div>
+    <MediaPreviewModal :show="showModal":image-url="selectedImage" @close="closeModal" />
     <div :class="['flex items-center space-x-2', isSentByMe ? 'justify-end': 'justify-start']">
       <div v-if="!isSentByMe">
         <img :src="senderAvatarUrl" alt="avatar" class="min-w-8 h-8 rounded-full border"/>

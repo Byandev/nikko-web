@@ -3,8 +3,8 @@ import {Icon} from "@iconify/vue";
 import type {ApiErrorResponse} from "~/types/api/response/error";
 import type {Media} from "~/types/models/Media";
 import type {Message} from "~/types/models/Message";
-import {accountStore} from "~/store/accountStore";
 import { ref } from 'vue';
+import MediaPreviewModal from '../modal/MediaPreviewModal.vue';
 
 const props = defineProps<{
     channelId: String;
@@ -17,7 +17,6 @@ const emit = defineEmits<{
 const { sendRequest: sendMessage, pending: isSending } = useSubmit<{ data: Message }, ApiErrorResponse>();
 const { sendRequest: sendAttachment } = useSubmit<{ data: Media }, ApiErrorResponse>();
 
-const { account } = storeToRefs(accountStore());
 const attachmentFiles = ref<File[]>([]);
 const newMessage = ref<string>('');
 const attachmentUrls = ref<string[]>([]);
@@ -127,12 +126,5 @@ defineExpose({
             <Icon :icon="!isSending ? 'mdi:send' : 'line-md:loading-loop'" class="w-5 h-5" />
         </button>
     </div>
-    <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white p-4 rounded-lg max-w-3xl max-h-3xl overflow-auto">
-            <img :src="selectedImage ?? ''" class="max-w-full max-h-full" />
-            <button @click="closeModal" class="mt-2 text-red-500 hover:text-red-700">
-                Close
-            </button>
-        </div>
-    </div>
+    <MediaPreviewModal :show="showModal" :imageUrl="selectedImage" @close="closeModal" />
 </template>
