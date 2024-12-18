@@ -3,7 +3,6 @@ import {Icon} from "@iconify/vue";
 import type {ApiErrorResponse} from "~/types/api/response/error";
 import type {Media} from "~/types/models/Media";
 import type {Message} from "~/types/models/Message";
-import {accountStore} from "~/store/accountStore";
 
 const props = defineProps<{
     channelId: String;
@@ -16,16 +15,29 @@ const emit = defineEmits<{
 const { sendRequest: sendMessage, pending: isSending } = useSubmit<{ data: Message }, ApiErrorResponse>();
 const { sendRequest: sendAttachment } = useSubmit<{ data: Media }, ApiErrorResponse>();
 
-const { account } = storeToRefs(accountStore());
 const attachmentFiles = ref<File[]>([]);
 const newMessage = ref<string>('');
 const attachmentUrls = ref<string[]>([]);
 const attachmentNames = ref<string[]>([]);
 
+const showModal = ref(false);
+const selectedImage = ref<string | null>(null);
+
+const handleImageClick = (imageUrl: string) => {
+    selectedImage.value = imageUrl;
+    showModal.value = true;
+};
+
+const closeModal = () => {
+    showModal.value = false;
+    selectedImage.value = null;
+};
+
 const handleAttachment = (event: Event) => {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files.length > 0) {
-      attachmentFiles.value = [...attachmentFiles.value, ...Array.from(target.files)];
+        attachmentFiles.value = [...attachmentFiles.value, ...Array.from(target.files)];
+        target.value = '';
     }
 };
 
@@ -85,12 +97,17 @@ watch(() => attachmentFiles.value, async (newFiles) => {
     }
 }, { immediate: true });
 
+
+defineExpose({
+    attachmentFiles,
+})
+
 </script>
 
 <template>
     <div v-if="attachmentFiles && attachmentFiles.length" class="mr-2 p-2 bg-gray-200 text-gray-600 rounded-t-lg flex items-center">
         <div v-for="(file, index) in attachmentFiles" :key="index" class="flex items-center mr-2">
-            <img :src="attachmentUrls[index]" :alt="attachmentNames[index]" class="w-20 h-20 object-cover rounded-lg max-w-[75%]" />
+            <img :src="attachmentUrls[index]" :alt="attachmentNames[index]" class="w-20 h-20 object-cover rounded-lg max-w-[75%]" @click="handleImageClick(attachmentUrls[index])" />
             <button @click="removeAttachment(index)" class="ml-2 text-red-500 hover:text-red-700">
                 <Icon icon="mdi:close" class="w-4 h-4" />
             </button>
@@ -107,4 +124,5 @@ watch(() => attachmentFiles.value, async (newFiles) => {
             <Icon :icon="!isSending ? 'mdi:send' : 'line-md:loading-loop'" class="w-5 h-5" />
         </button>
     </div>
+    <MediaPreviewModal :show="showModal" :imageUrl="selectedImage" @close="closeModal" />
 </template>
