@@ -226,6 +226,7 @@
 import { ChevronDownIcon } from "@heroicons/vue/16/solid";
 import { QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/vue/20/solid";
 import { useCartStore } from "~/store/cartStore";
+import { usePaymentMethodStore } from "~/store/paymentMethodStore";
 
 const paymentMethodInput = ref({
   email: "",
