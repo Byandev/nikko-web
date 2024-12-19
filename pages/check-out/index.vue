@@ -130,7 +130,7 @@
             Payment
           </h2>
 
-          <form class="mt-6 space-y-4">
+          <form class="mt-6 space-y-4" @submit.prevent="confirmPayment">
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700"
                 >Email Address</label
@@ -139,7 +139,8 @@
                 type="email"
                 id="email"
                 name="email"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                v-model="paymentMethod.email"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                 required
               />
             </div>
@@ -153,7 +154,8 @@
                 type="text"
                 id="name-on-card"
                 name="name-on-card"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                v-model="paymentMethod.name"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                 required
               />
             </div>
@@ -167,7 +169,8 @@
                 type="text"
                 id="card-number"
                 name="card-number"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                v-model="paymentMethod.card_number"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                 required
               />
             </div>
@@ -182,21 +185,21 @@
                   type="text"
                   id="expiration-date"
                   name="expiration-date"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                  v-model="paymentMethod.expiration_date"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                   required
                 />
               </div>
               <div>
-                <label
-                  for="expiration-date"
-                  class="block text-sm font-medium text-gray-700"
+                <label for="cvc" class="block text-sm font-medium text-gray-700"
                   >CVC</label
                 >
                 <input
                   type="text"
-                  id="expiration-date"
-                  name="expiration-date"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                  id="cvc"
+                  name="cvc"
+                  v-model="paymentMethod.cvc"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                   required
                 />
               </div>
@@ -218,10 +221,13 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon } from "@heroicons/vue/16/solid";
 import { QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/vue/20/solid";
 import { useCartStore } from "~/store/cartStore";
+import { usePaymentMethodStore } from "~/store/paymentMethodStore";
 
+const { paymentMethod } = storeToRefs(usePaymentMethodStore());
 const cartStore = useCartStore();
 const { cart } = storeToRefs(cartStore);
+
+const confirmPayment = () => {};
 </script>
