@@ -100,6 +100,7 @@
   import { StarIcon } from '@heroicons/vue/20/solid'
   import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/vue/24/outline'
   import { useCartStore } from '~/store/cartStore'
+  import _ from 'lodash'
 
   const { appendToCart } = useCartStore()
   const router = useRouter()
@@ -147,10 +148,10 @@
   
   const addToCart = () => {
     appendToCart({
-      id: Math.random().toString(36).substr(2, 9),
+      id: _.uniqueId(),
       name: product.name,
       imageSrc: product.images[0].src,
-      price: product.price,
+      price: parseFloat(product.price.replace('$', '')),
       variant: selectedColor.value.name,
       quantity: quantity.value,
     })

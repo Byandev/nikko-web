@@ -7,7 +7,7 @@
             <h2 id="cart-heading" class="sr-only">Items in your shopping cart</h2>
   
             <ul role="list" class="divide-y divide-gray-200 border-b border-t border-gray-200">
-              <li v-for="(product, productIdx) in cartStore.cart" :key="product.id" class="flex py-6 sm:py-10">
+              <li v-for="(product, productIdx) in cart" :key="product.id" class="flex py-6 sm:py-10">
                 <div class="shrink-0">
                   <img :src="product.imageSrc" :alt="product.imageAlt" class="size-24 rounded-md object-cover sm:size-48" />
                 </div>
@@ -23,7 +23,7 @@
                       <div class="mt-1 flex text-sm">
                         <p v-if="product.variant" class="text-gray-500">{{ product.variant }}</p>
                       </div>
-                      <p class="mt-1 text-sm font-medium text-gray-900">{{ product.price }}</p>
+                      <p class="mt-1 text-sm font-medium text-gray-900">${{ product.price }}</p>
                     </div>
   
                     <div class="mt-4 sm:mt-0 sm:pr-9">
@@ -42,7 +42,7 @@
                       </div>
   
                       <div class="absolute right-0 top-0">
-                        <button type="button" class="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500">
+                        <button type="button" class="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500" @click="cartStore.removeFromCart(product)">
                           <span class="sr-only">Remove</span>
                           <XMarkIcon class="size-5" aria-hidden="true" />
                         </button>
@@ -61,7 +61,7 @@
             <dl class="mt-6 space-y-4">
               <div class="flex items-center justify-between">
                 <dt class="text-sm text-gray-600">Subtotal</dt>
-                <dd class="text-sm font-medium text-gray-900">$99.00</dd>
+                <dd class="text-sm font-medium text-gray-900">${{ cartStore.subtotal }}</dd>
               </div>
               <div class="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt class="flex items-center text-sm text-gray-600">
@@ -75,12 +75,15 @@
             </div>
               <div class="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt class="text-base font-medium text-gray-900">Order total</dt>
-                <dd class="text-base font-medium text-gray-900">$108.99</dd>
+                <dd class="text-base font-medium text-gray-900">${{ cartStore.subtotal + 9.99 }}</dd>
               </div>
             </dl>
   
             <div class="mt-6">
-              <button type="submit" class="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">Checkout</button>
+              <button type="submit" class="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 flex items-center justify-center">
+                <ShoppingCartIcon class="mr-2 h-5 w-5" aria-hidden="true" />
+                Checkout
+              </button>
             </div>
           </section>
         </form>
@@ -94,4 +97,5 @@
   import { useCartStore } from '~/store/cartStore'
   
   const cartStore = useCartStore()
+  const {cart} = storeToRefs(cartStore)
   </script>
