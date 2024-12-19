@@ -77,7 +77,7 @@
             </div>
           </div>
 
-          <form class="mt-6" @submit.prevent="addToCart">
+          <div class="mt-6">
             <!-- Colors -->
             <div>
               <h3 class="text-sm font-medium text-gray-600">Variant</h3>
@@ -89,7 +89,7 @@
                 >
                   <RadioGroupOption
                     as="template"
-                    v-for="color in product.colors"
+                    v-for="color in product.variant"
                     :key="color.name"
                     :value="color"
                     :aria-label="color.name"
@@ -125,7 +125,8 @@
                 class="p-3 block w-20 rounded-md ring-1 ring-gray-300 shadow-sm sm:text-sm"
               />
               <button
-                type="submit"
+                type="button"
+                @click="addToCart"
                 class="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 Add to Cart
@@ -138,7 +139,7 @@
                 <span class="sr-only">Add to favorites</span>
               </button>
             </div>
-          </form>
+          </div>
 
           <section aria-labelledby="details-heading" class="mt-12">
             <div class="mt-6">
@@ -169,7 +170,11 @@ import {
 } from "@headlessui/vue";
 import { StarIcon } from "@heroicons/vue/20/solid";
 import { HeartIcon } from "@heroicons/vue/24/outline";
+import { useCartStore } from "~/store/cartStore";
+import _ from "lodash";
 
+const cartStore = useCartStore();
+const router = useRouter();
 const product = {
   name: "Zip Tote Basket",
   price: 140,
@@ -183,7 +188,7 @@ const product = {
     },
     // More images...
   ],
-  colors: [
+  variant: [
     {
       name: "Washed Black",
       bgColor: "bg-gray-700",
@@ -216,11 +221,18 @@ const product = {
   ],
 };
 
-const selectedColor = ref(product.colors[0]);
+const selectedColor = ref(product.variant[0]);
 const quantity = ref(1);
 
 const addToCart = () => {
-  console.log(`Adding ${quantity.value} of ${product.name} to cart`);
-  // Add your logic to handle adding the product to the cart
+  cartStore.appendToCart({
+    id: Number(_.uniqueId()),
+    name: product.name,
+    price: product.price,
+    imageSrc: product.images[0].src,
+    variant: selectedColor.value.name,
+    quantity: quantity.value,
+  });
+  router.push("/cart");
 };
 </script>
