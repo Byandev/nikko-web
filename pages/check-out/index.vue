@@ -130,7 +130,7 @@
             Payment
           </h2>
 
-          <form class="mt-6 space-y-4">
+          <form class="mt-6 space-y-4" @submit.prevent="confirmPayment">
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700"
                 >Email Address</label
