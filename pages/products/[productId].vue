@@ -233,6 +233,6 @@ const addToCart = () => {
     variant: selectedColor.value.name,
     quantity: quantity.value,
   });
-  router.push("/cart");
+  router.push("/check-out");
 };
 </script>
