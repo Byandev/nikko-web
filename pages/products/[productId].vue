@@ -147,6 +147,7 @@
   
   const addToCart = () => {
     appendToCart({
+      id: Math.random().toString(36).substr(2, 9),
       name: product.name,
       imageSrc: product.images[0].src,
       price: product.price,
