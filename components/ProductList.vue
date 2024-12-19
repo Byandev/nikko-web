@@ -9,13 +9,18 @@
   </div>
 </template>
 
-<script setup>
-import { defineProps } from 'vue'
+<script setup lang="ts">
+interface Product {
+  id: number;
+  name: string;
+  href: string;
+  price: string;
+  availability: string;
+  imageSrc: string;
+  imageAlt: string;
+}
 
-const props = defineProps({
-  products: {
-    type: Array,
-    required: true
-  }
-})
+const props = defineProps<{
+  products: Product[]
+}>()
 </script>

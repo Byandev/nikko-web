@@ -39,10 +39,19 @@
   </div>
 </template>
 
-<script setup>
-import ProductList from '@/components/ProductList.vue'
+<script setup lang="ts">
 
-const products = [
+interface Product {
+  id: number;
+  name: string;
+  href: string;
+  price: string;
+  availability: string;
+  imageSrc: string;
+  imageAlt: string;
+}
+
+const products: Product[] = [
   {
     id: 1,
     name: 'Nomad Pouch',
