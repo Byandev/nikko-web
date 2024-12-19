@@ -24,7 +24,6 @@
               <div class="shrink-0">
                 <img
                   :src="product.imageSrc"
-                  :alt="product.imageAlt"
                   class="size-24 rounded-md object-cover sm:size-48"
                 />
               </div>
@@ -36,10 +35,9 @@
                   <div>
                     <div class="flex justify-between">
                       <h3 class="text-sm">
-                        <a
-                          :href="product.href"
+                        <span
                           class="font-medium text-gray-700 hover:text-gray-800"
-                          >{{ product.name }}</a
+                          >{{ product.name }}</span
                         >
                       </h3>
                     </div>
@@ -58,6 +56,7 @@
                       <select
                         :name="`quantity-${productIdx}`"
                         :aria-label="`Quantity, ${product.name}`"
+                        v-model="product.quantity"
                         class="col-start-1 row-start-1 appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       >
                         <option value="1">1</option>

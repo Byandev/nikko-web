@@ -6,7 +6,7 @@
       <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
         Shopping Cart
       </h1>
-      <form
+      <div
         class="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16"
       >
         <section aria-labelledby="cart-heading" class="lg:col-span-7">
@@ -136,7 +136,8 @@
 
           <div class="mt-6">
             <button
-              type="submit"
+              type="button"
+              @click="checkOut"
               class="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 flex items-center justify-center"
             >
               <ShoppingCartIcon class="mr-2 h-5 w-5" aria-hidden="true" />
@@ -144,7 +145,7 @@
             </button>
           </div>
         </section>
-      </form>
+      </div>
     </div>
   </div>
 </template>
@@ -155,6 +156,10 @@ import { QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/vue/20/solid";
 import { useCartStore } from "~/store/cartStore";
 
 const cartStore = useCartStore();
-const { updateQuantity } = cartStore;
 const { cart } = storeToRefs(cartStore);
+const router = useRouter();
+
+const checkOut = () => {
+  router.push("/check-out");
+};
 </script>
