@@ -20,6 +20,9 @@
                           <a :href="product.href" class="font-medium text-gray-700 hover:text-gray-800">{{ product.name }}</a>
                         </h3>
                       </div>
+                      <div class="mt-1 flex text-sm">
+                        <p v-if="product.variant" class="text-gray-500">{{ product.variant }}</p>
+                      </div>
                       <p class="mt-1 text-sm font-medium text-gray-900">{{ product.price }}</p>
                     </div>
   
@@ -39,7 +42,7 @@
                       </div>
   
                       <div class="absolute right-0 top-0">
-                        <button type="button" class="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500" @click="cartStore.removeFromCart(product)">
+                        <button type="button" class="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500">
                           <span class="sr-only">Remove</span>
                           <XMarkIcon class="size-5" aria-hidden="true" />
                         </button>
@@ -61,25 +64,23 @@
                 <dd class="text-sm font-medium text-gray-900">$99.00</dd>
               </div>
               <div class="flex items-center justify-between border-t border-gray-200 pt-4">
-                <dt class="flex text-sm text-gray-600">
+                <dt class="flex items-center text-sm text-gray-600">
                   <span>Fees</span>
                   <a href="#" class="ml-2 shrink-0 text-gray-400 hover:text-gray-500">
-                    <span class="sr-only">Learn more about how tax is calculated</span>
+                    <span class="sr-only">Learn more about how shipping is calculated</span>
                     <QuestionMarkCircleIcon class="size-5" aria-hidden="true" />
                   </a>
                 </dt>
                 <dd class="text-sm font-medium text-gray-900">$9.99</dd>
-              </div>
+            </div>
               <div class="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt class="text-base font-medium text-gray-900">Order total</dt>
-                <dd class="text-base font-medium text-gray-900">$108.98</dd>
+                <dd class="text-base font-medium text-gray-900">$108.99</dd>
               </div>
             </dl>
   
             <div class="mt-6">
-              <button type="submit" class="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">
-                <ShoppingCartIcon class="size-6 text-white mr-2" aria-hidden="true" />Checkout
-              </button>
+              <button type="submit" class="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">Checkout</button>
             </div>
           </section>
         </form>
@@ -87,7 +88,7 @@
     </div>
   </template>
   
-  <script setup>
+  <script setup lang="ts">
   import { ChevronDownIcon, ShoppingCartIcon } from '@heroicons/vue/16/solid'
   import { QuestionMarkCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid'
   import { useCartStore } from '~/store/cartStore'
