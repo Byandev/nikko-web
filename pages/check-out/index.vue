@@ -139,7 +139,7 @@
                 type="email"
                 id="email"
                 name="email"
-                v-model="paymentMethod.email"
+                v-model="paymentMethodInput.email"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                 required
               />
@@ -154,7 +154,7 @@
                 type="text"
                 id="name-on-card"
                 name="name-on-card"
-                v-model="paymentMethod.name"
+                v-model="paymentMethodInput.name"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                 required
               />
@@ -169,7 +169,7 @@
                 type="text"
                 id="card-number"
                 name="card-number"
-                v-model="paymentMethod.card_number"
+                v-model="paymentMethodInput.card_number"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                 required
               />
@@ -185,7 +185,7 @@
                   type="text"
                   id="expiration-date"
                   name="expiration-date"
-                  v-model="paymentMethod.expiration_date"
+                  v-model="paymentMethodInput.expiration_date"
                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                   required
                 />
@@ -198,7 +198,7 @@
                   type="text"
                   id="cvc"
                   name="cvc"
-                  v-model="paymentMethod.cvc"
+                  v-model="paymentMethodInput.cvc"
                   class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                   required
                 />
@@ -225,9 +225,20 @@ import { QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/vue/20/solid";
 import { useCartStore } from "~/store/cartStore";
 import { usePaymentMethodStore } from "~/store/paymentMethodStore";
 
+const paymentMethodInput = ref({
+  email: "",
+  name: "",
+  card_number: "",
+  expiration_date: "",
+  cvc: "",
+});
+
 const { paymentMethod } = storeToRefs(usePaymentMethodStore());
 const cartStore = useCartStore();
 const { cart } = storeToRefs(cartStore);
 
-const confirmPayment = () => {};
+const confirmPayment = () => {
+  paymentMethod.value = paymentMethodInput.value;
+  console.log("Payment confirmed", paymentMethod.value);
+};
 </script>

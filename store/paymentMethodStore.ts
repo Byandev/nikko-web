@@ -8,16 +8,14 @@ interface PaymentMethod {
   cvc: string
 }
 
-export const usePaymentMethodStore = defineStore('cart', () => {
-  const paymentMethod = ref<PaymentMethod>(
-    {
-      name: '',
-      email: '',
-      card_number: '',
-      expiration_date: '',
-      cvc: '',
-    }
-  )
+export const usePaymentMethodStore = defineStore('paymentMethod', () => {
+  const paymentMethod = ref<PaymentMethod>({
+    name: '',
+    email: '',
+    card_number: '',
+    expiration_date: '',
+    cvc: '',
+  })
 
   return {
     paymentMethod,
