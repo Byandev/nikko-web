@@ -52,7 +52,7 @@
           <div class="mt-3">
             <h2 class="sr-only">Product information</h2>
             <p class="text-3xl tracking-tight text-gray-900">
-              {{ product.price }}
+              ${{ product.price }}
             </p>
           </div>
 
@@ -159,9 +159,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import {
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
   RadioGroup,
   RadioGroupOption,
   Tab,
@@ -171,12 +168,7 @@ import {
   TabPanels,
 } from "@headlessui/vue";
 import { StarIcon } from "@heroicons/vue/20/solid";
-import { HeartIcon, MinusIcon, PlusIcon } from "@heroicons/vue/24/outline";
-import { useCartStore } from "~/store/cartStore";
-import _ from "lodash";
-
-const { appendToCart } = useCartStore();
-const router = useRouter();
+import { HeartIcon } from "@heroicons/vue/24/outline";
 
 const product = {
   name: "Zip Tote Basket",
@@ -228,15 +220,7 @@ const selectedColor = ref(product.colors[0]);
 const quantity = ref(1);
 
 const addToCart = () => {
-  appendToCart({
-    id: Number(_.uniqueId()),
-    name: product.name,
-    imageSrc: product.images[0].src,
-    price: product.price,
-    variant: selectedColor.value.name,
-    quantity: quantity.value,
-  });
-
-  router.push("/cart");
+  console.log(`Adding ${quantity.value} of ${product.name} to cart`);
+  // Add your logic to handle adding the product to the cart
 };
 </script>
