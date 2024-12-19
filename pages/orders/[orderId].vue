@@ -120,6 +120,17 @@
               </dd>
             </div>
           </dl>
+
+          <!-- Payment method -->
+          <div class="mt-6">
+            <h3 class="text-lg font-medium text-gray-900">Payment Method</h3>
+            <div class="mt-2 p-4 border border-gray-200 rounded-md bg-white">
+              <p class="font-medium text-gray-700">Mastercard</p>
+              <p class="mt-1 text-gray-500">
+                {{ _.replace(paymentMethod.card_number, /^(\d{3})/, "***") }}
+              </p>
+            </div>
+          </div>
         </section>
       </div>
     </div>
@@ -130,6 +141,8 @@
 import { ChevronDownIcon, ShoppingCartIcon } from "@heroicons/vue/16/solid";
 import { QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/vue/20/solid";
 import { useCartStore } from "~/store/cartStore";
+import { usePaymentMethodStore } from "~/store/paymentMethodStore";
+import _ from "lodash";
 
 const { cart, subtotal } = storeToRefs(useCartStore());
 const { removeFromCart, appendToCart } = useCartStore();
@@ -139,4 +152,7 @@ const route = useRoute();
 const checkoutOrder = () => {
   router.push("/check-out");
 };
+
+// Add paymentMethod to the component's state
+const { paymentMethod } = storeToRefs(usePaymentMethodStore());
 </script>
