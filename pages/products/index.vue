@@ -1,8 +1,8 @@
 <template>
   <div class="bg-white">
     <div class="mx-auto max-w-7xl overflow-hidden px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-      <div class="flex">
-        <div class="w-1/4 pr-4">
+      <div class="flex flex-col lg:flex-row">
+        <div class="w-full lg:w-1/4 lg:pr-4">
           <h2 class="text-lg font-medium text-gray-900">Filter by</h2>
           <div class="mt-4">
             <label class="block text-sm font-medium text-gray-700">Price Range</label>
@@ -31,7 +31,7 @@
             </div>
           </div>
         </div>
-        <div class="w-3/4">
+        <div class="w-full lg:w-3/4 mt-8 lg:mt-0">
           <ProductList :products="products" />
         </div>
       </div>
