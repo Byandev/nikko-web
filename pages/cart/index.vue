@@ -6,7 +6,7 @@
       <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
         Shopping Cart
       </h1>
-      <div
+      <form
         class="mt-12 lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-12 xl:gap-x-16"
       >
         <section aria-labelledby="cart-heading" class="lg:col-span-7">
@@ -24,7 +24,6 @@
               <div class="shrink-0">
                 <img
                   :src="product.imageSrc"
-                  :alt="product.imageAlt"
                   class="size-24 rounded-md object-cover sm:size-48"
                 />
               </div>
@@ -36,10 +35,9 @@
                   <div>
                     <div class="flex justify-between">
                       <h3 class="text-sm">
-                        <a
-                          :href="product.href"
+                        <span
                           class="font-medium text-gray-700 hover:text-gray-800"
-                          >{{ product.name }}</a
+                          >{{ product.name }}</span
                         >
                       </h3>
                     </div>
@@ -58,6 +56,7 @@
                       <select
                         :name="`quantity-${productIdx}`"
                         :aria-label="`Quantity, ${product.name}`"
+                        v-model="product.quantity"
                         class="col-start-1 row-start-1 appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                       >
                         <option value="1">1</option>
@@ -79,7 +78,7 @@
                       <button
                         type="button"
                         class="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500"
-                        @click="removeFromCart(product)"
+                        @click="cartStore.removeFromCart(product)"
                       >
                         <span class="sr-only">Remove</span>
                         <XMarkIcon class="size-5" aria-hidden="true" />
@@ -104,7 +103,9 @@
           <dl class="mt-6 space-y-4">
             <div class="flex items-center justify-between">
               <dt class="text-sm text-gray-600">Subtotal</dt>
-              <dd class="text-sm font-medium text-gray-900">${{ subtotal }}</dd>
+              <dd class="text-sm font-medium text-gray-900">
+                ${{ cartStore.subtotal }}
+              </dd>
             </div>
             <div
               class="flex items-center justify-between border-t border-gray-200 pt-4"
@@ -128,7 +129,7 @@
             >
               <dt class="text-base font-medium text-gray-900">Order total</dt>
               <dd class="text-base font-medium text-gray-900">
-                ${{ subtotal + 9.99 }}
+                ${{ cartStore.subtotal + 9.99 }}
               </dd>
             </div>
           </dl>
@@ -136,7 +137,6 @@
           <div class="mt-6">
             <button
               type="submit"
-              @click.prevent="checkoutOrder"
               class="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50 flex items-center justify-center"
             >
               <ShoppingCartIcon class="mr-2 h-5 w-5" aria-hidden="true" />
@@ -144,7 +144,7 @@
             </button>
           </div>
         </section>
-      </div>
+      </form>
     </div>
   </div>
 </template>
@@ -154,11 +154,7 @@ import { ChevronDownIcon, ShoppingCartIcon } from "@heroicons/vue/16/solid";
 import { QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/vue/20/solid";
 import { useCartStore } from "~/store/cartStore";
 
-const { cart, subtotal } = storeToRefs(useCartStore());
-const { removeFromCart, appendToCart } = useCartStore();
-const router = useRouter();
-
-const checkoutOrder = () => {
-  router.push("/check-out");
-};
+const cartStore = useCartStore();
+const { updateQuantity } = cartStore;
+const { cart } = storeToRefs(cartStore);
 </script>
