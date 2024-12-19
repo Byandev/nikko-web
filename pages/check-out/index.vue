@@ -236,9 +236,10 @@ const paymentMethodInput = ref({
 const { paymentMethod } = storeToRefs(usePaymentMethodStore());
 const cartStore = useCartStore();
 const { cart } = storeToRefs(cartStore);
+const router = useRouter();
 
 const confirmPayment = () => {
   paymentMethod.value = paymentMethodInput.value;
-  console.log("Payment confirmed", paymentMethod.value);
+  router.push("/orders/100");
 };
 </script>
