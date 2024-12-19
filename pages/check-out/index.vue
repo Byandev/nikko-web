@@ -139,7 +139,8 @@
                 type="email"
                 id="email"
                 name="email"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                v-model="paymentMethodInput.email"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                 required
               />
             </div>
@@ -153,7 +154,8 @@
                 type="text"
                 id="name-on-card"
                 name="name-on-card"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                v-model="paymentMethodInput.name"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                 required
               />
             </div>
@@ -167,7 +169,8 @@
                 type="text"
                 id="card-number"
                 name="card-number"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                v-model="paymentMethodInput.card_number"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                 required
               />
             </div>
@@ -182,7 +185,8 @@
                   type="text"
                   id="expiration-date"
                   name="expiration-date"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                  v-model="paymentMethodInput.expiration_date"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                   required
                 />
               </div>
@@ -194,9 +198,10 @@
                 >
                 <input
                   type="text"
-                  id="expiration-date"
-                  name="expiration-date"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2"
+                  id="cvc"
+                  name="cvc"
+                  v-model="paymentMethodInput.cvc"
+                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-2 px-2"
                   required
                 />
               </div>
@@ -222,6 +227,20 @@ import { ChevronDownIcon } from "@heroicons/vue/16/solid";
 import { QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/vue/20/solid";
 import { useCartStore } from "~/store/cartStore";
 
+const paymentMethodInput = ref({
+  email: "",
+  name: "",
+  card_number: "",
+  expiration_date: "",
+  cvc: "",
+});
+
+const { paymentMethod } = storeToRefs(usePaymentMethodStore());
 const cartStore = useCartStore();
 const { cart } = storeToRefs(cartStore);
+
+const confirmPayment = () => {
+  paymentMethod.value = paymentMethodInput.value;
+  console.log("Payment confirmed", paymentMethod.value);
+};
 </script>
