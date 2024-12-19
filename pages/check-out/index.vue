@@ -52,27 +52,13 @@
                   </div>
 
                   <div class="mt-4 sm:mt-0 sm:pr-9">
-                    <div class="grid w-full max-w-16 grid-cols-1">
-                      <select
-                        :name="`quantity-${productIdx}`"
-                        :aria-label="`Quantity, ${product.name}`"
-                        v-model="product.quantity"
-                        class="col-start-1 row-start-1 appearance-none rounded-md bg-white py-1.5 pl-3 pr-8 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                      >
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                      </select>
-                      <ChevronDownIcon
-                        class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                        aria-hidden="true"
-                      />
-                    </div>
+                    <input
+                      type="number"
+                      id="quantity"
+                      v-model="product.quantity"
+                      min="1"
+                      class="p-3 block w-20 rounded-md ring-1 ring-gray-300 shadow-sm sm:text-sm"
+                    />
 
                     <div class="absolute right-0 top-0">
                       <button
