@@ -26,18 +26,10 @@ export const useCartStore = defineStore('cart', () => {
     return cart.value.reduce((total, item) => total + item.price * item.quantity, 0)
   })
 
-  const updateQuantity = (item: Cart, quantity: number) => {
-    const existingItem = cart.value.find(i => i.id === item.id)
-    if (existingItem) {
-      existingItem.quantity = quantity
-    }
-  }
-
   return {
     cart,
     appendToCart,
     removeFromCart,
-    updateQuantity,
     subtotal
   }
 })
