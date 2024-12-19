@@ -83,7 +83,7 @@
     </div>
   </template>
   
-  <script setup>
+  <script setup lang="ts">
   import { ref } from 'vue'
   import {
     Disclosure,
@@ -99,6 +99,10 @@
   } from '@headlessui/vue'
   import { StarIcon } from '@heroicons/vue/20/solid'
   import { HeartIcon, MinusIcon, PlusIcon } from '@heroicons/vue/24/outline'
+  import { useCartStore } from '~/store/cartStore'
+
+  const { appendToCart } = useCartStore()
+  const router = useRouter()
   
   const product = {
     name: 'Zip Tote Basket',
@@ -142,7 +146,14 @@
   const quantity = ref(1)
   
   const addToCart = () => {
-    console.log(`Adding ${quantity.value} of ${product.name} to cart`)
-    // Add your logic to handle adding the product to the cart
+    appendToCart({
+      name: product.name,
+      imageSrc: product.images[0].src,
+      price: product.price,
+      variant: selectedColor.value.name,
+      quantity: quantity.value,
+    })
+
+    router.push('/cart')
   }
   </script>

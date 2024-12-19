@@ -7,7 +7,7 @@
             <h2 id="cart-heading" class="sr-only">Items in your shopping cart</h2>
   
             <ul role="list" class="divide-y divide-gray-200 border-b border-t border-gray-200">
-              <li v-for="(product, productIdx) in products" :key="product.id" class="flex py-6 sm:py-10">
+              <li v-for="(product, productIdx) in cartStore.cart" :key="product.id" class="flex py-6 sm:py-10">
                 <div class="shrink-0">
                   <img :src="product.imageSrc" :alt="product.imageAlt" class="size-24 rounded-md object-cover sm:size-48" />
                 </div>
@@ -19,10 +19,6 @@
                         <h3 class="text-sm">
                           <a :href="product.href" class="font-medium text-gray-700 hover:text-gray-800">{{ product.name }}</a>
                         </h3>
-                      </div>
-                      <div class="mt-1 flex text-sm">
-                        <p class="text-gray-500">{{ product.color }}</p>
-                        <p v-if="product.size" class="ml-4 border-l border-gray-200 pl-4 text-gray-500">{{ product.size }}</p>
                       </div>
                       <p class="mt-1 text-sm font-medium text-gray-900">{{ product.price }}</p>
                     </div>
@@ -43,19 +39,13 @@
                       </div>
   
                       <div class="absolute right-0 top-0">
-                        <button type="button" class="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500">
+                        <button type="button" class="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500" @click="cartStore.removeFromCart(product)">
                           <span class="sr-only">Remove</span>
                           <XMarkIcon class="size-5" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
                   </div>
-  
-                  <p class="mt-4 flex space-x-2 text-sm text-gray-700">
-                    <CheckIcon v-if="product.inStock" class="size-5 shrink-0 text-green-500" aria-hidden="true" />
-                    <ClockIcon v-else class="size-5 shrink-0 text-gray-300" aria-hidden="true" />
-                    <span>{{ product.inStock ? 'In stock' : `Ships in ${product.leadTime}` }}</span>
-                  </p>
                 </div>
               </li>
             </ul>
@@ -71,33 +61,25 @@
                 <dd class="text-sm font-medium text-gray-900">$99.00</dd>
               </div>
               <div class="flex items-center justify-between border-t border-gray-200 pt-4">
-                <dt class="flex items-center text-sm text-gray-600">
-                  <span>Shipping estimate</span>
-                  <a href="#" class="ml-2 shrink-0 text-gray-400 hover:text-gray-500">
-                    <span class="sr-only">Learn more about how shipping is calculated</span>
-                    <QuestionMarkCircleIcon class="size-5" aria-hidden="true" />
-                  </a>
-                </dt>
-                <dd class="text-sm font-medium text-gray-900">$5.00</dd>
-              </div>
-              <div class="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt class="flex text-sm text-gray-600">
-                  <span>Tax estimate</span>
+                  <span>Fees</span>
                   <a href="#" class="ml-2 shrink-0 text-gray-400 hover:text-gray-500">
                     <span class="sr-only">Learn more about how tax is calculated</span>
                     <QuestionMarkCircleIcon class="size-5" aria-hidden="true" />
                   </a>
                 </dt>
-                <dd class="text-sm font-medium text-gray-900">$8.32</dd>
+                <dd class="text-sm font-medium text-gray-900">$9.99</dd>
               </div>
               <div class="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt class="text-base font-medium text-gray-900">Order total</dt>
-                <dd class="text-base font-medium text-gray-900">$112.32</dd>
+                <dd class="text-base font-medium text-gray-900">$108.98</dd>
               </div>
             </dl>
   
             <div class="mt-6">
-              <button type="submit" class="w-full rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">Checkout</button>
+              <button type="submit" class="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50">
+                <ShoppingCartIcon class="size-6 text-white mr-2" aria-hidden="true" />Checkout
+              </button>
             </div>
           </section>
         </form>
@@ -106,42 +88,9 @@
   </template>
   
   <script setup>
-  import { ChevronDownIcon } from '@heroicons/vue/16/solid'
-  import { CheckIcon, ClockIcon, QuestionMarkCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid'
+  import { ChevronDownIcon, ShoppingCartIcon } from '@heroicons/vue/16/solid'
+  import { QuestionMarkCircleIcon, XMarkIcon } from '@heroicons/vue/20/solid'
+  import { useCartStore } from '~/store/cartStore'
   
-  const products = [
-    {
-      id: 1,
-      name: 'Basic Tee',
-      href: '#',
-      price: '$32.00',
-      color: 'Sienna',
-      inStock: true,
-      size: 'Large',
-      imageSrc: 'https://tailwindui.com/plus/img/ecommerce-images/shopping-cart-page-01-product-01.jpg',
-      imageAlt: "Front of men's Basic Tee in sienna.",
-    },
-    {
-      id: 2,
-      name: 'Basic Tee',
-      href: '#',
-      price: '$32.00',
-      color: 'Black',
-      inStock: false,
-      leadTime: '3–4 weeks',
-      size: 'Large',
-      imageSrc: 'https://tailwindui.com/plus/img/ecommerce-images/shopping-cart-page-01-product-02.jpg',
-      imageAlt: "Front of men's Basic Tee in black.",
-    },
-    {
-      id: 3,
-      name: 'Nomad Tumbler',
-      href: '#',
-      price: '$35.00',
-      color: 'White',
-      inStock: true,
-      imageSrc: 'https://tailwindui.com/plus/img/ecommerce-images/shopping-cart-page-01-product-03.jpg',
-      imageAlt: 'Insulated bottle with white base and black snap lid.',
-    },
-  ]
+  const cartStore = useCartStore()
   </script>
