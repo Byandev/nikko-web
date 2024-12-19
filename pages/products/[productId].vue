@@ -77,7 +77,7 @@
             </div>
           </div>
 
-          <div class="mt-6" @submit.prevent="addToCart">
+          <div class="mt-6">
             <!-- Colors -->
             <div>
               <h3 class="text-sm font-medium text-gray-600">Variant</h3>
@@ -125,7 +125,8 @@
                 class="p-3 block w-20 rounded-md ring-1 ring-gray-300 shadow-sm sm:text-sm"
               />
               <button
-                type="submit"
+                type="button"
+                @click="addToCart"
                 class="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
                 Add to Cart
