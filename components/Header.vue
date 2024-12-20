@@ -93,6 +93,14 @@ defineProps({
                 </div>
             </div>
 
+            <div class="hidden sm:block ml-5" v-if="account?.type === 'FREELANCER'">
+                <NuxtLink to="/products"
+                    @click="closeDropdown" class="text-sm text-black">
+                    Shop
+                </NuxtLink>
+            </div>
+
+
             <div v-if="account?.type === 'CLIENT'" class="hidden sm:block relative ml-5 text-sm">
                 <button @click="toggleDropdownMyContract" class="flex items-center space-x-2 text-black">
                     <span>My Projects</span>
