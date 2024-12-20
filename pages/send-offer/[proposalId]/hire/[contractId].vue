@@ -43,10 +43,6 @@ onMounted(async () => {
     });
 });
 
-const handlePayNow = async () => {
-    await router.push(`/projects/${proposal.value?.data.project.id}/proposals`);
-};
-
 const platformFee = computed(() => {
     const amount = proposal.value?.data.contract?.amount ?? 0;
     const feePercentage = proposal.value?.data.contract?.platform_fee_percentage ?? 0;
@@ -96,22 +92,11 @@ const platformFee = computed(() => {
                                     <p class="text-lg font-medium">${{ proposal?.data.contract.total_amount }}</p>
                                 </div>
                             </div>
-
-                            <div class="py-4 px-4">
-                                <Button @click="handlePayNow" text="Pay Now & Hire" type="button" foreground="white" background="primary"
-                                    :is-wide="true" />
-                            </div>
                         </div>
 
                         <div
-                            class="col-span-1 md:col-span-3 ring-1 ring-gray-300 rounded-md p-4 flex flex-col items-center justify-center space-y-5">
-                            <!-- Icon and Payment Method text -->
-                            <div class="flex items-center flex-col">
-                                <Icon icon="mdi:credit-card-outline" class="text-gray-500 text-4xl" />
-                                <span class="text-gray-700 font-medium">You haven't add payment method yet</span>
-                            </div>
-                            <!-- Add Payment Method button -->
-                            <Button text="Add Payment Method" type="button" foreground="white" background="primary" />
+                            class="col-span-1 md:col-span-3 ring-1 ring-gray-300 rounded-md p-4">
+                            <PaymentMethod />
                         </div>
                     </div>
                 </div>
