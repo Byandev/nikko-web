@@ -191,9 +191,7 @@
                 />
               </div>
               <div>
-                <label
-                  for="expiration-date"
-                  class="block text-sm font-medium text-gray-700"
+                <label for="cvc" class="block text-sm font-medium text-gray-700"
                   >CVC</label
                 >
                 <input
@@ -223,7 +221,6 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDownIcon } from "@heroicons/vue/16/solid";
 import { QuestionMarkCircleIcon, XMarkIcon } from "@heroicons/vue/20/solid";
 import { useCartStore } from "~/store/cartStore";
 import { usePaymentMethodStore } from "~/store/paymentMethodStore";
@@ -239,9 +236,10 @@ const paymentMethodInput = ref({
 const { paymentMethod } = storeToRefs(usePaymentMethodStore());
 const cartStore = useCartStore();
 const { cart } = storeToRefs(cartStore);
+const router = useRouter();
 
 const confirmPayment = () => {
   paymentMethod.value = paymentMethodInput.value;
-  console.log("Payment confirmed", paymentMethod.value);
+  router.push("/orders/100");
 };
 </script>
