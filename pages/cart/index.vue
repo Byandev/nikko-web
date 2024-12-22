@@ -129,6 +129,15 @@
               Checkout
             </button>
           </div>
+          <div class="mt-4">
+            <button
+              type="button"
+              @click="viewOrderHistory"
+              class="w-full rounded-md border border-transparent bg-gray-600 px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-50 flex items-center justify-center"
+            >
+              Order History
+            </button>
+          </div>
         </section>
       </div>
     </div>
@@ -146,5 +155,9 @@ const router = useRouter();
 
 const checkOut = () => {
   router.push("/check-out");
+};
+
+const viewOrderHistory = () => {
+  router.push("/order-history");
 };
 </script>
