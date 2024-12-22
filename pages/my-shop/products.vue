@@ -7,37 +7,41 @@
             <div class="mt-12">
                 <Tab :tabs="tabs">
                     <div class="bg-white shadow sm:rounded-lg">
-                        <div class="px-4 py-5 sm:px-6">
-                            <div class="overflow-x-auto">
-                                <Table :columns="columns" :rows="rows">
-                                    <template #default="{ row }">
-                                        <td
-                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                            {{ row.id }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                            {{ row.totalAmount }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                            {{ row.customer }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                            {{ row.date }}
-                                        </td>
-                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                            <div :class="{
-                                                'inline-block px-2 py-1 rounded': true,
-                                                'bg-yellow-100 text-gray-500': row.status === 'Pending',
-                                                'bg-blue-100 text-gray-500': row.status === 'Shipped',
-                                                'bg-green-100 text-green-500': row.status === 'Completed',
-                                                'bg-red-100 text-red-500': row.status === 'Cancelled'
-                                            }">
-                                                {{ row.status }}
-                                            </div>
-                                        </td>
-                                    </template>
-                                </Table>
+                        <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+                            <div class="flex justify-end w-full">
+                                <button class="bg-primary text-white px-4 py-2 rounded ">
+                                    Create new
+                                </button>
                             </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <Table :columns="columns" :rows="rows">
+                                <template #default="{ row }">
+                                    <td class="whitespace-nowrap py-4 px-3 text-sm font-medium text-gray-900">
+                                        {{ row.sku }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ row.title }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ row.description }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {{ row.inventory }}
+                                    </td>
+                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        <div :class="{
+                                            'inline-block px-2 py-1 rounded': true,
+                                            'bg-yellow-100 text-gray-500': row.status === 'Pending',
+                                            'bg-blue-100 text-gray-500': row.status === 'In Stock',
+                                            'bg-green-100 text-green-500': row.status === 'Active',
+                                            'bg-red-100 text-red-500': row.status === 'Out of Stock'
+                                        }">
+                                            {{ row.status }}
+                                        </div>
+                                    </td>
+                                </template>
+                            </Table>
                         </div>
                     </div>
                 </Tab>
@@ -46,13 +50,12 @@
     </div>
 </template>
 
-
 <script setup lang="ts">
 interface Row {
-    id: number;
-    totalAmount: string;
-    customer: string;
-    date: string;
+    sku: string;
+    title: string;
+    description: string;
+    inventory: number;
     status: string;
 }
 
@@ -64,25 +67,21 @@ interface Column {
 const tabs = [
     { name: "Home", href: "/my-shop/home", current: true },
     { name: "Products", href: "/my-shop/products", current: false },
-    {
-        name: "Orders",
-        href: "/my-shop/orders",
-        current: false,
-    },
+    { name: "Orders", href: "/my-shop/orders", current: false }
 ];
 
 const rows: Row[] = [
-    { id: 1, totalAmount: '$100.00', customer: 'Lindsay Walton', date: '2024-12-22', status: 'Completed' },
-    { id: 2, totalAmount: '$250.00', customer: 'Courtney Henry', date: '2024-12-21', status: 'Pending' },
-    { id: 3, totalAmount: '$300.00', customer: 'Tom Cook', date: '2024-12-20', status: 'Shipped' },
-    { id: 4, totalAmount: '$75.00', customer: 'Whitney Francis', date: '2024-12-19', status: 'Cancelled' }
+    { sku: 'SKU001', title: 'Product 1', description: 'Description for Product 1', inventory: 10, status: 'Active' },
+    { sku: 'SKU002', title: 'Product 2', description: 'Description for Product 2', inventory: 0, status: 'Out of Stock' },
+    { sku: 'SKU003', title: 'Product 3', description: 'Description for Product 3', inventory: 25, status: 'In Stock' },
+    { sku: 'SKU004', title: 'Product 4', description: 'Description for Product 4', inventory: 5, status: 'Pending' }
 ];
 
 const columns: Column[] = [
-    { name: 'ID' },
-    { name: 'Total Amount' },
-    { name: 'Customer' },
-    { name: 'Date' },
+    { name: 'SKU' },
+    { name: 'Title' },
+    { name: 'Description' },
+    { name: 'Inventory' },
     { name: 'Status' }
 ];
 </script>
