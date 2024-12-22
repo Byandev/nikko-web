@@ -1,4 +1,53 @@
 <template>
+    <Modal :modelValue="isModalOpen" @update:modelValue="isModalOpen = $event">
+        <template #title>Create New Product</template>
+        <template #content>
+            <form @submit.prevent="createProduct" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="mb-4">
+                    <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
+                    <input v-model="newProduct.sku" type="text" id="sku"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 ring-1 ring-gray-300"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                    <input v-model="newProduct.title" type="text" id="title"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 ring-1 ring-gray-300"
+                        required>
+                </div>
+                <div class="mb-4 md:col-span-2">
+                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea v-model="newProduct.description" id="description"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 ring-1 ring-gray-300"
+                        required></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="inventory" class="block text-sm font-medium text-gray-700">Inventory</label>
+                    <input v-model="newProduct.inventory" type="number" id="inventory"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 ring-1 ring-gray-300"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                    <select v-model="newProduct.status" id="status"
+                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 ring-1 ring-gray-300"
+                        required>
+                        <option value="Pending">Pending</option>
+                        <option value="In Stock">In Stock</option>
+                        <option value="Active">Active</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                    </select>
+                </div>
+            </form>
+        </template>
+        <template #actions>
+            <div class="flex justify-end space-x-2">
+                <button @click="isModalOpen = false" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
+                <button @click="createProduct" class="bg-primary text-white px-4 py-2 rounded">Create</button>
+            </div>
+        </template>
+    </Modal>
+
     <div class="bg-white">
         <div class="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
             <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
@@ -9,7 +58,7 @@
                     <div class="bg-white shadow sm:rounded-lg">
                         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
                             <div class="flex justify-end w-full">
-                                <button class="bg-primary text-white px-4 py-2 rounded ">
+                                <button class="bg-primary text-white px-4 py-2 rounded" @click="isModalOpen = true">
                                     Create new
                                 </button>
                             </div>
@@ -51,6 +100,9 @@
 </template>
 
 <script setup lang="ts">
+
+const isModalOpen = ref(false);
+
 interface Row {
     sku: string;
     title: string;
@@ -84,4 +136,18 @@ const columns: Column[] = [
     { name: 'Inventory' },
     { name: 'Status' }
 ];
+
+const newProduct = ref({
+    sku: '',
+    title: '',
+    description: '',
+    inventory: 0,
+    status: 'Pending'
+});
+
+const createProduct = () => {
+    rows.push({ ...newProduct.value });
+    isModalOpen.value = false;
+    newProduct.value = { sku: '', title: '', description: '', inventory: 0, status: 'Pending' };
+};
 </script>
