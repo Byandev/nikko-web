@@ -21,9 +21,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import OrderItem from "@/components/OrderItem.vue";
-
 const orderHistory = ref([
   {
     id: "123456",
