@@ -2,18 +2,21 @@
     <Modal :modelValue="isModalOpen" @update:modelValue="isModalOpen = $event">
         <template #title>Create New Product</template>
         <template #content>
-            <form @submit.prevent="createProduct" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="mb-4">
-                    <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
-                    <input v-model="newProduct.sku" type="text" id="sku"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 ring-1 ring-gray-300"
-                        required>
-                </div>
-                <div class="mb-4">
-                    <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
-                    <input v-model="newProduct.title" type="text" id="title"
-                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 ring-1 ring-gray-300"
-                        required>
+            <form @submit.prevent="createProduct" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-10">
+                <div class="md:col-span-2">
+                    <div class="mb-4">
+                        <label for="sku" class="block text-sm font-medium text-gray-700">SKU</label>
+                        <input v-model="newProduct.sku" type="text" id="sku"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 ring-1 ring-gray-300"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                        <input v-model="newProduct.title" type="text" id="title"
+                            class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2 ring-1 ring-gray-300"
+                            required>
+                    </div>
+
                 </div>
                 <div class="mb-4 md:col-span-2">
                     <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
@@ -42,8 +45,10 @@
         </template>
         <template #actions>
             <div class="flex justify-end space-x-2">
-                <button @click="isModalOpen = false" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
-                <button @click="createProduct" class="bg-primary text-white px-4 py-2 rounded">Create</button>
+                <Button type="button" text="Cancel" background="white" foreground="primary" :is-wide="false"
+                    @click="isModalOpen = false" />
+                <Button type="button" text="Create" background="primary" foreground="white" :is-wide="false"
+                    @click="isModalOpen = false" />
             </div>
         </template>
     </Modal>
@@ -58,9 +63,8 @@
                     <div class="bg-white shadow sm:rounded-lg">
                         <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
                             <div class="flex justify-end w-full">
-                                <button class="bg-primary text-white px-4 py-2 rounded" @click="isModalOpen = true">
-                                    Create new
-                                </button>
+                                <Button text="Create new" type="button" background="primary" foreground="white"
+                                    @click="isModalOpen = true" />
                             </div>
                         </div>
                         <div class="overflow-x-auto">
