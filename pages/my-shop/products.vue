@@ -8,34 +8,36 @@
                 <Tab :tabs="tabs">
                     <div class="bg-white shadow sm:rounded-lg">
                         <div class="px-4 py-5 sm:px-6">
-                            <Table :columns="columns" :rows="rows">
-                                <template #default="{ row }">
-                                    <td
-                                        class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                                        {{ row.id }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        {{ row.totalAmount }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        {{ row.customer }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        {{ row.date }}
-                                    </td>
-                                    <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        <div :class="{
-                                            'inline-block px-2 py-1 rounded': true,
-                                            'bg-yellow-100 text-gray-500': row.status === 'Pending',
-                                            'bg-blue-100 text-gray-500': row.status === 'Shipped',
-                                            'bg-green-100 text-green-500': row.status === 'Completed',
-                                            'bg-red-100 text-red-500': row.status === 'Cancelled'
-                                        }">
-                                            {{ row.status }}
-                                        </div>
-                                    </td>
-                                </template>
-                            </Table>
+                            <div class="overflow-x-auto">
+                                <Table :columns="columns" :rows="rows">
+                                    <template #default="{ row }">
+                                        <td
+                                            class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                            {{ row.id }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                            {{ row.totalAmount }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                            {{ row.customer }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                            {{ row.date }}
+                                        </td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                            <div :class="{
+                                                'inline-block px-2 py-1 rounded': true,
+                                                'bg-yellow-100 text-gray-500': row.status === 'Pending',
+                                                'bg-blue-100 text-gray-500': row.status === 'Shipped',
+                                                'bg-green-100 text-green-500': row.status === 'Completed',
+                                                'bg-red-100 text-red-500': row.status === 'Cancelled'
+                                            }">
+                                                {{ row.status }}
+                                            </div>
+                                        </td>
+                                    </template>
+                                </Table>
+                            </div>
                         </div>
                     </div>
                 </Tab>
