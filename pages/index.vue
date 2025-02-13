@@ -162,11 +162,13 @@ definePageMeta({
               </p>
               <div class="mt-10 flex items-center justify-center gap-x-6">
                 <RouterLink
-                  to="#"
-                  class="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+                  to="/login"
+                  class="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
                   >Get started</RouterLink
                 >
-                <RouterLink to="#" class="text-sm/6 font-semibold text-gray-900"
+                <RouterLink
+                  to="/login"
+                  class="text-sm/6 font-semibold text-gray-900"
                   >Learn more <span aria-hidden="true">→</span></RouterLink
                 >
               </div>
@@ -210,12 +212,11 @@ definePageMeta({
           <p
             class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl"
           >
-            Manage Your Projects Efficiently
+            Sign Up and Start Managing Your Projects
           </p>
           <p class="mt-4 text-lg leading-6 tracking-tight text-white">
-            Switch between Freelancer and Client dashboards to manage your
-            projects, track earnings, and communicate with clients or
-            freelancers.
+            Sign up as a client or freelancer to manage your projects, track
+            earnings, and communicate with clients or freelancers.
           </p>
         </div>
         <div class="flex flex-col md:flex-row mt-8">
@@ -248,7 +249,7 @@ definePageMeta({
       </div>
 
       <!-- Logo cloud -->
-      <div class="mx-auto max-w-7xl px-6 lg:px-8 mt-56">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8 mt-32 sm:mt-56">
         <div
           class="mx-auto grid max-w-lg grid-cols-1 items-center gap-x-8 gap-y-12 sm:max-w-xl sm:grid-cols-2 sm:gap-x-10 sm:gap-y-14 lg:mx-0 lg:max-w-none lg:grid-cols-2"
         >
@@ -265,9 +266,9 @@ definePageMeta({
           </div>
           <div class="col-span-1">
             <p class="text-lg font-medium text-gray-600">
-              ArtsyCrowd connects you with talented artists and crafters from
-              around the world. Whether you're looking for painters, sculptors,
-              or artisans, ArtsyCrowd has the talent you need.
+              ArtsyCrowd links you with skilled artists and crafters globally.
+              Whether you need painters, sculptors, or artisans, ArtsyCrowd has
+              the expertise you're looking for.
             </p>
           </div>
         </div>
@@ -495,7 +496,7 @@ definePageMeta({
           <div class="mt-10 flex items-center justify-center gap-x-6">
             <RouterLink
               to="/login"
-              class="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              class="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >Get started</RouterLink
             >
             <RouterLink
