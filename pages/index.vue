@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import {
   ArrowPathIcon,
   Bars3Icon,
@@ -86,7 +85,11 @@ const faqs = [
   },
 ];
 
-const selectedTab = ref(0);
+const selectedTab = ref<number | null>(null);
+
+onMounted(() => {
+  selectedTab.value = 0;
+});
 
 const tabs = ref([
   {
@@ -240,8 +243,8 @@ definePageMeta({
           <div class="w-full md:w-2/3 flex items-center justify-center">
             <img
               loading="lazy"
-              :src="tabs[selectedTab].image"
-              :alt="tabs[selectedTab].image"
+              :src="tabs[selectedTab ?? 1]?.image"
+              :alt="tabs[selectedTab ?? 1].image"
               class="rounded-lg shadow-lg w-full md:max-w-full h-auto"
             />
           </div>
