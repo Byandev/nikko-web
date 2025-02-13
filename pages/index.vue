@@ -108,9 +108,7 @@ const tabs = ref([
 
 definePageMeta({
   auth: {
-    unauthenticatedOnly: true,
-    navigateAuthenticatedTo: '/find-work',
-    navigateUnauthenticatedTo: '/register',
+    unauthenticatedOnly: false,
   },
 });
 </script>
