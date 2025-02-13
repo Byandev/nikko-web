@@ -1,24 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Dialog, DialogPanel } from '@headlessui/vue';
 import {
   ArrowPathIcon,
   Bars3Icon,
   CloudArrowUpIcon,
-  FingerPrintIcon,
   LockClosedIcon,
   MagnifyingGlassIcon,
   UserPlusIcon,
-  XMarkIcon,
 } from '@heroicons/vue/24/outline';
-import { CheckIcon } from '@heroicons/vue/20/solid';
 
-const navigation = [
-  { name: 'Product', href: '#' },
-  { name: 'Features', href: '#' },
-  { name: 'Marketplace', href: '#' },
-  { name: 'Company', href: '#' },
-];
 const features = [
   {
     name: 'Showcase Your Portfolio',
@@ -60,39 +50,41 @@ const features = [
 const faqs = [
   {
     id: 1,
-    question: "What's the best thing about Switzerland?",
+    question: 'How do I create a portfolio on Artsycrowd?',
     answer:
-      "I don't know, but the flag is a big plus. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas cupiditate laboriosam fugiat.",
+      "To create a portfolio, sign up for an account, navigate to the 'Portfolio' section, and follow the prompts to add your projects, skills, and experiences.",
   },
-  // More questions...
+  {
+    id: 2,
+    question: 'Is there a fee for using Artsycrowd?',
+    answer:
+      'Artsycrowd offers both free and premium plans. The free plan allows you to create a basic portfolio, while the premium plan offers additional features such as advanced analytics and priority support.',
+  },
+  {
+    id: 3,
+    question: 'How can I ensure secure transactions on Artsycrowd?',
+    answer:
+      'Artsycrowd uses an integrated payment system that ensures secure transactions between freelancers and clients. All payments are processed through trusted payment gateways.',
+  },
+  {
+    id: 4,
+    question: 'Can I invite freelancers to apply for my job postings?',
+    answer:
+      "Yes, you can invite freelancers to apply for your job postings by using the 'Invite Freelancers' feature. This ensures you get the best candidates for your projects.",
+  },
+  {
+    id: 5,
+    question: 'How does the job matching algorithm work?',
+    answer:
+      'Our platform uses advanced algorithms to match freelancers with the most suitable job opportunities based on their skills and experience. This helps both freelancers and clients find the best matches.',
+  },
+  {
+    id: 6,
+    question: 'What types of projects can I find on Artsycrowd?',
+    answer:
+      "Artsycrowd features a wide range of projects, including painting, sculpting, crafting, and more. Whether you're an artist or a client, you'll find projects that suit your needs.",
+  },
 ];
-const footerNavigation = {
-  solutions: [
-    { name: 'Hosting', href: '#' },
-    { name: 'Data services', href: '#' },
-    { name: 'Uptime monitoring', href: '#' },
-    { name: 'Enterprise services', href: '#' },
-    { name: 'Analytics', href: '#' },
-  ],
-  support: [
-    { name: 'Submit ticket', href: '#' },
-    { name: 'Documentation', href: '#' },
-    { name: 'Guides', href: '#' },
-  ],
-  company: [
-    { name: 'About', href: '#' },
-    { name: 'Blog', href: '#' },
-    { name: 'Jobs', href: '#' },
-    { name: 'Press', href: '#' },
-  ],
-  legal: [
-    { name: 'Terms of service', href: '#' },
-    { name: 'Privacy policy', href: '#' },
-    { name: 'License', href: '#' },
-  ],
-};
-
-const mobileMenuOpen = ref(false);
 
 const selectedTab = ref(0);
 
@@ -101,13 +93,13 @@ const tabs = ref([
     title: 'Freelancer Dashboard',
     description:
       'Manage your projects, track your earnings, and communicate with clients all in one place. The Freelancer Dashboard provides all the tools you need to succeed.',
-    image: '/assets/images/freelancer-dashboard.png',
+    image: new URL('@/assets/images/freelancer-page.png', import.meta.url).href,
   },
   {
     title: 'Client Dashboard',
     description:
       'Post new projects, review freelancer bids, and manage your ongoing projects with ease. The Client Dashboard helps you keep everything organized.',
-    image: '/assets/images/client-dashboard.png',
+    image: new URL('@/assets/images/client-page.png', import.meta.url).href,
   },
 ]);
 
@@ -169,13 +161,13 @@ definePageMeta({
                 Artsycrowd has the talent you need.
               </p>
               <div class="mt-10 flex items-center justify-center gap-x-6">
-                <a
-                  href="#"
+                <RouterLink
+                  to="#"
                   class="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
-                  >Get started</a
+                  >Get started</RouterLink
                 >
-                <a href="#" class="text-sm/6 font-semibold text-gray-900"
-                  >Learn more <span aria-hidden="true">→</span></a
+                <RouterLink to="#" class="text-sm/6 font-semibold text-gray-900"
+                  >Learn more <span aria-hidden="true">→</span></RouterLink
                 >
               </div>
             </div>
@@ -212,42 +204,72 @@ definePageMeta({
       </div>
 
       <div
-        class="flex flex-col md:flex-row bg-gradient-to-br from-green-700 to-green-600 p-10 text-white"
+        class="flex flex-col bg-gradient-to-br from-green-700 to-green-600 px-6 md:px-10 py-6 md:py-40 text-white mt-10"
       >
-        <!-- Left Side Tabs -->
-        <div class="w-full md:w-1/3 space-y-6 mb-6 md:mb-0">
-          <div
-            v-for="(tab, index) in tabs"
-            :key="index"
-            class="p-6 rounded-lg cursor-pointer"
-            :class="{ 'bg-white/10': selectedTab === index }"
-            @click="selectedTab = index"
+        <div class="text-center mb-10">
+          <p
+            class="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl"
           >
-            <h2 class="text-lg font-semibold">{{ tab.title }}</h2>
-            <p class="text-sm">{{ tab.description }}</p>
-          </div>
+            Manage Your Projects Efficiently
+          </p>
+          <p class="mt-4 text-lg leading-6 tracking-tight text-white">
+            Switch between Freelancer and Client dashboards to manage your
+            projects, track earnings, and communicate with clients or
+            freelancers.
+          </p>
         </div>
+        <div class="flex flex-col md:flex-row mt-8">
+          <!-- Left Side Tabs -->
+          <div class="w-full md:w-1/3 space-y-4 md:space-y-6 mb-4 md:mb-0">
+            <div
+              v-for="(tab, index) in tabs"
+              :key="index"
+              class="p-4 md:p-6 rounded-lg cursor-pointer"
+              :class="{ 'bg-white/10': selectedTab === index }"
+              @click="selectedTab = index"
+            >
+              <h2 class="text-base md:text-lg font-semibold">
+                {{ tab.title }}
+              </h2>
+              <p class="text-xs md:text-sm">{{ tab.description }}</p>
+            </div>
+          </div>
 
-        <!-- Right Side Image Display -->
-        <div class="w-full md:w-2/3 flex items-center justify-center">
-          <img
-            :src="tabs[selectedTab].image"
-            alt="Selected Tab Image"
-            class="rounded-lg shadow-lg max-w-full h-auto"
-          />
+          <!-- Right Side Image Display -->
+          <div class="w-full md:w-2/3 flex items-center justify-center">
+            <img
+              loading="lazy"
+              :src="tabs[selectedTab].image"
+              :alt="tabs[selectedTab].image"
+              class="rounded-lg shadow-lg w-full md:max-w-full h-auto"
+            />
+          </div>
         </div>
       </div>
 
       <!-- Logo cloud -->
-      <div class="mx-auto max-w-7xl px-6 lg:px-8 mt-10">
+      <div class="mx-auto max-w-7xl px-6 lg:px-8 mt-56">
         <div
-          class="mx-auto grid max-w-lg grid-cols-1 items-center gap-x-8 gap-y-12 sm:max-w-xl sm:grid-cols-1 sm:gap-x-10 sm:gap-y-14 lg:mx-0 lg:max-w-none lg:grid-cols-1"
+          class="mx-auto grid max-w-lg grid-cols-1 items-center gap-x-8 gap-y-12 sm:max-w-xl sm:grid-cols-2 sm:gap-x-10 sm:gap-y-14 lg:mx-0 lg:max-w-none lg:grid-cols-2"
         >
-          <img
-            class="col-span-1 max-h-12 w-full object-contain"
-            src="/assets/icons/artsycrowd.png"
-            alt="ArtsyCrowd"
-          />
+          <div
+            class="flex flex-row w-full items-center justify-start sm:justify-end"
+          >
+            <img
+              loading="lazy"
+              class="col-span-1 max-h-12 object-contain"
+              src="/assets/icons/artsycrowd.png"
+              alt="ArtsyCrowd"
+            />
+            ArtsyCrowd
+          </div>
+          <div class="col-span-1">
+            <p class="text-lg font-medium text-gray-600">
+              ArtsyCrowd connects you with talented artists and crafters from
+              around the world. Whether you're looking for painters, sculptors,
+              or artisans, ArtsyCrowd has the talent you need.
+            </p>
+          </div>
         </div>
         <div class="mt-16 flex justify-center">
           <p
@@ -257,9 +279,9 @@ definePageMeta({
               >ArtsyCrowd connects you with talented artists and crafters from
               around the world.</span
             >
-            <a href="#" class="font-semibold text-primary"
+            <RouterLink to="/login" class="font-semibold text-primary"
               ><span class="absolute inset-0" aria-hidden="true" /> Learn more
-              about us <span aria-hidden="true">&rarr;</span></a
+              about us <span aria-hidden="true">&rarr;</span></RouterLink
             >
           </p>
         </div>
@@ -316,17 +338,18 @@ definePageMeta({
           class="relative overflow-hidden bg-gray-900 px-6 py-20 shadow-xl sm:rounded-3xl sm:px-10 sm:py-24 md:px-12 lg:px-20"
         >
           <img
+            loading="lazy"
             class="absolute inset-0 size-full object-cover brightness-150 saturate-0"
-            src="https://images.unsplash.com/photo-1601381718415-a05fb0a261f3?ixid=MXwxMjA3fDB8MHxwcm9maWxlLXBhZ2V8ODl8fHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1216&q=80"
-            alt=""
+            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+            alt="Testimonial Background"
           />
-          <div class="absolute inset-0 bg-gray-900/90 mix-blend-multiply" />
+          <div class="absolute inset-0 bg-green-900/90 mix-blend-multiply" />
           <div
             class="absolute -left-80 -top-56 transform-gpu blur-3xl"
             aria-hidden="true"
           >
             <div
-              class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-r from-[#ff4694] to-[#776fff] opacity-[0.45]"
+              class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-r from-[#34d399] to-[#10b981] opacity-[0.45]"
               style="
                 clip-path: polygon(
                   74.1% 44.1%,
@@ -354,7 +377,7 @@ definePageMeta({
             aria-hidden="true"
           >
             <div
-              class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-r from-[#ff4694] to-[#776fff] opacity-25"
+              class="aspect-[1097/845] w-[68.5625rem] bg-gradient-to-r from-[#34d399] to-[#10b981] opacity-25"
               style="
                 clip-path: polygon(
                   74.1% 44.1%,
@@ -379,24 +402,24 @@ definePageMeta({
           </div>
           <div class="relative mx-auto max-w-2xl lg:mx-0">
             <img
+              loading="lazy"
               class="h-12 w-auto"
-              src="https://tailwindui.com/plus-assets/img/logos/workcation-logo-white.svg"
-              alt=""
+              src="/assets/icons/artsycrowd-white.png"
+              alt="ArtsyCrowd Logo"
             />
             <figure>
               <blockquote
                 class="mt-6 text-lg font-semibold text-white sm:text-xl/8"
               >
                 <p>
-                  “Amet amet eget scelerisque tellus sit neque faucibus non
-                  eleifend. Integer eu praesent at a. Ornare arcu gravida
-                  natoque erat et cursus tortor consequat at. Vulputate gravida
-                  sociis enim nullam ultricies habitant malesuada lorem ac.”
+                  “ArtsyCrowd has transformed the way we connect with talented
+                  artists and crafters. The platform is user-friendly and has
+                  helped us find the perfect match for our projects every time.”
                 </p>
               </blockquote>
               <figcaption class="mt-6 text-base text-white">
-                <div class="font-semibold">Judith Black</div>
-                <div class="mt-1">CEO of Tuple</div>
+                <div class="font-semibold">Nikko</div>
+                <div class="mt-1">Founder of ArtsyCrowrd</div>
               </figcaption>
             </figure>
           </div>
@@ -462,20 +485,23 @@ definePageMeta({
           <h2
             class="text-balance text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
           >
-            Boost your creativity. Start using Artsycrowd today.
+            Discover and Hire Top Artists and Crafters
           </h2>
           <p class="mx-auto mt-6 max-w-xl text-pretty text-lg/8 text-gray-600">
-            Incididunt sint fugiat pariatur cupidatat consectetur sit cillum
-            anim id veniam aliqua proident excepteur commodo do ea.
+            Connect with talented artists and crafters from around the world.
+            Whether you're looking for painters, sculptors, or artisans,
+            Artsycrowd has the talent you need.
           </p>
           <div class="mt-10 flex items-center justify-center gap-x-6">
-            <a
-              href="#"
-              class="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >Get started</a
+            <RouterLink
+              to="/login"
+              class="rounded-md bg-primary px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              >Get started</RouterLink
             >
-            <a href="#" class="text-sm/6 font-semibold text-gray-900"
-              >Learn more <span aria-hidden="true">→</span></a
+            <RouterLink
+              to="/login"
+              class="text-sm/6 font-semibold text-gray-900"
+              >Learn more <span aria-hidden="true">→</span></RouterLink
             >
           </div>
         </div>
