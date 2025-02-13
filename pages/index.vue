@@ -206,7 +206,7 @@ definePageMeta({
       </div>
 
       <div
-        class="flex flex-col bg-gradient-to-br from-green-700 to-green-600 px-6 md:px-10 py-6 md:py-40 text-white mt-10"
+        class="flex flex-col bg-gradient-to-br from-green-700 to-green-600 px-6 md:px-10 py-20 md:py-40 text-white mt-10"
       >
         <div class="text-center mb-10">
           <p
@@ -429,7 +429,7 @@ definePageMeta({
 
       <!-- FAQs -->
       <div
-        class="mx-auto max-w-2xl px-6 pb-8 sm:pb-24 sm:pt-12 lg:max-w-7xl lg:px-8 lg:pb-32"
+        class="mx-auto max-w-2xl px-6 pb-8 sm:pb-24 sm:pt-12 lg:max-w-7xl lg:px-8 lg:pb-32 mt-24 sm:mt-32"
       >
         <h2
           class="text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
